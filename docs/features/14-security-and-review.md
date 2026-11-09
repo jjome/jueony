@@ -156,10 +156,10 @@
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 현재 Rust/WASM의 원시 TRACKCHANGE 보존은 조회·표시·기록·승인·거절 API가 아니므로 구현으로 승격하지 않았다. document-internal v1 계약과 revision/token CAS·사후 상태 검증 seam만 추가했으며 실제 기능은 여전히 미구현이다.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-track-changes-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-changes-b133.ts>) · [document-track-changes-b133.test.ts](<../../apps/editor/tests/document-track-changes-b133.test.ts>)
-- 원래 기록: `MISSING;CAPABILITY_AUDITED_FAIL_CLOSED_2026_11_09`
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 원시 TRACKCHANGE 보존과 불투명 레코드 진단은 의미 기반 변경 추적 기능의 구현으로 보지 않는다.
+- 다음 작업: document-internal v1 계약과 revision/token CAS·사후 상태 검증 seam에 더해 HWP5 DocInfo +80/+81 레코드의 종류·크기만 최대 64개 읽는 진단 API를 추가하고 HWP 저장·재열기 및 HWPX 미지원 fail-close를 검증했다. payload 의미 모델·범위 파서·작성자 연결·표시·기록·승인·거절은 여전히 미구현이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-track-changes-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-changes-b133.ts>) · [document-track-changes-b133.test.ts](<../../apps/editor/tests/document-track-changes-b133.test.ts>) · [document-track-change-inventory-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-change-inventory-b133.ts>) · [document-track-change-inventory-b133.test.ts](<../../apps/editor/tests/document-track-change-inventory-b133.test.ts>)
+- 원래 기록: `MISSING;OPAQUE_HWP_DOCINFO_INVENTORY_PASS_2026_11_09;SEMANTIC_TRACK_CHANGES_UNAVAILABLE`
 
 </details>
 

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 19 · 미구현 10 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 4 · 미검증 26 |
+| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 20 · 미구현 9 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 5 · 미검증 25 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -63,7 +63,7 @@
 | [B050](<12-ui-and-shortcuts.md#b050>) · 범위 | 격자 표시 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B051](<12-ui-and-shortcuts.md#b051>) · 범위 | 격자 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B052](<12-ui-and-shortcuts.md#b052>) · 범위 | 개체 이동 안내선 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B053](<12-ui-and-shortcuts.md#b053>) · 범위 | 문서 보기 색 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B053](<12-ui-and-shortcuts.md#b053>) · 범위 | 문서 보기 색 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B055](<12-ui-and-shortcuts.md#b055>) · 범위 | 서식 도구 상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B056](<12-ui-and-shortcuts.md#b056>) · 범위 | 도구 상자 사용자 설정 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B057](<12-ui-and-shortcuts.md#b057>) · 범위 | 스타일 작업 창 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
@@ -314,12 +314,12 @@
 <summary>B053 · 문서 보기 색</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 앱 테마와 다른 문서 보기 기능
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 작업 영역·용지 색상은 문서 모델과 분리한 사용자 설정으로만 다루며 HWP/HWPX 저장 바이트를 변경하지 않는다.
+- 다음 작업: 색상 검증·사용자별 저장·미리보기·취소·저장 실패 롤백과 실제 WASM HWP/HWPX export 바이트 불변을 검증했다. 실제 설정 대화상자와 시작 시 초기화 배선 및 한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-view-colors-b053.ts](<../../apps/editor/src/adapters/browser/document-view-colors-b053.ts>) · [document-view-colors-b053.test.ts](<../../apps/editor/tests/document-view-colors-b053.test.ts>)
+- 원래 기록: `PARTIAL;UI_ONLY_VIEW_COLOR_CONTRACT_PASS_2026_11_09;RUNTIME_WIRING_PENDING`
 
 </details>
 

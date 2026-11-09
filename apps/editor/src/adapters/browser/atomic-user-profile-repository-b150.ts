@@ -9,7 +9,7 @@ import {
   type UserProfileB150,
   type UserProfilePolicyB150,
   type UserProfileScopeB150,
-} from '../../modules/preferences/application/user-profile-b150.ts';
+} from '../../modules/preferences/public/index.ts';
 
 export interface AtomicProfileRecordStoreB150 {
   read(key: string): Promise<string | null>;

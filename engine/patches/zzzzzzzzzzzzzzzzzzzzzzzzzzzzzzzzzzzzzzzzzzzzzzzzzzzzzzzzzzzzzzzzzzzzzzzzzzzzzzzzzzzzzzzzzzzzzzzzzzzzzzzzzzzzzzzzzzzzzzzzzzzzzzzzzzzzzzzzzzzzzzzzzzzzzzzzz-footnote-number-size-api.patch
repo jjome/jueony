@@ -1,0 +1,100 @@
+diff --git a/src/document_core/commands/object_ops/shape.rs b/src/document_core/commands/object_ops/shape.rs
+index f707ee36..f97b0ab2 100644
+--- a/src/document_core/commands/object_ops/shape.rs
++++ b/src/document_core/commands/object_ops/shape.rs
+@@ -2646,19 +2646,14 @@ impl DocumentCore {
+         }
+     }
+ 
+-    /// 현재 구역의 미주 모양을 조회한다.
+-    pub fn get_endnote_shape_native(&self, section_idx: usize) -> Result<String, HwpError> {
+-        let section = self.document.sections.get(section_idx).ok_or_else(|| {
+-            HwpError::RenderError(format!("구역 인덱스 {} 범위 초과", section_idx))
+-        })?;
+-        let shape = &section.section_def.endnote_shape;
++    fn note_shape_json(shape: &crate::model::footnote::FootnoteShape) -> String {
+         let separator_enabled = shape.separator_length != 0
+             || shape.separator_line_type != 0
+             || shape.separator_line_width != 0;
+         let separator_color =
+             crate::document_core::helpers::clipboard_color_to_css(shape.separator_color);
+ 
+-        Ok(format!(
++        format!(
+             concat!(
+                 "{{\"ok\":true,",
+                 "\"numberFormat\":\"{}\",",
+@@ -2705,7 +2700,42 @@ impl DocumentCore {
+             },
+             Self::footnote_numbering_name(shape.numbering),
+             Self::footnote_placement_name(shape.placement),
+-        ))
++        )
++    }
++    /// 현재 구역의 각주 모양을 조회한다.
++    pub fn get_footnote_shape_native(&self, section_idx: usize) -> Result<String, HwpError> {
++        let section = self.document.sections.get(section_idx).ok_or_else(|| {
++            HwpError::RenderError(format!("구역 인덱스 {} 범위 초과", section_idx))
++        })?;
++        Ok(Self::note_shape_json(&section.section_def.footnote_shape))
++    }
++    /// 각주 내용 번호의 작은 번호 표시만 적용한다.
++    pub fn apply_footnote_content_number_size_native(
++        &mut self,
++        section_idx: usize,
++        small: bool,
++    ) -> Result<String, HwpError> {
++        {
++            let section = self.document.sections.get_mut(section_idx).ok_or_else(|| {
++                HwpError::RenderError(format!("구역 인덱스 {} 범위 초과", section_idx))
++            })?;
++            let shape = &mut section.section_def.footnote_shape;
++            shape.number_code_superscript = small;
++            shape.attr = Self::encode_footnote_shape_attr(shape);
++            section.raw_stream = None;
++        }
++        self.sync_section_def_controls_from_section(section_idx);
++        self.recompose_section(section_idx);
++        self.paginate_if_needed();
++        self.invalidate_page_tree_cache();
++        Ok(crate::document_core::helpers::json_ok())
++    }
++    /// 현재 구역의 미주 모양을 조회한다.
++    pub fn get_endnote_shape_native(&self, section_idx: usize) -> Result<String, HwpError> {
++        let section = self.document.sections.get(section_idx).ok_or_else(|| {
++            HwpError::RenderError(format!("구역 인덱스 {} 범위 초과", section_idx))
++        })?;
++        Ok(Self::note_shape_json(&section.section_def.endnote_shape))
+     }
+     /// 현재 구역의 미주 모양을 적용한다.
+     pub fn apply_endnote_shape_native(
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+index 77d2faf8..930743c0 100644
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -4985,6 +4985,24 @@ impl HwpDocument {
+         .map_err(|e| e.into())
+     }
+ 
++    /// 각주 모양을 조회한다.
++    #[wasm_bindgen(js_name = getFootnoteShape)]
++    pub fn get_footnote_shape(&self, section_idx: u32) -> Result<String, JsValue> {
++        self.get_footnote_shape_native(section_idx as usize)
++            .map_err(|e| e.into())
++    }
++
++    /// 각주 내용 번호의 작은 번호 표시만 적용한다.
++    #[wasm_bindgen(js_name = applyFootnoteContentNumberSize)]
++    pub fn apply_footnote_content_number_size(
++        &mut self,
++        section_idx: u32,
++        small: bool,
++    ) -> Result<String, JsValue> {
++        self.apply_footnote_content_number_size_native(section_idx as usize, small)
++            .map_err(|e| e.into())
++    }
++
+     /// 미주를 삽입한다.
+     #[wasm_bindgen(js_name = insertEndnote)]
+     pub fn insert_endnote(
+

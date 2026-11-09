@@ -1,0 +1,50 @@
+diff --git a/src/document_core/commands/object_ops/picture.rs b/src/document_core/commands/object_ops/picture.rs
+--- a/src/document_core/commands/object_ops/picture.rs
++++ b/src/document_core/commands/object_ops/picture.rs
+@@ -414,5 +414,11 @@ impl DocumentCore {
+             crate::model::shape::TextWrap::InFrontOfText => "InFrontOfText",
+         };
++        let drop_cap_style = match c.drop_cap_style {
++            crate::model::shape::DropCapStyle::None => "None",
++            crate::model::shape::DropCapStyle::DoubleLine => "DoubleLine",
++            crate::model::shape::DropCapStyle::TripleLine => "TripleLine",
++            crate::model::shape::DropCapStyle::Margin => "Margin",
++        };
+         let effect = match pic.image_attr.effect {
+             crate::model::image::ImageEffect::RealPic => "RealPic",
+             crate::model::image::ImageEffect::GrayScale => "GrayScale",
+@@ -440,7 +446,8 @@ impl DocumentCore {
+                 "\"vertRelTo\":\"{}\",\"vertAlign\":\"{}\",",
+                 "\"horzRelTo\":\"{}\",\"horzAlign\":\"{}\",",
+                 "\"vertOffset\":{},\"horzOffset\":{},",
+-                "\"textWrap\":\"{}\",\"restrictInPage\":{},\"allowOverlap\":{},\"sizeProtect\":{},",
++                "\"textWrap\":\"{}\",\"dropCapStyle\":\"{}\",",
++                "\"restrictInPage\":{},\"allowOverlap\":{},\"sizeProtect\":{},",
+                 "\"brightness\":{},\"contrast\":{},\"effect\":\"{}\",\"transparency\":{},",
+                 "\"description\":\"{}\",",
+                 // 회전/대칭
+@@ -463,7 +470,7 @@ impl DocumentCore {
+             vert_rel, vert_align,
+             horz_rel, horz_align,
+             c.vertical_offset as i32, c.horizontal_offset as i32,
+-            text_wrap, c.flow_with_text, c.allow_overlap, c.size_protect,
++            text_wrap, drop_cap_style, c.flow_with_text, c.allow_overlap, c.size_protect,
+             pic.image_attr.brightness,
+             pic.image_attr.contrast,
+             effect,
+@@ -1055,6 +1062,15 @@ impl DocumentCore {
+                 _ => pic.common.text_wrap,
+             };
+         }
++        if let Some(v) = json_str(props_json, "dropCapStyle") {
++            pic.common.drop_cap_style = match v.as_str() {
++                "None" => crate::model::shape::DropCapStyle::None,
++                "DoubleLine" => crate::model::shape::DropCapStyle::DoubleLine,
++                "TripleLine" => crate::model::shape::DropCapStyle::TripleLine,
++                "Margin" => crate::model::shape::DropCapStyle::Margin,
++                _ => pic.common.drop_cap_style,
++            };
++        }
+         if let Some(v) = json_bool(props_json, "restrictInPage") {
+             pic.common.flow_with_text = v;
+             if v {

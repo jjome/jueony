@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 23 · 미구현 1 |
-| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 14 · 미검증 10 |
+| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 16 · 미검증 8 |
 | Agent 연결 | 연결 28/33 · 부분 5 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -50,7 +50,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B067](<08-tables.md#b067>) · 범위 | 표 만들기 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
+| [B067](<08-tables.md#b067>) · 범위 | 표 만들기 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [A031](<08-tables.md#a031>) · 작업 | 새 단순 표 생성 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 
 <a id="work-2"></a>
@@ -185,7 +185,7 @@
 | [B169](<08-tables.md#b169>) · 범위 | 첫 셀·셀 블록 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B171](<08-tables.md#b171>) · 범위 | 칸 전체 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B172](<08-tables.md#b172>) · 범위 | 줄 전체 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B173](<08-tables.md#b173>) · 범위 | 셀 이동·표 안 탭 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B173](<08-tables.md#b173>) · 범위 | 셀 이동·표 안 탭 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-14"></a>
 
@@ -222,13 +222,13 @@
 <summary>B067 · 표 만들기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ◐ 부분.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 키는 입력 대화상자; 메뉴는 격자
+- 다음 작업: 8×10 격자와 1~256 키 입력·4096칸 상한·stale 차단·단일 snapshot·HWP/HWPX 재열기 검증 완료. 실제 Studio table:create 입력 경로 연결과 비어 있지 않은 문단·다구역·고급 크기 옵션은 남음.
 - UI 명령: `table:create`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [table-create-b067.ts](<../../apps/editor/src/adapters/rhwp/table-create-b067.ts>) · [table-create-b067.test.ts](<../../apps/editor/tests/table-create-b067.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_WASM_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -545,12 +545,12 @@
 <summary>B173 · 셀 이동·표 안 탭</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 엔진 이동 경로 존재; 문서 탭 순환 충돌 검수
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: 일반 Tab·Shift+Tab과 문서 Ctrl+Tab 소유권을 분리하고 stale·IME·선택·중첩 마지막 셀을 차단하는 실행 경계를 검증함. 실제 InputHandler와 원자적 마지막 행 추가 연결은 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [table-cell-tab-routing-b173.ts](<../../apps/editor/src/shortcuts/table-cell-tab-routing-b173.ts>) · [table-cell-tab-routing-b173.test.ts](<../../apps/editor/tests/table-cell-tab-routing-b173.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_ROUTING_TEST_PASS_2026_11_09`
 
 </details>
 

@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **9/9** · 부분 0 | 완료 0/11 · 부분 8 · 미구현 3 |
-| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 2 · 미검증 9 |
+| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 3 · 미검증 8 |
 | Agent 연결 | 연결 🟢 **8/8** · 부분 0 · 해당 없음 1 | 연결 0/11 · 부분 2 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -42,7 +42,7 @@
 | [B077](<10-headers-notes-fields.md#b077>) · 범위 | 필드 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B078](<10-headers-notes-fields.md#b078>) · 범위 | 양식 개체 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B086](<10-headers-notes-fields.md#b086>) · 범위 | 미주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B088](<10-headers-notes-fields.md#b088>) · 범위 | 날짜·시간·파일명 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
@@ -144,13 +144,13 @@
 <summary>B087 · 각주·미주 모양</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 각주·미주 입력/일부 모양 있음. 미주 내용 번호 작은 크기 옵션 비활성.
+- 다음 작업: 미주 내용 번호 작은 크기를 section 소유 shape API·stale guard·snapshot undo/redo로 적용하고 HWP/HWPX 저장 재열기를 검증함. 실제 대화상자 연결과 각주 대응 public API는 남음.
 - UI 명령: `insert:endnote-shape`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [endnote-content-number-size-b087.ts](<../../apps/editor/src/adapters/rhwp/endnote-content-number-size-b087.ts>) · [endnote-content-number-size-b087.test.ts](<../../apps/editor/tests/endnote-content-number-size-b087.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_WASM_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 

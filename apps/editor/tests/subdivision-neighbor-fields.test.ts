@@ -26,6 +26,16 @@ function snapshot(d:any,format:string):Snapshot {
   const name='이웃 필드.'+format,structure=readStructure(d);
   return {name,structure,nodes:[],limitations:[],revision:'test',tableSubdivisionSources:readTableSubdivisionSources(d,structure.tables,name)};
 }
+function separatedInlineFields(format:string){
+  const source=subdivisionInlineFieldTable(HwpDocument,true),first=JSON.parse(source.getFieldList())
+    .find((field:any)=>field.name==='주누름틀'),start=first.endCharIdx+1;
+  try{
+    assert.ok(source.getCellParagraphLength(...at,0,0)>start);
+    const second=JSON.parse(source.insertClickHereFieldInCell(...at,0,0,start,false,'둘째','설명','보조누름틀',true));
+    assert.equal(second.ok,true);assert.equal(JSON.parse(source.setFieldValue(second.fieldId,'병')).ok,true);
+    return new HwpDocument(bytes(source,format));
+  }finally{source.free();}
+}
 
 for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' preserves both moved field owners when splitting a merged cell into '+columns,()=>{
   const doc=fixture(format);
@@ -95,6 +105,30 @@ test(format+' preserves an inline '+(filled?'value':'guide')+' in the first piec
       d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),original);
     }finally{d.discardSnapshot(undo);}
   }finally{d.free();}
+});
+
+for(const format of ['hwp','hwpx'])test(format+' preserves two normal-cell fields separated by one verified plain scalar',()=>{
+  const doc=separatedInlineFields(format);
+  try{
+    const state=snapshot(doc,format),before=bytes(doc,format),fields=JSON.parse(doc.getFieldList()),undo=doc.saveSnapshot();let redo:any;
+    const owned=fields.filter((field:any)=>field.location?.path?.[0]?.cellIndex===0&&field.cellField===false)
+      .sort((a:any,b:any)=>a.startCharIdx-b.startCharIdx);
+    assert.equal(owned.length,2);assert.equal(owned[1].startCharIdx,owned[0].endCharIdx+1);
+    assert.equal(state.tableSubdivisionSources![target].editable,true);
+    try{
+      executeDocumentOperations(doc,state,validateEditOperations([op],state));
+      const saved=bytes(doc,format);redo=doc.saveSnapshot();const copy=new HwpDocument(saved);
+      try{for(const output of [doc,copy]){
+        const after=JSON.parse(output.getFieldList());
+        assert.equal(after.length,fields.length);
+        for(const original of owned)assert.deepEqual(after.find((field:any)=>field.name===original.name),original);
+        assert.equal(readStructure(output).tables[0].cells[0].axisFieldSignature,
+          state.structure!.tables[0].cells[0].axisFieldSignature);
+      }}finally{copy.free();}
+      doc.restoreSnapshot(undo);assert.deepEqual(bytes(doc,format),before);
+      doc.restoreSnapshot(redo);assert.deepEqual(bytes(doc,format),saved);
+    }finally{if(redo!==undefined)doc.discardSnapshot(redo);doc.discardSnapshot(undo);}
+  }finally{doc.free();}
 });
 
 test('an inline field in a later paragraph can be retained but cannot be moved to a new cell',()=>{

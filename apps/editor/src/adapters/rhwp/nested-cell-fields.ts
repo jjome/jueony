@@ -68,8 +68,11 @@ export function readNestedCellFields(doc:any,lists:any[],fields:any[],controls:a
   }
   for(const [p,group] of ranges){
    const indices=slots.filter(c=>c.para===p).map(c=>c.controlIndex);group.sort((a,b)=>a[0]-b[0]);
+   // FieldInfoAt includes the end cursor in the preceding field. Therefore a
+   // second field that starts at that boundary is ambiguous, while one plain
+   // scalar between the ranges has distinct IDs, marker slots and lookups.
    if(indices.length!==group.length||new Set(indices).size!==indices.length||
-      group.some(([start],i)=>i>0&&start<=group[i-1][1]+1))throw invalid();
+      group.some(([start],i)=>i>0&&start<=group[i-1][1]))throw invalid();
   }
   records.set(l.listId,{name:named[0]?.name,inlineIds:inline.map(f=>f.fieldId),data:{fields:data,controls:slots}});
  }

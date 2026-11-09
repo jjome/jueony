@@ -29,17 +29,18 @@ export function subdivisionNestedFields(doc:any,table:Table,owner:NestedSubdivis
     if(data.fields.some(f=>f.info?.isGuide!==false))throw invalid();
     for(const paragraph of new Set(owned.map((f:any)=>f.paraInList))){
       const group=owned.filter((f:any)=>f.paraInList===paragraph).sort((a:any,b:any)=>a.startCharIdx-b.startCharIdx);
+      const markers=data.controls.filter(c=>c.para===paragraph).sort((a,b)=>a.pos-b.pos||a.controlIndex-b.controlIndex);
+      if(markers.length!==group.length)throw invalid();
       const encoded=JSON.stringify([...path.slice(0,-1),{...path.at(-1)!,cellParaIndex:paragraph}]);
       const text=doc.getTextInCellByPath(table.section,table.paragraph,encoded,0,
         doc.getCellParagraphLengthByPath(table.section,table.paragraph,encoded));
       for(const [index,field] of group.entries()){
-        const slots=data.controls.filter(c=>c.para===paragraph && c.pos===field.startCharIdx);
         // startPos/endPos are logical scalar/control-slot positions, not HWP
         // UTF-16 byte offsets. field_query::field_content_start counts seven
         // extra units per preceding tab and two 8-unit markers per prior field.
         const tabs=Array.from(text as string).slice(0,field.startCharIdx).filter(c=>c==='\t').length;
-        const rawStart=field.startCharIdx+7*tabs+16*index+8;
-        if(slots.length!==1 || field.startPos!==rawStart || field.endCharIdx<=field.startCharIdx ||
+        const markerPos=field.startCharIdx+7*tabs+7*index,rawStart=field.startCharIdx+7*tabs+16*index+8;
+        if(markers[index]?.pos!==markerPos || field.startPos!==rawStart || field.endCharIdx<=field.startCharIdx ||
             field.endPos!==rawStart+field.endCharIdx-field.startCharIdx)throw invalid();
       }
     }

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 23 · 미구현 6 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 8 · 미검증 22 |
+| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 25 · 미구현 4 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 10 · 미검증 20 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -51,7 +51,7 @@
 | [B045](<12-ui-and-shortcuts.md#b045>) · 범위 | 투명 선 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B046](<12-ui-and-shortcuts.md#b046>) · 범위 | 쪽 윤곽 | ☑ 완료 | ◐ 부분 | ☐ 미연결 |
 | [B047](<12-ui-and-shortcuts.md#b047>) · 범위 | 교정 부호·그림 표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B048](<12-ui-and-shortcuts.md#b048>) · 범위 | 메모 표시·안내선 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B048](<12-ui-and-shortcuts.md#b048>) · 범위 | 메모 표시·안내선 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
@@ -78,7 +78,7 @@
 | [B059](<12-ui-and-shortcuts.md#b059>) · 범위 | 책갈피·개요·클립보드 작업 창 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B060](<12-ui-and-shortcuts.md#b060>) · 범위 | 번역·사전·스크립트 작업 창 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B062](<12-ui-and-shortcuts.md#b062>) · 범위 | 편집 화면 분할 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B063](<12-ui-and-shortcuts.md#b063>) · 범위 | 문서 창 배열 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B063](<12-ui-and-shortcuts.md#b063>) · 범위 | 문서 창 배열 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
 
@@ -247,12 +247,12 @@
 <summary>B048 · 메모 표시·안내선</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 주석 구조 지원과 UI는 별개
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. B092의 검증된 본문 point memo만 view-state로 투영한다.
+- 다음 작업: commit 77e4a472 기준 메모 표시 on/off와 안내선 anchor 상태를 document identity·revision·목록 fingerprint로 재검증한다. stale·malformed·범위 메모·특수 story는 fail-closed이며 HWP/HWPX 바이트와 편집 history 호출이 변하지 않음을 3/3으로 확인했다. 실제 Studio overlay·메뉴/단축키·설정 저장과 한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [memo-view-state-b048.ts](<../../apps/editor/src/adapters/rhwp/memo-view-state-b048.ts>) · [memo-view-state-b048.test.ts](<../../apps/editor/tests/memo-view-state-b048.test.ts>)
+- 원래 기록: `PARTIAL;BODY_POINT_MEMO_VIEW_STATE_PASS_2026_11_09;STUDIO_OVERLAY_PENDING`
 
 </details>
 
@@ -448,12 +448,12 @@
 <summary>B063 · 문서 창 배열</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 단일 host iframe 탭 기반
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 다중 문서 창 descriptor와 OS batch callback의 안전 계약만 구현한다.
+- 다음 작업: commit 28efb1ae 기준 가로/세로 바둑판·계단식 계획과 document identity·revision·window epoch 재검증·단일 batch 적용·readback 실패 전체 rollback을 5/5로 확인했다. 한 창·hidden·modal·이동 불가·중복·stale은 callback 전에 차단한다. 실제 native host callback·메뉴 UI·한글 창 배열 비교는 미연결이라 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-window-arrangement-b063.ts](<../../apps/editor/src/adapters/browser/document-window-arrangement-b063.ts>) · [document-window-arrangement-b063.test.ts](<../../apps/editor/tests/document-window-arrangement-b063.test.ts>)
+- 원래 기록: `PARTIAL;SAFE_WINDOW_LAYOUT_CONTRACT_PASS_2026_11_09;NATIVE_HOST_WIRING_PENDING`
 
 </details>
 

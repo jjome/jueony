@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **9/9** · 부분 0 | 완료 0/11 · 부분 8 · 미구현 3 |
-| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 3 · 미검증 8 |
+| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 4 · 미검증 7 |
 | Agent 연결 | 연결 🟢 **8/8** · 부분 0 · 해당 없음 1 | 연결 0/11 · 부분 2 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -44,7 +44,7 @@
 | [B086](<10-headers-notes-fields.md#b086>) · 범위 | 미주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B088](<10-headers-notes-fields.md#b088>) · 범위 | 날짜·시간·파일명 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 | [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B095](<10-headers-notes-fields.md#b095>) · 범위 | 하이퍼링크 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
@@ -172,12 +172,12 @@
 <summary>B089 · 덧말</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 발음/루비 표현 보존 별도
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. Rust 모델과 HWP/HWPX 코덱의 기존 Ruby 보존만 확인됐으며 편집·표시 기능은 구현되지 않았다.
+- 다음 작업: commit 812f8c84 기준 공개 WASM에 getRubyContext·insertRubyEx·removeRubyEx가 없고 renderer에 Control::Ruby 배치 경로가 없음을 감사했다. stale·보호·비본문·중첩·혼합·잘못된 범위를 선차단하고 실제 WASM의 snapshot·HWP/HWPX 바이트·재열기 본문 불변 4/4를 확인했다. 보이지 않는 Ruby나 일반 문자열 대체는 만들지 않았으며 API와 renderer가 함께 구현되기 전까지 미구현이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [ruby-capability-b089.ts](<../../apps/editor/src/adapters/rhwp/ruby-capability-b089.ts>) · [ruby-capability-b089.test.ts](<../../apps/editor/tests/ruby-capability-b089.test.ts>)
+- 원래 기록: `MISSING;RUBY_MODEL_CODEC_ONLY_AUDIT_PASS_2026_11_09;EDIT_AND_RENDER_APIS_MISSING`
 
 </details>
 

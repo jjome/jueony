@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
-| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 6 · 미검증 12 |
+| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 16 · 미구현 1 · stub 1 |
+| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 7 · 미검증 11 |
 | Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -136,7 +136,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B183](<07-formatting-and-styles.md#b183>) · 범위 | 문단 첫 글자 장식 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B183](<07-formatting-and-styles.md#b183>) · 범위 | 문단 첫 글자 장식 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-10"></a>
 
@@ -406,12 +406,12 @@
 <summary>B183 · 문단 첫 글자 장식</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 전용 편집 UI·명령 연결 없음. 단락 시작 장식과 줄 배치·저장 구현.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 엔진이 실제 보존하는 HWPX 그림 기반 dropcapstyle이 이미 존재할 때만 안전하게 다룬다.
+- 다음 작업: 기존 HWPX picture-backed 드롭캡의 조회·DoubleLine/TripleLine/Margin 변경·snapshot undo·저장 재열기를 실제 WASM에서 검증했다. 신규 드롭캡 생성·HWP 보존/편집·전용 UI·Agent 명령 연결과 한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [paragraph-drop-cap-b183.ts](<../../apps/editor/src/adapters/rhwp/paragraph-drop-cap-b183.ts>) · [paragraph-drop-cap-b183.test.ts](<../../apps/editor/tests/paragraph-drop-cap-b183.test.ts>)
+- 원래 기록: `PARTIAL;EXISTING_HWPX_PICTURE_DROP_CAP_PASS_2026_11_09;CREATE_HWP_UI_AGENT_PENDING`
 
 </details>
 

@@ -127,10 +127,11 @@ function cellDocument(value='김민수'){
 }
 function cellInput(native:any,direction:'forward'|'backward'='forward'){
  const field=JSON.parse(native.getFieldList()).find((item:any)=>item.location?.path?.[0]?.type==='cell');
- const owner=JSON.parse(native.getCursorModel()).lists.find((item:any)=>item.listId===field.listId);
- const cellPath=[{controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,cellParaIndex:field.paraInList}];
- const at=(offset:number)=>({sectionIndex:owner.sectionIndex,parentParaIndex:owner.hostPara,paragraphIndex:field.paraInList,charOffset:offset,
-  controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,cellParaIndex:field.paraInList,cellPath:structuredClone(cellPath)});
+ const owners=JSON.parse(native.getCursorModel()).lists,owner=owners.find((item:any)=>item.listId===field.listId);
+ const cellPath=field.location.path.map((item:any)=>({controlIndex:item.controlIndex,cellIndex:item.cellIndex,cellParaIndex:item.paraIndex}));
+ const first=cellPath[0],last=cellPath.at(-1);
+ const at=(offset:number)=>({sectionIndex:field.location.sectionIndex,parentParaIndex:field.location.paraIndex,paragraphIndex:last.cellParaIndex,charOffset:offset,
+  controlIndex:first.controlIndex,cellIndex:first.cellIndex,cellParaIndex:first.cellParaIndex,cellPath:structuredClone(cellPath)});
  let anchor=at(direction==='forward'?field.startCharIdx:field.endCharIdx),focus=at(direction==='forward'?field.endCharIdx:field.startCharIdx);
  let calls=0,restored:any;
  const session:any={getCursorPosition:()=>focus,restoreSessionSelection:(next:any,previous:any,phase:any,block:any)=>{
@@ -142,13 +143,13 @@ function cellInput(native:any,direction:'forward'|'backward'='forward'){
 function cellFieldState(native:any){
  const field=JSON.parse(native.getFieldList()).find((item:any)=>item.location?.path?.[0]?.type==='cell');
  const owner=JSON.parse(native.getCursorModel()).lists.find((item:any)=>item.listId===field.listId);
- const path=JSON.stringify([{controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,cellParaIndex:field.paraInList}]);
- const length=native.getCellParagraphLengthByPath(owner.sectionIndex,owner.hostPara,path);
- return {field,owner,text:native.getTextInCellByPath(owner.sectionIndex,owner.hostPara,path,0,length),
-  start:JSON.parse(native.getFieldInfoAtByPath(owner.sectionIndex,owner.hostPara,path,field.startCharIdx)),
-  end:JSON.parse(native.getFieldInfoAtByPath(owner.sectionIndex,owner.hostPara,path,field.endCharIdx)),
-  startRect:JSON.parse(native.getCursorRectByPath(owner.sectionIndex,owner.hostPara,path,field.startCharIdx)),
-  endRect:JSON.parse(native.getCursorRectByPath(owner.sectionIndex,owner.hostPara,path,field.endCharIdx))};
+ const path=JSON.stringify(field.location.path.map((item:any)=>({controlIndex:item.controlIndex,cellIndex:item.cellIndex,cellParaIndex:item.paraIndex})));
+ const section=field.location.sectionIndex,parent=field.location.paraIndex,length=native.getCellParagraphLengthByPath(section,parent,path);
+ return {field,owner,text:native.getTextInCellByPath(section,parent,path,0,length),
+  start:JSON.parse(native.getFieldInfoAtByPath(section,parent,path,field.startCharIdx)),
+  end:JSON.parse(native.getFieldInfoAtByPath(section,parent,path,field.endCharIdx)),
+  startRect:JSON.parse(native.getCursorRectByPath(section,parent,path,field.startCharIdx)),
+  endRect:JSON.parse(native.getCursorRectByPath(section,parent,path,field.endCharIdx))};
 }
 
 test('top-level table-cell ClickHere full selection restores both directions across HWP/HWPX without changing bytes',()=>{
@@ -201,4 +202,50 @@ test('cell selection restore verifies callback readback and attempts rollback be
   assert.equal(restoreSessionCursor(fixture.session,saved),false);assert.equal(callbacks,2,'failed readback invokes the previous-selection rollback');
   assert.deepEqual(fixture.session.cursor.getSelection(),{anchor:fixture.at(fixture.field.startCharIdx),focus:fixture.at(fixture.field.endCharIdx)});
  }finally{native.free();}
+});
+
+function nestedCellDocument(value='김민수'){
+ const native=HwpDocument.createEmpty();native.createBlankDocument();
+ native.pasteHtml(0,0,0,'<table><tr><td>바깥<table><tr><td>앞뒤</td></tr></table></td></tr></table>');
+ const owners=JSON.parse(native.getCursorModel()).lists,leaf=owners.find((item:any)=>item.hostListId!==0),parent=owners.find((item:any)=>item.listId===leaf.hostListId);
+ const path=[{controlIndex:parent.controlIndex,cellIndex:parent.cellIndex,cellParaIndex:leaf.hostPara},
+  {controlIndex:leaf.controlIndex,cellIndex:leaf.cellIndex,cellParaIndex:0}];
+ native.insertClickHereFieldByPath(leaf.sectionIndex,parent.hostPara,JSON.stringify(path),1,'입력 안내','설명','중첩 성명',true);
+ native.setFieldValueByName('중첩 성명',value);return native;
+}
+
+test('nested table-cell ClickHere exact full selection preserves the complete owner chain across HWP/HWPX',()=>{
+ const source=nestedCellDocument();try{
+  const sourceState=cellFieldState(source),forward=captureSessionCursor(cellInput(source).session),backward=captureSessionCursor(cellInput(source,'backward').session);
+  assert.ok(forward&&backward);assert.equal((forward as any).path.length,2);assert.equal((backward as any).direction,'backward');
+  for(const format of ['hwp','hwpx'] as const){
+   const savedBytes=bytes(source,format),reopened=new HwpDocument(savedBytes);try{
+    const fixture=cellInput(reopened),before=bytes(reopened,format),saved=captureSessionCursor(fixture.session);
+    assert.deepEqual(cellFieldState(reopened),sourceState,`${format} nested owner/list/path/text/geometry`);assert.deepEqual(saved,forward);
+    assert.equal(restoreSessionCursor(fixture.session,saved),true);assert.deepEqual(fixture.session.cursor.getSelection(),
+     {anchor:fixture.at(fixture.field.startCharIdx),focus:fixture.at(fixture.field.endCharIdx)});
+    assert.deepEqual(bytes(reopened,format),before,`${format} nested restore byte invariant`);
+    const reverse=cellInput(reopened,'backward');assert.equal(restoreSessionCursor(reverse.session,backward),true);
+    assert.deepEqual(reverse.session.cursor.getSelection(),{anchor:reverse.at(reverse.field.endCharIdx),focus:reverse.at(reverse.field.startCharIdx)});
+    assert.deepEqual(bytes(reopened,format),before);
+   }finally{reopened.free();}
+  }
+ }finally{source.free();}
+});
+
+test('nested field partial, changed owner chain, caption-like path and stale value remain fail closed',()=>{
+ const native=nestedCellDocument();try{
+  const fixture=cellInput(native),saved=captureSessionCursor(fixture.session)!;
+  fixture.setSelection(fixture.at(fixture.field.startCharIdx+1),fixture.at(fixture.field.endCharIdx));assert.equal(captureSessionCursor(fixture.session),undefined);
+  const originalList=native.getFieldList.bind(native),caption=cellInput(native);
+  native.getFieldList=()=>JSON.stringify(JSON.parse(originalList()).map((field:any)=>({...field,location:{...field.location,path:field.location.path.map((entry:any,index:number)=>index===1?{...entry,type:'caption'}:entry)}})));
+  assert.equal(captureSessionCursor(caption.session),undefined);native.getFieldList=originalList;
+  const overlap=cellInput(native);native.getFieldList=()=>{const fields=JSON.parse(originalList());return JSON.stringify([...fields,{...fields[0],fieldId:fields[0].fieldId+100}]);};
+  assert.equal(captureSessionCursor(overlap.session),undefined);native.getFieldList=originalList;
+  const story=cellInput(native);story.session.cursor.isInFootnote=()=>true;assert.equal(captureSessionCursor(story.session),undefined);
+  const model=native.getCursorModel.bind(native);native.getCursorModel=()=>{const value=JSON.parse(model()),leaf=value.lists.find((item:any)=>item.hostListId!==0);leaf.hostPara++;return JSON.stringify(value);};
+  assert.equal(restoreSessionCursor(cellInput(native).session,saved),false);native.getCursorModel=model;
+  native.setFieldValueByName('중첩 성명','변경');assert.equal(restoreSessionCursor(cellInput(native).session,saved),false);
+ }finally{native.free();}
+ const empty=nestedCellDocument('');try{assert.equal(captureSessionCursor(cellInput(empty).session),undefined);}finally{empty.free();}
 });

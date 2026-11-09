@@ -24,7 +24,7 @@ export type ObjectSelectionEntry = RestorableObjectRef & {objectFingerprint:stri
 export type ObjectSelectionBookmark = {version:1;kind:'object-selection';objects:ObjectSelectionEntry[];active:number;documentFingerprint:string};
 export type RootClickHereFieldSelectionBookmarkN016 =
   | {version:1;kind:'root-clickhere-field-selection';fieldId:number;section:number;paragraph:number;start:number;end:number;direction:'forward'|'backward';fieldFingerprint:string;paragraphFingerprint:string;selectionFingerprint:string}
-  | {version:1;kind:'root-clickhere-field-selection';owner:'cell';fieldId:number;section:number;parentParagraph:number;listId:number;path:[{controlIndex:number;cellIndex:number;cellParaIndex:number}];start:number;end:number;direction:'forward'|'backward';ownerFingerprint:string;fieldFingerprint:string;paragraphFingerprint:string;geometryFingerprint:string;selectionFingerprint:string};
+  | {version:1;kind:'root-clickhere-field-selection';owner:'cell';fieldId:number;section:number;parentParagraph:number;listId:number;path:SessionCellPath;start:number;end:number;direction:'forward'|'backward';ownerFingerprint:string;fieldFingerprint:string;paragraphFingerprint:string;geometryFingerprint:string;selectionFingerprint:string};
 export type SessionCursor = { kind: 'text'; focus: SessionPoint; anchor?: SessionPoint; blockPhase: number | null; selectionFingerprint?: string }
   | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark }
   | { kind: 'table-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; tableFingerprint: string }

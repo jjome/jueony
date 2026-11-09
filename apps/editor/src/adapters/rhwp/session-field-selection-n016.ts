@@ -19,7 +19,7 @@ type RootFieldBookmark={
 type CellPathEntry={controlIndex:number;cellIndex:number;cellParaIndex:number};
 type CellFieldBookmark={
  version:1;kind:'root-clickhere-field-selection';owner:'cell';fieldId:number;section:number;parentParagraph:number;listId:number;
- path:[CellPathEntry];start:number;end:number;direction:'forward'|'backward';ownerFingerprint:string;fieldFingerprint:string;
+ path:CellPathEntry[];start:number;end:number;direction:'forward'|'backward';ownerFingerprint:string;fieldFingerprint:string;
  paragraphFingerprint:string;geometryFingerprint:string;selectionFingerprint:string;
 };
 export type RootClickHereFieldSelectionBookmarkN016=RootFieldBookmark|CellFieldBookmark;
@@ -66,10 +66,10 @@ type Field={
  startCharIdx:number;endCharIdx:number;listId:0;paraInList:number;editableInForm:boolean;
 };
 type CellField={
- fieldId:number;fieldType:'clickhere';cellField:false;location:{sectionIndex:number;paraIndex:number;path:[{type:'cell';controlIndex:number;cellIndex:number;paraIndex:number}]};
+ fieldId:number;fieldType:'clickhere';cellField:false;location:{sectionIndex:number;paraIndex:number;path:{type:'cell';controlIndex:number;cellIndex:number;paraIndex:number}[]};
  startCharIdx:number;endCharIdx:number;listId:number;paraInList:number;editableInForm:boolean;value:string;
 };
-type CellOwner={listId:number;isCell:true;hostListId:0;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
+type CellOwner={listId:number;isCell:true;hostListId:number;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
 
 const integer=(value:unknown):value is number=>Number.isSafeInteger(value)&&(value as number)>=0&&(value as number)<=2147483647;
 const positive=(value:unknown):value is number=>integer(value)&&value>0;
@@ -90,13 +90,14 @@ function documentOf(input:FieldSelectionSessionInputN016):NativeDocument|undefin
   .every(name=>typeof (document as any)[name]==='function'))return;
  return document as NativeDocument;
 }
-function cellPosition(value:Position|undefined):{section:number;parent:number;path:[CellPathEntry]}|undefined{
+function cellPosition(value:Position|undefined):{section:number;parent:number;path:CellPathEntry[]}|undefined{
  if(!value||!integer(value.sectionIndex)||!integer(value.parentParaIndex)||!integer(value.paragraphIndex)||!integer(value.charOffset)||value.isTextBox===true
-  ||!Array.isArray(value.cellPath)||value.cellPath.length!==1)return;
- const entry=value.cellPath[0] as any;
- if(!entry||!integer(entry.controlIndex)||!integer(entry.cellIndex)||!integer(entry.cellParaIndex)
-  ||value.controlIndex!==entry.controlIndex||value.cellIndex!==entry.cellIndex||value.cellParaIndex!==entry.cellParaIndex||value.paragraphIndex!==entry.cellParaIndex)return;
- return {section:value.sectionIndex,parent:value.parentParaIndex,path:[{controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex}]};
+  ||!Array.isArray(value.cellPath)||value.cellPath.length<1||value.cellPath.length>8)return;
+ const path=value.cellPath as any[],first=path[0],last=path.at(-1);
+ if(!path.every(entry=>entry&&integer(entry.controlIndex)&&integer(entry.cellIndex)&&integer(entry.cellParaIndex))
+  ||value.controlIndex!==first.controlIndex||value.cellIndex!==first.cellIndex||value.paragraphIndex!==last.cellParaIndex
+  ||(value.cellParaIndex!==first.cellParaIndex&&value.cellParaIndex!==last.cellParaIndex))return;
+ return {section:value.sectionIndex,parent:value.parentParaIndex,path:path.map(entry=>({controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex}))};
 }
 function blocked(input:FieldSelectionSessionInputN016):boolean{
  const cursor=input.cursor;
@@ -140,14 +141,14 @@ function asField(value:any):Field|undefined{
 function asCellField(value:any):CellField|undefined{
  const path=value?.location?.path;
  if(!value||typeof value!=='object'||Array.isArray(value)||!positive(value.fieldId)||value.fieldType!=='clickhere'||value.cellField!==false
-  ||!value.location||!integer(value.location.sectionIndex)||!integer(value.location.paraIndex)||!Array.isArray(path)||path.length!==1
-  ||path[0]?.type!=='cell'||!integer(path[0].controlIndex)||!integer(path[0].cellIndex)||!integer(path[0].paraIndex)
+  ||!value.location||!integer(value.location.sectionIndex)||!integer(value.location.paraIndex)||!Array.isArray(path)||path.length<1||path.length>8
+  ||!path.every((entry:any)=>entry?.type==='cell'&&integer(entry.controlIndex)&&integer(entry.cellIndex)&&integer(entry.paraIndex))
   ||!integer(value.startCharIdx)||!integer(value.endCharIdx)||value.endCharIdx<=value.startCharIdx||!positive(value.listId)
-  ||!integer(value.paraInList)||value.paraInList!==path[0].paraIndex||typeof value.editableInForm!=='boolean'||typeof value.value!=='string')return;
+  ||!integer(value.paraInList)||value.paraInList!==path.at(-1).paraIndex||typeof value.editableInForm!=='boolean'||typeof value.value!=='string')return;
  return value as CellField;
 }
 function asCellOwner(value:any):CellOwner|undefined{
- if(!value||typeof value!=='object'||Array.isArray(value)||!positive(value.listId)||value.isCell!==true||value.hostListId!==0
+ if(!value||typeof value!=='object'||Array.isArray(value)||!positive(value.listId)||value.isCell!==true||!integer(value.hostListId)
   ||!integer(value.sectionIndex)||!integer(value.hostPara)||!integer(value.controlIndex)||!integer(value.cellIndex)||!positive(value.paraCount))return;
  return value as CellOwner;
 }
@@ -180,9 +181,9 @@ function fieldEvidence(document:NativeDocument,fieldId:number,section:number,par
  const paragraphFingerprint=hash({section,paragraph,length,text});
  return {fieldFingerprint,paragraphFingerprint,selectionFingerprint:hash({fieldFingerprint,paragraphFingerprint,start,end,selected})};
 }
-function cellFieldEvidence(document:NativeDocument,fieldId:number,section:number,parent:number,path:[CellPathEntry],listId:number,start:number,end:number){
+function cellFieldEvidence(document:NativeDocument,fieldId:number,section:number,parent:number,path:CellPathEntry[],listId:number,start:number,end:number){
  if(!document.getCursorModel||!document.getCellParagraphLengthByPath||!document.getTextInCellByPath||!document.getFieldInfoAtByPath||!document.getCursorRectByPath)return;
- const pathJson=JSON.stringify(path),entry=path[0];
+ const pathJson=JSON.stringify(path),entry=path.at(-1)!;
  const length=document.getCellParagraphLengthByPath(section,parent,pathJson);
  if(!integer(length)||end>length||length>100000)return;
  const text=document.getTextInCellByPath(section,parent,pathJson,0,length);
@@ -190,12 +191,20 @@ function cellFieldEvidence(document:NativeDocument,fieldId:number,section:number
  const fields=parse(document.getFieldList());if(!Array.isArray(fields)||fields.length>100000)return;
  const matches=fields.filter(value=>value?.fieldId===fieldId);if(matches.length!==1)return;
  const field=asCellField(matches[0]);if(!field||field.listId!==listId||field.location.sectionIndex!==section||field.location.paraIndex!==parent
-  ||field.location.path[0].controlIndex!==entry.controlIndex||field.location.path[0].cellIndex!==entry.cellIndex||field.paraInList!==entry.cellParaIndex
+  ||JSON.stringify(field.location.path.map(item=>({controlIndex:item.controlIndex,cellIndex:item.cellIndex,cellParaIndex:item.paraIndex})))!==pathJson
+  ||field.paraInList!==path.at(-1)!.cellParaIndex
   ||field.startCharIdx!==start||field.endCharIdx!==end)return;
  const model=parse(document.getCursorModel()),owners=Array.isArray(model?.lists)?model.lists.map(asCellOwner).filter(Boolean) as CellOwner[]:[];
- const ownerMatches=owners.filter(owner=>owner.listId===listId);if(ownerMatches.length!==1)return;
- const owner=ownerMatches[0];
- if(owner.sectionIndex!==section||owner.hostPara!==parent||owner.controlIndex!==entry.controlIndex||owner.cellIndex!==entry.cellIndex||entry.cellParaIndex>=owner.paraCount)return;
+ const byId=new Map<number,CellOwner>();for(const owner of owners){if(byId.has(owner.listId))return;byId.set(owner.listId,owner);}
+ const chain:CellOwner[]=[];let current=byId.get(listId);
+ for(let depth=path.length-1;depth>=0;depth--){
+  const point=path[depth];if(!current||current.sectionIndex!==section||current.controlIndex!==point.controlIndex||current.cellIndex!==point.cellIndex
+   ||point.cellParaIndex>=current.paraCount)return;
+  chain.unshift(current);
+  if(depth===0){if(current.hostListId!==0||current.hostPara!==parent)return;}
+  else{const child=current;current=byId.get(child.hostListId);if(!current||child.hostPara!==path[depth-1].cellParaIndex)return;}
+ }
+ if(chain.at(-1)?.listId!==listId||chain.length!==path.length)return;
  const overlaps=fields.map(asCellField).filter((candidate):candidate is CellField=>Boolean(candidate)&&candidate!.listId===listId
   &&candidate!.paraInList===entry.cellParaIndex&&Math.max(candidate!.startCharIdx,start)<Math.min(candidate!.endCharIdx,end));
  if(overlaps.length!==1||overlaps[0].fieldId!==fieldId)return;
@@ -207,7 +216,7 @@ function cellFieldEvidence(document:NativeDocument,fieldId:number,section:number
  const value=parse(document.getFieldValue(fieldId));
  if(!value||typeof value!=='object'||Array.isArray(value)||value.ok!==true||typeof value.value!=='string'||value.value!==field.value)return;
  const selected=[...text].slice(start,end).join('');if(selected.length===0||selected!==value.value)return;
- const ownerFingerprint=hash({owner,path,location:field.location,listId});
+ const ownerFingerprint=hash({chain,path,location:field.location,listId});
  const fieldFingerprint=hash({field:matches[0],startInfo,endInfo,value});
  const paragraphFingerprint=hash({ownerFingerprint,length,text});
  const geometryFingerprint=hash({start:startRect,end:endRect});
@@ -223,8 +232,9 @@ export function validateRootClickHereFieldSelectionN016(value:unknown):RootClick
   ||!digest(item.fieldFingerprint)||!digest(item.paragraphFingerprint)||!digest(item.selectionFingerprint))return;
  if(item.owner==='cell'){
   const path=item.path as any;
-  if(!integer(item.parentParagraph)||!positive(item.listId)||!Array.isArray(path)||path.length!==1||!integer(path[0]?.controlIndex)
-   ||!integer(path[0]?.cellIndex)||!integer(path[0]?.cellParaIndex)||!digest(item.ownerFingerprint)||!digest(item.geometryFingerprint))return;
+  if(!integer(item.parentParagraph)||!positive(item.listId)||!Array.isArray(path)||path.length<1||path.length>8
+   ||!path.every((entry:any)=>integer(entry?.controlIndex)&&integer(entry?.cellIndex)&&integer(entry?.cellParaIndex))
+   ||!digest(item.ownerFingerprint)||!digest(item.geometryFingerprint))return;
   return value as CellFieldBookmark;
  }
  if(item.owner!==undefined||!integer(item.paragraph))return;
@@ -249,11 +259,11 @@ export function inspectRootClickHereFieldSelectionN016(input:FieldSelectionSessi
     ||JSON.stringify(anchorCell)!==JSON.stringify(focusCell)||JSON.stringify(focusCell)!==JSON.stringify(currentCell))return {status:'unsupported-field-selection'};
    const start=Math.min(selection.anchor.charOffset,selection.focus.charOffset),end=Math.max(selection.anchor.charOffset,selection.focus.charOffset);
    if(start===end)return {status:'unsupported-field-selection'};
-   const entry=focusCell.path[0];
+   const entry=focusCell.path.at(-1)!,locationPath=JSON.stringify(focusCell.path.map(item=>({type:'cell',controlIndex:item.controlIndex,cellIndex:item.cellIndex,paraIndex:item.cellParaIndex})));
    const candidates=fields.filter(raw=>{
-    const field=asCellField(raw),owner=field?.location.path[0];
-    return field?.location.sectionIndex===focusCell.section&&field.location.paraIndex===focusCell.parent&&owner?.controlIndex===entry.controlIndex
-     &&owner.cellIndex===entry.cellIndex&&field.paraInList===entry.cellParaIndex&&field.startCharIdx===start&&field.endCharIdx===end;
+    const field=asCellField(raw);
+    return field?.location.sectionIndex===focusCell.section&&field.location.paraIndex===focusCell.parent
+     &&JSON.stringify(field.location.path)===locationPath&&field.paraInList===entry.cellParaIndex&&field.startCharIdx===start&&field.endCharIdx===end;
    });
    if(candidates.length!==1)return {status:'unsupported-field-selection'};
    const field=asCellField(candidates[0]);if(!field)return {status:'unsupported-field-selection'};
@@ -304,9 +314,9 @@ export function restoreRootClickHereFieldSelectionN016(input:FieldSelectionSessi
    if(!evidence||evidence.ownerFingerprint!==saved.ownerFingerprint||evidence.fieldFingerprint!==saved.fieldFingerprint
     ||evidence.paragraphFingerprint!==saved.paragraphFingerprint||evidence.geometryFingerprint!==saved.geometryFingerprint
     ||evidence.selectionFingerprint!==saved.selectionFingerprint)return false;
-   const entry=saved.path[0],position=(offset:number):Position=>({sectionIndex:saved.section,parentParaIndex:saved.parentParagraph,
-    paragraphIndex:entry.cellParaIndex,charOffset:offset,controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex,
-    cellPath:[{...entry}]});
+   const first=saved.path[0],last=saved.path.at(-1)!,position=(offset:number):Position=>({sectionIndex:saved.section,parentParaIndex:saved.parentParagraph,
+    paragraphIndex:last.cellParaIndex,charOffset:offset,controlIndex:first.controlIndex,cellIndex:first.cellIndex,cellParaIndex:first.cellParaIndex,
+    cellPath:saved.path.map(entry=>({...entry}))});
    return saved.direction==='forward'?restoreCellSelectionWithReadback(input,position(saved.end),position(saved.start))
     :restoreCellSelectionWithReadback(input,position(saved.start),position(saved.end));
   }

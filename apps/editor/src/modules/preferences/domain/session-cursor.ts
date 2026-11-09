@@ -28,11 +28,11 @@ function rootClickHereFieldSelection(value:any):RootClickHereFieldSelectionBookm
   ||!integer(value.fieldId)||value.fieldId===0||!integer(value.section)||!integer(value.start)||!integer(value.end)||value.end<=value.start
   ||!['forward','backward'].includes(value.direction)||!digest(value.fieldFingerprint)||!digest(value.paragraphFingerprint)||!digest(value.selectionFingerprint))return;
  if(value.owner==='cell'){
-  if(!integer(value.parentParagraph)||!integer(value.listId)||value.listId===0||!Array.isArray(value.path)||value.path.length!==1
-   ||!integer(value.path[0]?.controlIndex)||!integer(value.path[0]?.cellIndex)||!integer(value.path[0]?.cellParaIndex)
+  if(!integer(value.parentParagraph)||!integer(value.listId)||value.listId===0||!Array.isArray(value.path)||value.path.length<1||value.path.length>8
+   ||!value.path.every((entry:any)=>integer(entry?.controlIndex)&&integer(entry?.cellIndex)&&integer(entry?.cellParaIndex))
    ||!digest(value.ownerFingerprint)||!digest(value.geometryFingerprint))return;
   return {version:1,kind:'root-clickhere-field-selection',owner:'cell',fieldId:value.fieldId,section:value.section,parentParagraph:value.parentParagraph,
-   listId:value.listId,path:[{controlIndex:value.path[0].controlIndex,cellIndex:value.path[0].cellIndex,cellParaIndex:value.path[0].cellParaIndex}],start:value.start,end:value.end,
+   listId:value.listId,path:value.path.map((entry:any)=>({controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex})),start:value.start,end:value.end,
    direction:value.direction,ownerFingerprint:value.ownerFingerprint,fieldFingerprint:value.fieldFingerprint,paragraphFingerprint:value.paragraphFingerprint,
    geometryFingerprint:value.geometryFingerprint,selectionFingerprint:value.selectionFingerprint};
  }

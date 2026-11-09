@@ -7,14 +7,15 @@
 | 항목 | 구현·보호 범위 | 검증 | 남은 제한 |
 |---|---|---|---|
 | N011 | portable v1 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 TabDef/기본 BorderFill과 basic character BorderFill의 원본 자원 인증·이식·실패 전체 롤백 | `7db995bd` basic character BorderFill HWP/HWPX 가져오기·저장·재열기·보존 보호 6/6; complete 번호/개요 graph 감사에는 코드 변경 없음 | **부분 유지·명시 차단:** 고급 BorderFill·번호/개요 complete definition graph Rust/WASM 포트·특수 영역·UI·Agent·한글 비교 |
-| N013 | 기관 프로필 v1 검증·portable profile/package JSON UI import/export·CAS/rollback과 빈 새 문서 stored-time typed warning·evidence·acknowledgement·stale 차단 | `8e3512eb` custom 엔진 및 회귀 14/14·격리 build 678 modules | **부분 유지:** 실제 앱 UI·한글 비교·Agent 연결 |
-| N014 / G091 | 단일 root Rectangle의 logical textbox story 커서·선택을 실제 Studio callback에서 exact root owner·story·path·geometry로 적용 전후 감사하고 HWP/HWPX byte invariant를 확인 | `5e98da17` 선별 27/27·build·typecheck·boundary 검사 통과 | **부분 유지:** group·nested·caption 실제 복원·앱 재시작·한글 비교 |
+| N013 | 기관 프로필 v1 검증·portable profile/package JSON UI import/export·CAS/rollback과 빈 새 문서 stored-time typed warning·evidence·acknowledgement·stale 차단 | `4ac67c16` 공식 npm WASM·실제 격리 Edge DOM 1/1: 경고/확인란·미확인 차단·확인 후 정확히 1회 적용·stale 재차단·nonblank 무경고, 외부/page/console/missing 0; 기존 custom 엔진 14/14·build 678 modules | **부분 유지:** 실제 앱 shell 메뉴 진입·한글 비교·Agent 연결 |
+| N014 / G091 | 단일 root Rectangle의 logical textbox story와 top-level group 커서·선택을 exact owner/type/properties/geometry 및 공개 HWP/HWPX document graph fingerprint로 적용 전후 감사하고 restore readback을 확인 | `6c4f0dd3` object family 19/19: HWP/HWPX fingerprint·exact owner/type/properties/geometry·restore readback·lying callback rollback | **부분 유지:** nested/caption owner path restore port 부재·앱 재시작·한글 비교 |
 | N015 | root vector shape 2~32개·중첩 group·embedded 이미지 2개 이상과 root 수식 2개 이상의 ordered selection·활성 개체·수식 속성·host/document private SHA 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 선택 검증 36/36·actual custom engine 수식 HWP/HWPX 저장·재열기·bytes invariant | **부분 유지:** 단일·mixed·nested 수식·OLE·table은 fail-closed; OLE payload typed property API와 table multi-restore port 없음·실제 앱 재시작·한글 비교 |
-| N016 | root-body/table-cell 복원 계약에 top-level single cell nonempty ClickHere의 정확한 full selection만 순방향·역방향으로 복원하고 partial/empty/nested/기타 field는 fail-closed | `59d9d368` custom engine 선별 27/27 | **부분 유지:** partial/empty/nested/기타 field·nested/caption object·실제 앱 재시작·한글 직접 비교 |
+| N016 | root-body/table-cell 복원 계약에 nested table-cell depth 1~8의 nonempty ClickHere exact full selection을 전체 owner chain으로 순방향·역방향 복원 | `b096acda` 신규 nested 10/10·root 회귀 29/29·관련 묶음 42/42 | **부분 유지:** partial/empty/caption/overlap/기타 field·nested/caption object·실제 앱 재시작·한글 직접 비교 |
 | N017 | read-only diagnostic→typed startup gate→memory-only activation→read-only runtime facade를 연결해 값 복사와 scope/backup projection만 노출하고 blocked/unknown key는 fail-closed | N015/N017 공동 선별 검사를 포함한 28/28·strict TypeScript·모듈 경계 diagnostics 0 | **부분 유지:** 실제 shell boot 주입·UI/facade consumer migration·Windows/한글/origin/DPI 수명 실측 미연결 |
 | N020 | 증거 수집→정책→최대 1회 refresh→activate→post evidence 재검증→semantic input의 fail-closed coordinator | 정책·coordinator 19/19·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
 | N018 | 실제 upstream EventBus callback을 continuity 정책과 capability gate에 연결하되 exact top recipe producer·atomic state read/apply·동일 token event payload·verified save transition이 없으면 state-uncertain으로 차단 | 코드 변경 없이 fail-closed 선별 21/21; `clear(wasm)` snapshot release 경계 확인 | **부분 유지·명시 차단:** 실제 InputHandler/CommandHistory의 exact top recipe producer/read/apply/event payload/save transition 포트와 runtime/process restart 통합 미연결 |
-| N007 | 반복 제목행의 마지막 제목행·첫 본문행 경계에서만 삽입·삭제하고 제목/본문 분류·행 span·셀 값·원본 구조를 재검증 | `067e79f3` HWP/HWPX 저장·재열기·undo/redo 포함 선택 77/77 | **부분 유지:** 제목 span 교차·필드·그림/개체·병합/복합 주 셀 삭제·한글 비교 |
+| N007 | 반복 제목행 경계와 비병합 연속 제목 구간 index 0에서 삽입·삭제하고 제목/본문 분류·행 span·셀 값·원본 구조를 재검증 | `d0a04fcd` 새 기능 추가 없이 기존 지원을 증명: HWP/HWPX 재열기·exact undo/redo·insert/delete proof·save rollback 15/15 | **부분 유지:** crossing span은 rowSpan>1 병합으로 fail-closed·필드·그림/개체·병합/복합 주 셀 삭제·한글 비교 |
+| N006 | 위/아래와 Left/Right 중첩 표 캡션에서 full path·원문·revision·live/portable geometry를 재검증하고 동일 Unicode scalar 길이 multi-run의 UTF-16/scalar 경계·서식·배치를 보존 | `e67ca6ee` custom engine HWP/HWPX 저장·재열기·undo/redo 18 pass·1 expected skip | **부분 유지:** 캡션 생성·일반 길이 변화·field/bookmark/object·실제 앱·한글 직접 비교 |
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
 | N012 | 저장 글자 스타일과 직접 서식 타입 분리·stored character-style reference capture·UI 적용 시점 재해석·stale/race fail-closed·정의 변경 재열기 전파 | `66ab2768` UI stored-time 소비 경계 9/9·격리 build 673 modules | **부분 유지:** 실제 브라우저 UI·한글 비교·Agent 연결 |
 | N021 | exact header/footer/footnote/endnote/textbox story에서 upstream/registry 계약으로 증명한 undo·redo·goto·select-all·save만 허용하고 unknown과 나머지 본문/파일/보기/서식 명령은 fail-closed | `1ec65059` 전용 25/25·전체 선택 묶음 61/61·strict TypeScript·module boundaries diagnostics 0 | **부분 유지:** 실제 앱·한글 비교·나머지 명령 story 의미·쪽 번호/매크로 pending·혼합 run |
@@ -31,7 +32,7 @@
 | N012 추가 | Studio 스타일 적용 seam에서 stored character-style reference를 먼저 캡처해 기존 검증된 적용 함수에 전달; 숫자 style ID 직접 전달 회귀와 patch drift 차단 | 관련 테스트 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 UI 동작 검수·Agent 연결·한글 비교 |
 | B031 | root-body 일반 문단의 `pghd` PageHide 조판 부호 한 종류를 위치·원문·revision·전체 문서 보존 상태 재검증 뒤 삭제하고 실패 시 snapshot 복원 | HWP/HWPX 저장·재열기·undo·stale/보호 실패 불변 4/4 | **부분 유지:** 다른 조판 부호·특수 story·종류별 UI·한글 비교 |
 | N022 | 설치 한글 저장 증거 기준 Ctrl+F7 양쪽 여백 증가·Ctrl+F8 감소와 공개 표 차이 감사 | 문단 여백·IME·navigation 회귀 37/37·TypeScript compile | 공개 표와 설치본 차이의 근본 원인·한글 재비교 |
-| N006 | 1문단·단일 글자 서식의 위/아래 중첩 표 캡션을 경로·원문·revision·보존 상태 재검증 후 교체 | HWP/HWPX 저장·재열기·undo와 음성 사례 3/3·회귀 4/4 | 빈/여러 문단·혼합 서식·좌우 캡션·필드·책갈피·개체·UI |
+| N006 | 위/아래와 Left/Right 중첩 표 캡션을 full path·원문·revision·live/portable geometry 재검증 후 동일 Unicode scalar 길이 multi-run으로 교체 | `e67ca6ee` HWP/HWPX 저장·재열기·undo/redo 18 pass·1 expected skip | **부분 유지:** 캡션 생성·일반 길이 변화·field/bookmark/object·실제 앱·한글 비교 |
 | N013 추가 | 프로필·항목·slot 계획·문서 style ID를 고정한 순수 preview와 snapshot apply controller | HWP/HWPX 저장·재열기·stale/충돌/중간 실패 복구 포함 9/9 | 전역 단축키 설정 저장·실제 UI·Agent·한글 비교 |
 | N019 | 메뉴·리본·빠른 도구·문맥 메뉴의 정적 reachability 감사와 `insert:comment`·`insert:para-band` native API/durable model/atomic history/HWP·HWPX 재열기 증거의 fail-closed capability gate | 신규 gate 5/5·기존 N019 감사 5/5·strict TypeScript 통과 | **부분 유지:** 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·동적 disabled 정책·한글 비교 |
 | N006 추가 | 최대 32문단의 위/아래 중첩 표 캡션에서 명시한 문단 하나를 경로·원문·revision·전체 문단 서식 재검증 후 교체 | HWP/HWPX 저장·재열기·undo 포함 5/5·회귀 4/4 | 빈 문단·혼합 글자 서식·좌우 캡션·필드·책갈피·개체 |
@@ -41,9 +42,9 @@
 | N013 추가 | 저장된 번호키 profile을 현재 catalog digest·ID·이름·종류·source에 맞춰 read-only resolve | HWP/HWPX 재열기 후보·bytes 불변·stale/충돌 포함 3/3 | post-apply digest 생산 연결·실제 keymap/UI·Agent |
 | N021 조사 | Ctrl+N,P 쪽 번호 매기기와 기존 새 번호 시작 명령을 구분하고 현재 API 부재 확인 | 단축키 회귀 11/11·코드 무변경 | Rust PageNumberPos 원자 API·WASM bridge·대화상자·명령 연결 |
 | N006 추가 | 단일 캡션 문단의 연속 2~128개 글자 run을 동일 길이 BMP 텍스트로 교체하고 기존 run 경계·charShapeId·위치·인접 중첩 표 배치를 보존 | 기본 엔진 fail-closed 2/2·Jueony 패치 엔진 HWP/HWPX 저장·재열기·undo 10/10·회귀 4/4·TypeScript compile | 길이 변화·surrogate/emoji·제어문자·좌우 캡션·필드·책갈피·개체 |
-| N006 추가 | 다중 빈 캡션 문단 중 exact path/source/revision/style/run이 검증된 하나를 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 채우고 UTF-16/scalar run 경계와 균일 수직 재조판을 보존 | `554ccfd9` custom Rust/WASM HWP/HWPX 저장·재열기·undo 14 pass·1 expected skip | **부분 유지:** 필드·책갈피·개체·일반 길이 변화·좌우 캡션·실제 앱/한글 |
-| N013 추가 | 정확한 빈 새 문서와 stored-time fingerprint·created/modified 상태를 mutation 전에 봉인하고 absent일 때 typed warning·acknowledgement를 요구하며 stale을 차단한다. official capability unavailable도 typed warning으로 노출해 직접 UI의 명시적 확인 전 적용을 차단한다. | `8e3512eb` custom HWP/HWPX 저장·재열기와 portable/style 회귀 14/14·격리 build 678 modules | **부분 유지:** 실제 앱 UI·한글 비교·Agent 연결 |
-| N016 추가 | top-level single cell의 nonempty ClickHere exact full selection만 순방향·역방향으로 복원하고 partial·empty·nested·다른 field는 fail-closed | `59d9d368` custom engine 선별 27/27 | **부분 유지:** nested/caption object·그 밖의 field·실제 앱 재시작·한글 직접 비교 |
+| N006 추가 | 다중 빈 캡션 문단과 Left/Right 중첩 캡션에서 exact path/source/revision/style/run 및 live/portable geometry가 검증된 대상을 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계와 재조판을 보존 | `e67ca6ee` custom Rust/WASM HWP/HWPX 저장·재열기·undo/redo 18 pass·1 expected skip | **부분 유지:** 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱/한글 |
+| N013 추가 | 정확한 빈 새 문서와 stored-time fingerprint·created/modified 상태를 mutation 전에 봉인하고 official capability unavailable도 typed warning과 확인란으로 노출해 미확인 적용과 stale evidence를 차단한다. | `4ac67c16` 공식 npm WASM·실제 격리 Edge DOM 1/1, 확인 후 apply 정확히 1회·nonblank 무경고·외부/page/console/missing 0; 기존 custom 회귀 14/14·build 678 modules | **부분 유지:** 실제 앱 shell 메뉴·한글 비교·Agent 연결 |
+| N016 추가 | nested table-cell depth 1~8의 nonempty ClickHere exact full selection을 전체 owner chain으로 순방향·역방향 복원하고 partial·empty·caption·overlap·다른 field는 fail-closed | `b096acda` 신규 10/10·root 회귀 29/29·관련 묶음 42/42 | **부분 유지:** nested/caption object·그 밖의 field·실제 앱 재시작·한글 직접 비교 |
 | N013 추가 | import 후 현재 catalog digest와 style ID·이름·종류·source를 원자적 shortcut 설정에 결합하고 저장 단계별 실패 상태를 rollback/applied/disconnected로 구분 | HWP/HWPX 재열기 consumer 연결과 실패 복구 14/14·TypeScript compile | 실제 keymap/UI·Agent·한글 비교 |
 | N021 조사 | 한글 스크립트 매크로와 기존 AI 명령 템플릿을 구분하고 Studio command/input recording 계약 부재 확인 | 단축키 회귀 11/11·코드 무변경 | dispatcher 성공 이벤트·IME/선택 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI/저장 |
 | B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·격리 build·실제 Edge 메뉴/상태바/교차 탭 smoke | 빈 문서 stored-time 초기화 경고·한글 직접 비교 |
@@ -97,8 +98,10 @@ npm test -- tests/preference-startup-gate-n017.test.ts tests/preference-memory-a
 59 tests passed; strict TypeScript passed for the three committed source files and module boundary audit passed with 455 files and 0 diagnostics
 N015/N017 committed selected verification bundle (embedded image selection + read-only preference runtime and regressions)
 28 tests passed; strict TypeScript and module boundary audit passed with 0 diagnostics
-N014 public HWP/HWPX textbox owner/story/geometry capability verification
-15/15 passed; caption ambiguity, nested owner chain and hidden group child remained exact fail-closed blockers
+N014 public HWP/HWPX top-level group document graph restore verification
+19/19 passed; exact owner/type/properties/geometry, restore readback and lying callback rollback covered; nested/caption owner path remained fail-closed
+N007 non-merged contiguous title segment index-0 verification
+15/15 passed; HWP/HWPX reopen, exact undo/redo, insert/delete proof and save rollback covered; crossing rowSpan>1 remained fail-closed
 N015 root equation multi-selection verification with actual custom engine HWP/HWPX save/reopen and bytes invariant
 36/36 passed; single/mixed/nested equation, OLE and table selection remained fail-closed
 N021 special-story shortcut boundary verification
@@ -168,11 +171,13 @@ JUEONY_BUILD_PROFILE=group-selection-session npm run build
 node apps/editor/scripts/verify-n013-b046-browser-smoke.mjs
 4 Edge smoke scenarios passed; pageErrors/consoleErrors/externalRequests 0
 JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-c932adab64d8bc4e/pkg npm test -- tests/nested-caption-text.test.ts
-14 tests passed; 1 unpatched-engine guard skipped; equal Unicode scalar length emoji and UTF-16/scalar run preservation, HWP/HWPX save-reopen and exact snapshot undo passed
+18 tests passed; 1 expected guard skipped; Left/Right full path/live+portable geometry and equal Unicode scalar multi-run preservation, HWP/HWPX save-reopen and undo/redo passed
+node --experimental-strip-types --test apps/editor/tests/style-package-dialog-browser-n013.test.ts
+1/1 passed in actual isolated Edge with official npm WASM; warning checkbox, unchecked block, acknowledged one apply, stale block and nonblank no-warning covered; external/page/console/missing 0
 N013 portable style profile/package JSON UI import-export verification
-14/14 passed with the custom engine; blank stored-time typed warning/evidence/ack/stale and official capability unavailable protection covered; isolated build 678 modules
-N016 top-level single cell nonempty ClickHere full-selection verification
-27/27 passed with the custom engine; forward/backward exact selection and fail-closed negatives covered
+14/14 passed with the custom engine; blank stored-time typed warning/evidence/ack/stale protection covered; isolated build 678 modules
+N016 nested table-cell depth 1~8 nonempty ClickHere full-selection verification
+10/10 new nested, 29/29 root regression and 42/42 related selection bundle passed; exact owner-chain forward/backward selection and fail-closed negatives covered
 ```
 
 회전 글상자의 실제 WASM 검사는 `source-cc7eb97e2669dc19` 엔진으로 HWP·HWPX 저장·재열기와 바이트 비변경을 확인했다. 기존 공유 dirty 빌드를 덮어쓰지 않기 위해 새 Edge 전체 빌드는 실행하지 않았다.

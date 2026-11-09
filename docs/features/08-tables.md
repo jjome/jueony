@@ -22,7 +22,7 @@
 
 - **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
 - **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 완전히 보이지 않는 0길이 이웃 ClickHere는 앱과 Rust 모두 mutation 전에 차단하고 정상 guide-only 0길이 필드는 유지한다. HWP/HWPX 저장·재열기 2/2와 관련 회귀 32/32를 통과했다. 겹친 필드·개체 혼합 셀·캡션 내부 필드는 남아 부분이다.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸며 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit 554ccfd9 기준 custom engine HWP/HWPX 저장·재열기·undo 선별 검사는 14 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·좌우 캡션·필드·책갈피·개체는 fail-closed로 남아 부분이다.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. Left/Right 중첩 캡션도 full path와 live·portable geometry를 재검증하며 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit e67ca6ee 기준 custom engine HWP/HWPX 저장·재열기·undo/redo 선별 검사는 18 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱·한글 직접 비교는 fail-closed로 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -973,11 +973,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸며 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit 554ccfd9 기준 custom engine HWP/HWPX 저장·재열기·undo 선별 검사는 14 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·좌우 캡션·필드·책갈피·개체는 fail-closed로 남아 부분이다.
+- 다음 작업: 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. Left/Right 중첩 캡션도 full path와 live·portable geometry를 재검증하며 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit e67ca6ee 기준 custom engine HWP/HWPX 저장·재열기·undo/redo 선별 검사는 18 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱·한글 직접 비교는 fail-closed로 남아 부분이다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - Agent 명령: `set_table_cell,insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;NESTED_CAPTION_TEXT_2026_11_08;MULTIPARAGRAPH_CAPTION_2026_11_09;EMPTY_CAPTION_FILL_2026_11_09;MULTIRUN_CAPTION_2026_11_09;MULTIBLANK_CAPTION_2026_11_09;UNICODE_SCALAR_CAPTION_2026_11_09`
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;NESTED_CAPTION_TEXT_2026_11_08;MULTIPARAGRAPH_CAPTION_2026_11_09;EMPTY_CAPTION_FILL_2026_11_09;MULTIRUN_CAPTION_2026_11_09;MULTIBLANK_CAPTION_2026_11_09;UNICODE_SCALAR_CAPTION_2026_11_09;LEFT_RIGHT_CAPTION_2026_11_09`
 
 </details>
 
@@ -987,12 +987,12 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 반복 제목행의 마지막 제목행·첫 본문행 경계에서만 삽입·삭제하고 제목/본문 분류·행 span·셀 값·원본 문서 구조를 재검증하며 HWP/HWPX 저장·재열기와 undo/redo를 보존
-- 다음 작업: commit 067e79f3 기준 마지막 제목행·첫 본문행 경계 삽입삭제와 HWP/HWPX 저장·재열기·undo/redo 선별 검사 77/77을 통과했다. 제목 span 교차·필드·그림/개체·병합/복합 주 셀 삭제와 한글 직접 비교는 남아 부분이다.
+- 완료 범위: 반복 제목행의 마지막 제목행·첫 본문행 경계와 비병합 연속 제목 구간 index 0에서 삽입·삭제하고 제목/본문 분류·행 span·셀 값·원본 문서 구조를 재검증하며 HWP/HWPX 저장·재열기와 exact undo/redo를 보존
+- 다음 작업: commit d0a04fcd는 새 제품 기능을 추가한 것이 아니라 비병합 연속 제목 구간의 index 0 삽입·삭제가 이미 지원됨을 증명했다. HWP/HWPX 재열기·exact undo/redo·insert/delete proof·save rollback 선별 15/15와 기존 제목 경계 회귀를 통과했다. crossing span은 rowSpan>1 병합이므로 계속 fail-closed이며 필드·그림/개체·병합/복합 주 셀 삭제와 한글 직접 비교는 남아 부분이다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [table-title-boundary-n007.test.ts](<../../apps/editor/tests/table-title-boundary-n007.test.ts>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;TABLE_TITLE_BOUNDARY_2026_11_09`
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;TABLE_TITLE_BOUNDARY_2026_11_09;NONMERGED_TITLE_SEGMENT_2026_11_09`
 
 </details>
 

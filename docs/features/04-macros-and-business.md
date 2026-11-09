@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 4 · 미구현 1 |
-| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 4 · 미검증 1 |
+| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 5 |
+| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 5 |
 | Agent 연결 | 연결 3/6 · 부분 0 · 미연결 3 | 연결 0/5 · 부분 0 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -66,7 +66,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B141](<04-macros-and-business.md#b141>) · 범위 | 메일 머지 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B141](<04-macros-and-business.md#b141>) · 범위 | 메일 머지 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-5"></a>
 
@@ -137,12 +137,12 @@
 <summary>B141 · 메일 머지</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 자료 원본·필드·일괄 결과 보존
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 명시적 로컬 행과 검증된 필드로 독립 문서 사본을 만드는 안전 코어만 구현한다.
+- 다음 작업: commit 91af64ca 기준 template revision·fingerprint·필드 스키마와 행/열/값/출력 이름 한도를 검증하고 각 행을 독립 clone에서 치환·재조회·export한 뒤 transactional stage·commit한다. 실제 WASM HWP/HWPX 두 사본 저장·재열기와 원본 바이트 불변·stale/중간 실패 전체 rollback을 4/4로 확인했다. 실제 파일시스템 transactional output port·UI·한글 비교는 미연결이라 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [mail-merge-b141.ts](<../../apps/editor/src/modules/document/application/mail-merge-b141.ts>) · [mail-merge-b141.test.ts](<../../apps/editor/tests/mail-merge-b141.test.ts>)
+- 원래 기록: `PARTIAL;TRANSACTIONAL_MAIL_MERGE_CORE_PASS_2026_11_09;FILESYSTEM_UI_WIRING_PENDING`
 
 </details>
 

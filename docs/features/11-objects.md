@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/18 · 부분 12 · 미구현 6 |
-| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 5 · 미검증 13 |
+| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 6 · 미검증 12 |
 | Agent 연결 | 해당 없음 1 | 연결 0/18 · 부분 0 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -64,7 +64,7 @@
 | [B075](<11-objects.md#b075>) · 범위 | 글맵시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B076](<11-objects.md#b076>) · 범위 | OLE 개체 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B079](<11-objects.md#b079>) · 범위 | 캡션 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B082](<11-objects.md#b082>) · 범위 | 글자 겹치기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B082](<11-objects.md#b082>) · 범위 | 글자 겹치기 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
 
@@ -257,12 +257,12 @@
 <summary>B082 · 글자 겹치기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 전용 대화상자 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. CharOverlap 모델·코덱·렌더러의 기존 보존만 확인됐으며 편집 기능은 구현되지 않았다.
+- 다음 작업: commit ddb71dea 기준 공개 엔진에 getCharOverlapListV1·insertCharOverlapAtSelectionV1·removeCharOverlapV1과 snapshot history 계약이 없음을 감사했다. 설치 엔진의 capability 차단과 HWP/HWPX 바이트 불변·소스 증거 3/3을 확인했다. 일반 문자 대체나 성공 위장은 만들지 않았으며 네이티브 조회·삽입·삭제 API와 범위 검증이 생길 때까지 미구현이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [character-overlap-capability-b082.ts](<../../apps/editor/src/adapters/rhwp/character-overlap-capability-b082.ts>) · [character-overlap-capability-b082.test.ts](<../../apps/editor/tests/character-overlap-capability-b082.test.ts>)
+- 원래 기록: `MISSING;CHAR_OVERLAP_MODEL_CODEC_RENDER_ONLY_AUDIT_PASS_2026_11_09;EDIT_APIS_MISSING`
 
 </details>
 

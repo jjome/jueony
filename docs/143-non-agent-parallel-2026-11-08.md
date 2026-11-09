@@ -211,6 +211,13 @@ N004는 동결된 206개 patch 엔진 `source-1c95e8f557d95b73`으로 네이티�
 
 B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·외부 요청이 모두 0이었다. 다만 공유 검수 빌드에서 차트와 무관한 favicon 404와 빈 문서 stored-time 초기화 API가 공식 npm WASM에 없는 오류가 별도로 관찰됐다. 소유 HWP/HWPX를 직접 연 차트 검수에는 영향을 주지 않았으며, 이 두 항목은 해결된 것으로 표시하지 않는다.
 
+## 2026-11-09 09:13 KST 혼합 개체·표 셀 선택 묶음
+
+- N015는 최상위 root의 수식과 embedded 그림이 함께 들어 있는 2~32개 ordered selection을 복원한다. 선택 순서와 마지막 활성 개체를 유지하고 수식 전체 속성, 그림 속성·MIME·payload SHA-256, owner/control/host 및 canonical 문서 지문을 검증한다. 신규 3/3에서 실제 HWP/HWPX 저장·재열기, exact export bytes 불변, 선택 undo/redo와 포트 실패 rollback을 확인했다. shape/group 혼합, nested, OLE, table 선택은 계속 fail-closed 또는 미지원이므로 N015는 부분이다.
+- N016은 최상위 표 셀의 단일 ClickHere 필드 내부 비어 있지 않은 strict partial 선택을 정방향·역방향으로 복원한다. root 표 control, cell owner/list/path, 필드·문단 텍스트·끝점 geometry·문서 revision을 검증하고 신규 3/3에서 실제 HWP/HWPX 저장·재열기, readback, bytes/undo snapshot 불변 및 실패 rollback을 확인했다. 중첩 셀 partial, 빈 필드 커서, caption, overlap, 기타 field는 남아 N016은 부분이다.
+- B078은 실제 upstream HWP에 있는 최상위 본문 CheckBox·RadioButton·ComboBox·Edit의 기존 값을 공개 Form API로 편집한다. strict CAS와 문서·control·속성·원값 지문, form mode·조합 중·암호/읽기 전용 차단, snapshot rollback을 적용했고 신규 5/5에서 실제 HWP/HWPX 저장·재열기와 byte-exact undo/redo를 확인했다. 신규 생성·삭제·속성 편집·셀 내부 양식·PushButton·UI·Agent 연결은 남아 부분이다.
+- 두 구현은 strict TypeScript와 `git diff --check`를 통과했다. 이번 묶음에서도 AI·Agent 실행과 참고 자료·검색·RAG는 수정하지 않았고, 한글 2024 직접 비교와 push는 실행하지 않았다.
+
 ## 변경 집합
 
 - `0eb379ec feat(editor): preserve styles and rotated textbox state`
@@ -256,4 +263,7 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `f28152cf feat(editor): restore single equation selection`
 - `414dfa55 feat(editor): restore partial ClickHere selections`
 - `176ef801 feat(security): add session personal info protection`
+- `72e2ced9 feat(editor): restore mixed root object selections`
+- `46737ef0 feat(editor): restore partial cell field selections`
+- `7acfe5f9 feat(editor): edit verified form object values`
 - AI·Agent 실행과 참고 자료·검색·RAG 코드는 이 묶음에서 변경하지 않았다.

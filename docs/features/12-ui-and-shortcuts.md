@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 command reachability 감사에 더해 insert:comment·insert:para-band가 현재 Rust/WASM native mutation API를 갖지 않음을 확인하고 native API→durable model→atomic undo/redo→HWP/HWPX 재열기 증거를 요구하는 fail-closed capability gate를 추가했다. 신규 gate 5/5와 기존 N019 감사 5/5를 통과했으며 API 선언만으로 enabled/success를 노출하지 않는다. 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·한글 비교는 남아 부분이다.
+- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 reachability·fail-closed capability gate에 더해 실제 생성한 Studio UI에서 미지원 자리표시 명령이 메뉴·문맥 메뉴 disabled·리본/빠른 메뉴 미노출·dispatcher disabled로 유지되고 UI dispatch·execute·native write·성공 이벤트가 모두 0임을 Edge로 확인했다. 891ac4d0 기준 Edge 1/1과 HWP/HWPX 불변 회귀 5/5를 통과했다. 실제 native API·durable model·undo/HWP·HWPX adapter와 dirty build.mjs를 건드리지 않는 정식 build hook·한글 비교는 남아 부분이다.
 - **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
-- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — commit 1ec65059 기준 exact special story에서는 upstream/registry 계약으로 증명한 undo·redo·goto·select-all·save만 허용하고 나머지 본문/파일/보기/서식 명령은 차단한다. 전용 검사 25/25와 전체 선택 묶음 61/61·strict TypeScript·경계 diagnostics 0을 통과했다. 실제 앱·한글 비교와 나머지 명령의 story별 허용 의미·쪽 번호·매크로·혼합 run은 남아 부분이다.
+- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — exact special story 안전 명령 경계에 더해 7df5d8fb에서 단일 구역 최상위 본문의 PageNumberPos 삽입·조회 Rust/WASM API와 단일 snapshot/readback adapter를 추가했다. HWP/HWPX 저장·재열기·undo/redo·실패 bytes 불변 Rust 3/3, adapter 4/4, 전체 엔진 패치 연쇄 적용, strict TypeScript와 경계 diagnostics 0을 통과했다. 기존 컨트롤 교체·다구역/특수 story·실제 Ctrl+N,P 대화상자와 명령 등록·매크로·한글 비교는 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -648,10 +648,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 하위 dialog/표·개체·특수 영역·disabled 조건까지
-- 다음 작업: 정적 command reachability 감사에 더해 insert:comment·insert:para-band가 현재 Rust/WASM native mutation API를 갖지 않음을 확인하고 native API→durable model→atomic undo/redo→HWP/HWPX 재열기 증거를 요구하는 fail-closed capability gate를 추가했다. 신규 gate 5/5와 기존 N019 감사 5/5를 통과했으며 API 선언만으로 enabled/success를 노출하지 않는다. 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·한글 비교는 남아 부분이다.
+- 다음 작업: 정적 reachability·fail-closed capability gate에 더해 실제 생성한 Studio UI에서 미지원 자리표시 명령이 메뉴·문맥 메뉴 disabled·리본/빠른 메뉴 미노출·dispatcher disabled로 유지되고 UI dispatch·execute·native write·성공 이벤트가 모두 0임을 Edge로 확인했다. 891ac4d0 기준 Edge 1/1과 HWP/HWPX 불변 회귀 5/5를 통과했다. 실제 native API·durable model·undo/HWP·HWPX adapter와 dirty build.mjs를 건드리지 않는 정식 build hook·한글 비교는 남아 부분이다.
 - 상위 항목: [B054](<12-ui-and-shortcuts.md#b054>) 기본 도구 상자
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [insert-placeholder-capability-n019.ts](<../../apps/editor/src/shortcuts/insert-placeholder-capability-n019.ts>) · [insert-placeholder-capability-n019.test.ts](<../../apps/editor/tests/insert-placeholder-capability-n019.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08;INSERT_PLACEHOLDER_CAPABILITY_GATE_2026_11_09`
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [insert-placeholder-capability-n019.ts](<../../apps/editor/src/shortcuts/insert-placeholder-capability-n019.ts>) · [insert-placeholder-command-patches-n019.mjs](<../../apps/editor/scripts/integration/insert-placeholder-command-patches-n019.mjs>) · [insert-placeholder-capability-n019.test.ts](<../../apps/editor/tests/insert-placeholder-capability-n019.test.ts>) · [insert-placeholder-studio-browser-n019.test.ts](<../../apps/editor/tests/insert-placeholder-studio-browser-n019.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08;INSERT_PLACEHOLDER_CAPABILITY_GATE_2026_11_09;INSERT_PLACEHOLDER_ACTUAL_UI_DISABLED_2026_11_09`
 
 </details>
 
@@ -676,10 +676,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한컴 기본 매핑과 header/footer/footnote/endnote/textbox exact story DTO·unknown/conflict fail-closed·normal/IME guard·body fallback/chord escape 차단·검증된 nested textbox table depth
-- 다음 작업: commit 1ec65059 기준 exact special story에서는 upstream/registry 계약으로 증명한 undo·redo·goto·select-all·save만 허용하고 나머지 본문/파일/보기/서식 명령은 차단한다. 전용 검사 25/25와 전체 선택 묶음 61/61·strict TypeScript·경계 diagnostics 0을 통과했다. 실제 앱·한글 비교와 나머지 명령의 story별 허용 의미·쪽 번호·매크로·혼합 run은 남아 부분이다.
+- 다음 작업: exact special story 안전 명령 경계에 더해 7df5d8fb에서 단일 구역 최상위 본문의 PageNumberPos 삽입·조회 Rust/WASM API와 단일 snapshot/readback adapter를 추가했다. HWP/HWPX 저장·재열기·undo/redo·실패 bytes 불변 Rust 3/3, adapter 4/4, 전체 엔진 패치 연쇄 적용, strict TypeScript와 경계 diagnostics 0을 통과했다. 기존 컨트롤 교체·다구역/특수 story·실제 Ctrl+N,P 대화상자와 명령 등록·매크로·한글 비교는 남아 부분이다.
 - 상위 항목: [B169](<08-tables.md#b169>) 첫 셀·셀 블록
-- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [special-story-context-n021.ts](<../../apps/editor/src/shortcuts/special-story-context-n021.ts>) · [special-story-command-scope-n021.ts](<../../apps/editor/src/shortcuts/special-story-command-scope-n021.ts>) · [special-story-command-scope-n021.test.ts](<../../apps/editor/tests/special-story-command-scope-n021.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;PAGE_NUMBER_API_BLOCKER_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09;SPECIAL_STORY_SAFE_GLOBALS_2026_11_09`
+- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [special-story-context-n021.ts](<../../apps/editor/src/shortcuts/special-story-context-n021.ts>) · [special-story-command-scope-n021.ts](<../../apps/editor/src/shortcuts/special-story-command-scope-n021.ts>) · [page-number-position-n021.ts](<../../apps/editor/src/adapters/rhwp/page-number-position-n021.ts>) · [page-number-position-n021.test.ts](<../../apps/editor/tests/page-number-position-n021.test.ts>) · [zzzzzzzzzzzzzzzzzzz-page-number-position.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzz-page-number-position.patch>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09;SPECIAL_STORY_SAFE_GLOBALS_2026_11_09;PAGE_NUMBER_POSITION_ENGINE_2026_11_09`
 
 </details>
 

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 3 · 미구현 6 · stub 2 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 2 · 미검증 9 |
+| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 5 · 미구현 6 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 4 · 미검증 7 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -35,7 +35,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B092](<14-security-and-review.md#b092>) · 범위 | 메모 | ☐ stub | ☐ 미검증 | ☐ 미연결 |
+| [B092](<14-security-and-review.md#b092>) · 범위 | 메모 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
@@ -58,7 +58,7 @@
 | [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 | [B134](<14-security-and-review.md#b134>) · 범위 | 문서 이력 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B135](<14-security-and-review.md#b135>) · 범위 | 문서 비교 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B136](<14-security-and-review.md#b136>) · 범위 | 메모 넣기·모양·표시 | ☐ stub | ☐ 미검증 | ☐ 미연결 |
+| [B136](<14-security-and-review.md#b136>) · 범위 | 메모 넣기·모양·표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
 
@@ -76,12 +76,12 @@
 <summary>B092 · 메모</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ stub / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 등록된 insert:comment가 canExecute=false, 빈 execute. B136과 동일 메모 계열.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `STUB;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 본문 단일 지점 메모만 실제 rhwp MEMO 필드로 생성·조회·삭제한다.
+- 다음 작업: commit 5c71c6d3 기준 본문 단일 지점 메모의 보호·story·revision·목록 fingerprint 검사와 snapshot undo/redo를 구현했다. fresh Rust/WASM 선별 검사 3/3에서 HWP/HWPX 재열기 후 본문·앵커·작성자·내용·memoIndex 보존과 삭제 후 본문 보존을 확인했다. 기존 Studio insert:comment stub·범위 메모·표/글상자·여러 문단·모양/표시 UI·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-comments-b092.ts](<../../apps/editor/src/adapters/rhwp/document-comments-b092.ts>) · [document-comments-b092.test.ts](<../../apps/editor/tests/document-comments-b092.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch>)
+- 원래 기록: `PARTIAL;BODY_POINT_MEMO_HWP_HWPX_REOPEN_PASS_2026_11_09;STUDIO_UI_WIRING_PENDING`
 
 </details>
 
@@ -195,12 +195,12 @@
 <summary>B136 · 메모 넣기·모양·표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ stub / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 메모 실행 stub. B092와 같은 기능군의 검토 메뉴 범주로 중복 집계 주의.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `STUB;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. B092와 같은 메모 계열이며 현재 본문 단일 지점 삽입 코어만 지원한다.
+- 다음 작업: commit 5c71c6d3 기준 실제 MEMO 필드 삽입·조회·삭제·undo/redo와 HWP/HWPX 재열기 보존을 선별 검사 3/3으로 확인했다. 메모 모양·표시·범위 메모·특수 story와 기존 Studio insert:comment UI 연결은 구현하지 않았으므로 완료가 아니다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-comments-b092.ts](<../../apps/editor/src/adapters/rhwp/document-comments-b092.ts>) · [document-comments-b092.test.ts](<../../apps/editor/tests/document-comments-b092.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch>)
+- 원래 기록: `PARTIAL;BODY_POINT_MEMO_CORE_PASS_2026_11_09;SHAPE_DISPLAY_UI_PENDING`
 
 </details>
 

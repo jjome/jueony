@@ -11,10 +11,38 @@ if (!pkg || !fixture || !isAbsolute(pkg) || !isAbsolute(fixture)) {
 }
 const { default: initialize, HwpDocument } = await import(pathToFileURL(join(pkg, 'rhwp.js')).href);
 await initialize({ module_or_path: await readFile(join(pkg, 'rhwp_bg.wasm')) });
-for (const method of ['splitCellParagraphs', 'previewTableFormulaField', 'updateTableFormulaField', 'insertTableFormulaField']) {
+for (const method of [
+  'splitCellParagraphs',
+  'previewTableFormulaField',
+  'updateTableFormulaField',
+  'insertTableFormulaField',
+  'insertPageNumberPosition',
+  'getPageNumberPosition',
+]) {
   assert.equal(typeof HwpDocument.prototype[method], 'function', 'Missing WASM binding ' + method);
 }
 const json = JSON.parse;
+
+const pageNumber = HwpDocument.createEmpty();
+try {
+  pageNumber.createBlankDocument();
+  assert.deepEqual(json(pageNumber.getPageNumberPosition(0)), { ok: true, exists: false });
+  assert.equal(json(pageNumber.insertPageNumberPosition(
+    0,
+    0,
+    JSON.stringify({ format: 3, position: 6, sideChar: '-' }),
+  )).inserted, true);
+  for (const bytes of [pageNumber.exportHwp(), pageNumber.exportHwpx()]) {
+    const reopened = new HwpDocument(bytes);
+    try {
+      const stored = json(reopened.getPageNumberPosition(0));
+      assert.equal(stored.exists, true);
+      assert.equal(stored.format, 3);
+      assert.equal(stored.position, 6);
+      assert.equal(stored.sideChar, '-');
+    } finally { reopened.free(); }
+  }
+} finally { pageNumber.free(); }
 
 const table = HwpDocument.createEmpty();
 try {
@@ -90,4 +118,4 @@ try {
   assert.equal(stored.command, '=A3*2??%g;;6');
   assert.equal(stored.value, '6');
 } finally { formulas.free(); }
-console.log('PASS compiled WASM split-cell paragraph distribution, native formula creation, dependency update and save/reopen');
+console.log('PASS compiled WASM page-number position, split-cell paragraph distribution, native formula creation, dependency update and save/reopen');

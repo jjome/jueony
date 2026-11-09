@@ -67,7 +67,15 @@ try {
 } finally { Pop-Location }
 }
 $pkg = Join-Path $sourceRoot 'pkg'
-$requiredMethods = @('insertSectionBreak', 'mergeSectionBoundary', 'splitCellParagraphs', 'previewTableFormulaField', 'updateTableFormulaField')
+$requiredMethods = @(
+    'insertSectionBreak',
+    'mergeSectionBoundary',
+    'splitCellParagraphs',
+    'previewTableFormulaField',
+    'updateTableFormulaField',
+    'insertPageNumberPosition',
+    'getPageNumberPosition'
+)
 $bindings = [IO.File]::ReadAllText((Join-Path $pkg 'rhwp.js'))
 foreach ($method in $requiredMethods) {
     if (-not $bindings.Contains("    $method(")) { throw "Compiled engine is missing the expected WASM binding $method." }

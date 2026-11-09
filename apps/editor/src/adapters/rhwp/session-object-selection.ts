@@ -19,6 +19,7 @@ function normalized(value:any):any{if(Array.isArray(value))return value.map(norm
 const hashJson=(value:any)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(normalized(value)))),v=>v.toString(16).padStart(2,'0')).join('');
 const hashBytes=(value:Uint8Array)=>Array.from(sha256(value),v=>v.toString(16).padStart(2,'0')).join('');
 const key=(ref:RestorableObjectRef)=>`${ref.section}:${ref.paragraph}:${ref.control}:${ref.type}`;
+const rawKey=(ref:RawRef)=>`${ref.sec}:${ref.ppi}:${ref.ci}:${ref.type}`;
 
 function reference(value:RawRef|undefined|null):RestorableObjectRef|undefined{
  if(!value||!integer(value.sec)||!integer(value.ppi)||!integer(value.ci)||!['shape','group','image','equation'].includes(value.type)
@@ -31,6 +32,17 @@ function validSelectionKinds(objects:ReadonlyArray<Pick<RestorableObjectRef,'typ
  const equations=objects.every(object=>object.type==='equation');
  if(equations)return objects.length>=2;
  return objects.every(object=>object.type==='shape'||object.type==='group')&&(objects.length>1||objects[0]?.type==='group');
+}
+function currentRestorableSelection(input:ObjectSelectionSessionInput):RestorableObjectRef[]|undefined{
+ const raw=input.cursor.getSelectedPictureRefs?.(),active=input.cursor.getSelectedPictureRef?.();
+ if(!Array.isArray(raw)||raw.length<1||raw.length>32||!active||rawKey(raw.at(-1)!)!==rawKey(active))return;
+ const refs=raw.map(reference);if(refs.some(value=>!value))return;
+ const values=refs as RestorableObjectRef[];if(new Set(values.map(key)).size!==values.length)return;
+ return values;
+}
+function sameSelection(input:ObjectSelectionSessionInput,expected:RestorableObjectRef[]):boolean{
+ const actual=currentRestorableSelection(input);
+ return Boolean(actual)&&actual!.length===expected.length&&expected.every((value,index)=>key(value)===key(actual![index]));
 }
 export function validateObjectSelectionBookmark(value:any):ObjectSelectionBookmark|undefined{
  if(!value||typeof value!=='object'||Array.isArray(value)||value.version!==1||value.kind!=='object-selection'||!Array.isArray(value.objects)||value.objects.length<1||value.objects.length>32||!integer(value.active)||value.active!==value.objects.length-1||!digest(value.documentFingerprint))return;
@@ -67,7 +79,11 @@ function equationDocumentFingerprint(document:any):string|undefined{
  return hashJson({version:1,sections,controls,objects});
 }
 function documentFingerprint(document:any,objects:ReadonlyArray<Pick<RestorableObjectRef,'type'>>):string|undefined{
- return objects.every(object=>object.type==='equation')?equationDocumentFingerprint(document):byteDocumentFingerprint(document);
+ // A top-level group is the only vector singleton that can be restored. Like
+ // equations, its HWP conversion rewrites the HWPX package container while the
+ // public document graph stays exact, so a raw package hash would reject the
+ // same group after a valid HWP reopen.
+ return objects.every(object=>object.type==='equation'||object.type==='group')?equationDocumentFingerprint(document):byteDocumentFingerprint(document);
 }
 function objectEvidence(document:any,ref:RestorableObjectRef):string|undefined{
  if(ref.section>=document.getSectionCount()||ref.paragraph>=document.getParagraphCount(ref.section))return;
@@ -132,6 +148,10 @@ export function restoreObjectSelection(input:ObjectSelectionSessionInput|undefin
  try{
   const document=access(input);if(documentFingerprint(document,saved.objects)!==saved.documentFingerprint)return false;
   for(const {section,paragraph,control,type,objectFingerprint} of saved.objects){if(objectEvidence(document,{section,paragraph,control,type})!==objectFingerprint)return false;}
-  return input.restoreSessionObjectSelection(saved.objects.map(({section,paragraph,control,type})=>({section,paragraph,control,type})));
+  const expected=saved.objects.map(({section,paragraph,control,type})=>({section,paragraph,control,type})),previous=currentRestorableSelection(input);
+  const restored=input.restoreSessionObjectSelection(expected);
+  if(restored&&sameSelection(input,expected))return true;
+  if(previous)try{input.restoreSessionObjectSelection(previous);}catch{/* The selection remains untrusted; never report success. */}
+  return false;
  }catch{return false;}
 }

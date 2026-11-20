@@ -1,0 +1,300 @@
+diff --git a/src/document_core/commands/mod.rs b/src/document_core/commands/mod.rs
+index 20a8020d..e1cd1df1 100644
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -20,3 +20,4 @@ mod html_import;
+ mod object_ops;
++mod page_number_position;
+ pub(crate) mod paragraph_block;
+ pub use object_ops::{TableColumnWidths, TableCreationOptions};
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+index 2031085e..3c694c61 100644
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8255,6 +8255,30 @@ impl HwpDocument {
+             .map_err(|e| e.into())
+     }
+ 
++    /// Root-body current-section page-number position insertion (Ctrl+N,P).
++    /// Multi-section documents and existing controls are rejected by the core.
++    #[wasm_bindgen(js_name = insertPageNumberPosition)]
++    pub fn insert_page_number_position(
++        &mut self,
++        section_idx: u32,
++        paragraph_idx: u32,
++        props_json: &str,
++    ) -> Result<String, JsValue> {
++        self.insert_page_number_position_native(
++            section_idx as usize,
++            paragraph_idx as usize,
++            props_json,
++        )
++        .map_err(|e| e.into())
++    }
++
++    /// Unique root-body page-number-position state for readback/preflight.
++    #[wasm_bindgen(js_name = getPageNumberPosition)]
++    pub fn get_page_number_position(&self, section_idx: u32) -> Result<String, JsValue> {
++        self.get_page_number_position_native(section_idx as usize)
++            .map_err(|e| e.into())
++    }
++
+     /// 문단 서식을 적용한다 (본문 문단).
+     /// 문단 번호 시작 방식 설정
+     #[wasm_bindgen(js_name = setNumberingRestart)]
+diff --git a/src/document_core/commands/page_number_position.rs b/src/document_core/commands/page_number_position.rs
+new file mode 100644
+index 00000000..9e8227b6
+--- /dev/null
++++ b/src/document_core/commands/page_number_position.rs
+@@ -0,0 +1,250 @@
++//! Root-body page-number-position mutation used by the Ctrl+N,P boundary.
++//!
++//! This deliberately supports the smallest durable shape: one section, one
++//! top-level body paragraph, and no existing top-level `PageNumberPos` control.
++//! Nested/special-story addressing and replacing ambiguous controls remain
++//! fail-closed until their owner paths are part of the public command contract.
++
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::control::{Control, PageNumberPos};
++
++#[derive(serde::Deserialize)]
++#[serde(rename_all = "camelCase", deny_unknown_fields)]
++struct PageNumberPositionInput {
++    format: u8,
++    position: u8,
++    side_char: String,
++}
++
++fn invalid(message: &str) -> HwpError {
++    HwpError::RenderError(message.to_string())
++}
++
++fn parse_input(props_json: &str) -> Result<PageNumberPos, HwpError> {
++    let input: PageNumberPositionInput =
++        serde_json::from_str(props_json).map_err(|_| invalid("쪽 번호 위치/모양 계약 오류"))?;
++    if input.format > 7 {
++        return Err(invalid("지원하지 않는 쪽 번호 모양"));
++    }
++    if !(1..=10).contains(&input.position) {
++        return Err(invalid("지원하지 않는 쪽 번호 위치"));
++    }
++    let mut chars = input.side_char.chars();
++    let side_char = chars
++        .next()
++        .filter(|value| !value.is_control() && (*value as u32) <= u16::MAX as u32)
++        .ok_or_else(|| invalid("쪽 번호 장식 문자는 BMP 한 글자여야 합니다"))?;
++    if chars.next().is_some() {
++        return Err(invalid("쪽 번호 장식 문자는 한 글자여야 합니다"));
++    }
++    Ok(PageNumberPos {
++        format: input.format,
++        position: input.position,
++        user_symbol: '\0',
++        prefix_char: '\0',
++        suffix_char: '\0',
++        dash_char: side_char,
++    })
++}
++
++impl DocumentCore {
++    fn root_page_number_position(
++        &self,
++        section_idx: usize,
++    ) -> Result<Option<(usize, &PageNumberPos)>, HwpError> {
++        let section = self
++            .document
++            .sections
++            .get(section_idx)
++            .ok_or_else(|| invalid("구역 범위 초과"))?;
++        let mut found = None;
++        for (paragraph_idx, paragraph) in section.paragraphs.iter().enumerate() {
++            for control in &paragraph.controls {
++                if let Control::PageNumberPos(value) = control {
++                    if found.is_some() {
++                        return Err(invalid(
++                            "현재 구역에 쪽 번호 위치 컨트롤이 여러 개 있습니다",
++                        ));
++                    }
++                    found = Some((paragraph_idx, value));
++                }
++            }
++        }
++        Ok(found)
++    }
++
++    /// Inserts one page-number-position control into a root body paragraph.
++    /// All validation happens before the document graph is borrowed mutably.
++    pub fn insert_page_number_position_native(
++        &mut self,
++        section_idx: usize,
++        paragraph_idx: usize,
++        props_json: &str,
++    ) -> Result<String, HwpError> {
++        let page_number = parse_input(props_json)?;
++        if self.document.sections.len() != 1 || section_idx != 0 {
++            return Err(invalid("다구역 쪽 번호 매기기는 아직 지원하지 않습니다"));
++        }
++        let section = self
++            .document
++            .sections
++            .get(section_idx)
++            .ok_or_else(|| invalid("구역 범위 초과"))?;
++        if section.paragraphs.get(paragraph_idx).is_none() {
++            return Err(invalid("본문 문단 범위 초과"));
++        }
++        if self.root_page_number_position(section_idx)?.is_some() {
++            return Err(invalid("현재 구역에 이미 쪽 번호 위치 컨트롤이 있습니다"));
++        }
++
++        let section = &mut self.document.sections[section_idx];
++        let paragraph = &mut section.paragraphs[paragraph_idx];
++        paragraph
++            .controls
++            .insert(0, Control::PageNumberPos(page_number.clone()));
++        paragraph.ctrl_data_records.insert(0, None);
++        section.raw_stream = None;
++        self.recompose_section(section_idx);
++        self.paginate_if_needed();
++
++        Ok(serde_json::json!({
++            "ok": true,
++            "inserted": true,
++            "sectionIdx": section_idx,
++            "paragraphIdx": paragraph_idx,
++            "format": page_number.format,
++            "position": page_number.position,
++            "sideChar": page_number.dash_char.to_string(),
++        })
++        .to_string())
++    }
++
++    /// Reads only a unique top-level control. Ambiguous controls are errors.
++    pub fn get_page_number_position_native(&self, section_idx: usize) -> Result<String, HwpError> {
++        let value = self.root_page_number_position(section_idx)?;
++        Ok(match value {
++            None => serde_json::json!({"ok": true, "exists": false}),
++            Some((paragraph_idx, value)) => serde_json::json!({
++                "ok": true,
++                "exists": true,
++                "sectionIdx": section_idx,
++                "paragraphIdx": paragraph_idx,
++                "format": value.format,
++                "position": value.position,
++                "sideChar": value.dash_char.to_string(),
++            }),
++        }
++        .to_string())
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::wasm_api::HwpDocument;
++
++    const PROPS: &str = r#"{"format":3,"position":6,"sideChar":"-"}"#;
++
++    fn blank() -> HwpDocument {
++        let mut document = HwpDocument::create_empty();
++        document
++            .create_blank_document_native()
++            .expect("blank document");
++        document
++    }
++
++    fn state(document: &HwpDocument) -> serde_json::Value {
++        serde_json::from_str(
++            &document
++                .get_page_number_position_native(0)
++                .expect("page number state"),
++        )
++        .expect("state JSON")
++    }
++
++    #[test]
++    fn insert_is_atomic_and_snapshot_undo_redo_restores_one_control() {
++        let mut document = blank();
++        let before = document.save_snapshot_native();
++        document
++            .insert_page_number_position_native(0, 0, PROPS)
++            .expect("insert page number position");
++        assert_eq!(state(&document)["position"], 6);
++        assert_eq!(state(&document)["format"], 3);
++        let after = document.save_snapshot_native();
++
++        document
++            .restore_snapshot_native(before)
++            .expect("undo snapshot");
++        assert_eq!(state(&document)["exists"], false);
++        document
++            .restore_snapshot_native(after)
++            .expect("redo snapshot");
++        assert_eq!(state(&document)["exists"], true);
++        assert_eq!(state(&document)["sideChar"], "-");
++    }
++
++    #[test]
++    fn invalid_shape_multi_section_and_existing_control_leave_bytes_unchanged() {
++        for invalid_props in [
++            r#"{"format":8,"position":6,"sideChar":"-"}"#,
++            r#"{"format":0,"position":11,"sideChar":"-"}"#,
++            r#"{"format":0,"position":5,"sideChar":"--"}"#,
++            r#"{"format":0,"position":5,"sideChar":"😀"}"#,
++            r#"{"format":0,"position":5,"sideChar":"-","extra":true}"#,
++        ] {
++            let mut document = blank();
++            let before = document.export_hwp_native().expect("before bytes");
++            assert!(document
++                .insert_page_number_position_native(0, 0, invalid_props)
++                .is_err());
++            assert_eq!(document.export_hwp_native().expect("after bytes"), before);
++        }
++
++        let mut duplicate = blank();
++        duplicate
++            .insert_page_number_position_native(0, 0, PROPS)
++            .expect("first insert");
++        let duplicate_before = duplicate.export_hwp_native().expect("duplicate before");
++        assert!(duplicate
++            .insert_page_number_position_native(0, 0, PROPS)
++            .is_err());
++        assert_eq!(
++            duplicate.export_hwp_native().expect("duplicate after"),
++            duplicate_before
++        );
++
++        let mut multi = blank();
++        let cloned = multi.document().sections[0].clone();
++        multi.document_mut().sections.push(cloned);
++        let multi_before = multi.export_hwp_native().expect("multi before");
++        assert!(multi
++            .insert_page_number_position_native(0, 0, PROPS)
++            .is_err());
++        assert_eq!(
++            multi.export_hwp_native().expect("multi after"),
++            multi_before
++        );
++    }
++
++    #[test]
++    fn hwp_and_hwpx_save_reopen_preserve_position_format_and_side_character() {
++        let mut document = blank();
++        document
++            .insert_page_number_position_native(0, 0, PROPS)
++            .expect("insert page number position");
++        let outputs = [
++            document.export_hwp_native().expect("HWP export"),
++            document.export_hwpx_native().expect("HWPX export"),
++        ];
++        for bytes in outputs {
++            let reopened = HwpDocument::from_bytes(&bytes).expect("reopen saved document");
++            let observed = state(&reopened);
++            assert_eq!(observed["exists"], true);
++            assert_eq!(observed["format"], 3);
++            assert_eq!(observed["position"], 6);
++            assert_eq!(observed["sideChar"], "-");
++        }
++    }
++}

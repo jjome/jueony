@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **15/15** · 부분 0 | 완료 0/20 · 부분 19 · 미구현 1 |
-| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 7 · 미검증 13 |
+| 구현 | 완료 🟢 **15/15** · 부분 0 | 완료 0/20 · 부분 20 |
+| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 10 · 미검증 10 |
 | Agent 연결 | 연결 🟢 **4/4** · 부분 0 · 해당 없음 11 | 연결 0/20 · 부분 2 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -51,7 +51,7 @@
 | [B024](<06-editing-and-selection.md#b024>) · 범위 | 다시 실행 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
 | [B026](<06-editing-and-selection.md#b026>) · 범위 | 복사 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B028](<06-editing-and-selection.md#b028>) · 범위 | 골라 붙이기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B031](<06-editing-and-selection.md#b031>) · 범위 | 조판 부호 삭제 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B031](<06-editing-and-selection.md#b031>) · 범위 | 조판 부호 삭제 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B032](<06-editing-and-selection.md#b032>) · 범위 | 전체 선택 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B034](<06-editing-and-selection.md#b034>) · 범위 | 바꾸기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B035](<06-editing-and-selection.md#b035>) · 범위 | 다음 검색 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
@@ -120,7 +120,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B090](<06-editing-and-selection.md#b090>) · 범위 | 문자표 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B090](<06-editing-and-selection.md#b090>) · 범위 | 문자표 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-9"></a>
 
@@ -128,7 +128,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B170](<06-editing-and-selection.md#b170>) · 범위 | 본문 블록 확대 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B170](<06-editing-and-selection.md#b170>) · 범위 | 본문 블록 확대 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G110](<06-editing-and-selection.md#g110>) · 작업 | 본문 경계 선택과 기본 서식 단축키 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G115](<06-editing-and-selection.md#g115>) · 작업 | Unicode 단어 삭제와 블록 선택 경계 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G118](<06-editing-and-selection.md#g118>) · 작업 | 표 셀 경계의 자동 단어 삭제 보호 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
@@ -197,12 +197,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 본문·셀·일부 개체의 clipboard 실패 보호와 undo/저장 자동 검사 완료. 특수 story 및 실제 OS clipboard 전체 형식 비교 남음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 본문·셀·일부 개체와 Studio 머리말·꼬리말 평문 cut을 내부 JSON·plain text clipboard 경로에서 원문·story owner·identity·revision·selection 재검증과 단일 snapshot rollback으로 보호한다.
+- 다음 작업: 머리말·꼬리말 adapter와 Studio copy/cut 이벤트 연결의 HWP/HWPX 저장·재열기·정확한 undo·OS clipboard 실패 보호 포함 12/12와 hfclipboard 격리 build를 통과했다. 각주/미주는 copySelectionInNote·replaceRangeInNote 원자 API가 없어 차단한다. RTF·그림·전체 OS clipboard 형식과 한글 비교는 남았다.
 - UI 명령: `edit:cut`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;HEADER_FOOTER_CLIPBOARD_STUDIO_2026_11_09;ISOLATED_BUILD_2026_11_09;NOTE_CLIPBOARD_API_BLOCKER_2026_11_09;PARTIAL`
 
 </details>
 
@@ -225,12 +225,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: HTML 실패 시 원문·undo 복원 자동 검사 완료. OS clipboard·RTF·내부 JSON·그림과 특수 문맥 및 한글 비교 남음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: HTML 실패 복구와 Studio 머리말·꼬리말 평문 paste를 내부 JSON·plain text clipboard 경로에서 원문·story owner·identity·revision·selection 재검증 및 단일 snapshot rollback으로 보호한다.
+- 다음 작업: 머리말·꼬리말 adapter와 Studio paste 이벤트 연결의 HWP/HWPX 저장·재열기·실패 원복·OS clipboard 불일치 차단 포함 12/12와 hfclipboard 격리 build를 통과했다. 각주/미주는 copySelectionInNote·replaceRangeInNote 원자 API가 없어 차단한다. RTF·그림·전체 OS clipboard 형식과 한글 비교는 남았다.
 - UI 명령: `edit:paste`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;HEADER_FOOTER_CLIPBOARD_STUDIO_2026_11_09;ISOLATED_BUILD_2026_11_09;NOTE_CLIPBOARD_API_BLOCKER_2026_11_09;PARTIAL`
 
 </details>
 
@@ -239,12 +239,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 텍스트만 골라 붙이기: 본문 한 문단 선택→여러 줄, 원문·서식·undo·양 형식 저장 검사. HTML/그림/HWP 조각, 표와 특수 영역·여러 문단 선택 남음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환한다. edit:paste-special이 identity·revision·선택을 봉인한 전용 command를 호출하며 snapshot 하나를 history resource로 소유해 execute·undo·redo·discard를 처리한다. 기존 한 문단 경로는 유지한다.
+- 다음 작업: 엔진 어댑터 HWP/HWPX 9/9에 더해 Studio 명령 연결 선별 7/7, 프로필 TypeScript 검사와 격리 build 664 modules를 통과했다. 표/필드/책갈피/개체/특수 story는 fail-closed다. 다구역·미지원 구조·HTML/그림/HWP 조각·실제 UI·한글 비교가 남아 PARTIAL을 유지한다.
 - UI 명령: `edit:paste-special`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [basic-text-browser.json](<../evidence/remaining-editor-2026-10-13/basic-text-browser.json>)
-- 원래 기록: `PARTIAL;BROWSER_TESTED_NATIVE_PENDING`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [basic-text-browser.json](<../evidence/remaining-editor-2026-10-13/basic-text-browser.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `PARTIAL;MULTI_PARAGRAPH_PLAIN_TEXT_2026_11_09;HWP_HWPX_REOPEN_9_OF_9;PASTE_SPECIAL_STUDIO_COMMAND_7_OF_7;ISOLATED_BUILD_664;PROFILE_TYPESCRIPT_PASS`
 
 </details>
 
@@ -280,12 +280,12 @@
 <summary>B031 · 조판 부호 삭제</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 종류별 삭제 대화상자 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: root-body 일반 문단의 pghd PageHide 조판 부호 한 종류만 위치·원문·revision·전체 문서 보존 상태를 재검증한 뒤 삭제하며 실패하면 전체 snapshot으로 복원한다.
+- 다음 작업: pghd 한 종류의 HWP/HWPX 저장·재열기·undo·stale·보호 실패 불변 4/4를 통과했다. 다른 조판 부호와 특수 story·종류별 UI·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `PARTIAL;ROOT_BODY_PAGE_HIDE_DELETE_2026_11_09`
 
 </details>
 
@@ -405,13 +405,13 @@
 <summary>B090 · 문자표</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 유니코드·옛한글·최근 값 검사
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재 안전 문자표 대화상자와 제한된 이름 검색·옛한글 자모열·최근 문자까지 연결됐지만 한글 2024 전체 문자 범주/검색과 동등한 데이터베이스는 완료 범위가 아님.
+- 다음 작업: 실제 insert:symbols 명령에 U+·0x·리터럴 1~8문자 입력과 명명된 기본 문자 검색·옛한글 프리셋/자모 순서·최근 문자 20개를 연결함. 선택 없음·취소 무동작·제어문자·stale·보호/특수 문맥 차단과 한 snapshot 삽입 및 HWP/HWPX 재열기 통과. 전체 Unicode 이름 데이터베이스와 한글 2024 범주 동등성은 남음.
 - UI 명령: `insert:symbols`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [symbol-insertion-b090.ts](<../../apps/editor/src/adapters/rhwp/symbol-insertion-b090.ts>) · [symbol-dialog-b090.ts](<../../apps/editor/src/adapters/browser/symbol-dialog-b090.ts>) · [symbol-insertion-b090.test.ts](<../../apps/editor/tests/symbol-insertion-b090.test.ts>) · [symbol-dialog-b090.test.ts](<../../apps/editor/tests/symbol-dialog-b090.test.ts>) · [symbol-command-b090.test.ts](<../../apps/editor/tests/symbol-command-b090.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_SYMBOL_DIALOG_COMMAND_AND_UNICODE_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -419,12 +419,12 @@
 <summary>B170 · 본문 블록 확대</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 엔진 5단계와 공식 4회 기준 차이
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: 실측 기록의 F3 4회 흐름을 현재 엔진의 내부 5단계에 진입→단어→문단→문서로 안전하게 매핑하고 선택 범위·실패 rollback을 검증했다. 정식 Studio keyboard hook·특수 story·한글 재비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [body-block-selection-b170.ts](<../../apps/editor/src/shortcuts/body-block-selection-b170.ts>) · [body-block-selection-b170.test.ts](<../../apps/editor/tests/body-block-selection-b170.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_F3_STAGE_MAPPING_2026_11_09`
 
 </details>
 

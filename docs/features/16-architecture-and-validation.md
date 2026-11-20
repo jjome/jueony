@@ -10,17 +10,17 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/25 · 부분 16 · 미구현 2 | — 상위 범위 없음 |
-| 검증 | 완료 7/25 · 부분 13 · 미검증 5 | — 상위 범위 없음 |
+| 구현 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
+| 검증 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
 | Agent 연결 | 해당 없음 25 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
 ## 먼저 할 일
 
-- **구현** [N041](<16-architecture-and-validation.md#n041>) **독립 한글에서 복합 코퍼스 일괄 검수** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N042](<16-architecture-and-validation.md#n042>) **한글·Jueony 인쇄/PDF 조판 비교** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N041](<16-architecture-and-validation.md#n041>) **독립 한글에서 복합 코퍼스 일괄 검수** — 합성 5종×HWP/HWPX 10/10과 manifest 계약 3/3을 통과했다. 같은 Jueony Rust/WASM 엔진의 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서와 공개 문서 코퍼스의 독립 비교는 남아 부분이다.
+- **구현** [N042](<16-architecture-and-validation.md#n042>) **한글·Jueony 인쇄/PDF 조판 비교** — 계약 4/4와 2쪽 표·그림·필드 복합 문서의 HWP/HWPX baseline 2/2를 통과했다. 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 fingerprint 비교는 실행하지 않아 부분이다.
+- **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — 정책·coordinator 15/15와 strict TypeScript 검사를 통과했다. 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증은 미연결·미실행이라 부분이다.
 
 ## 기능별 작업표
 
@@ -78,11 +78,11 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [N041](<16-architecture-and-validation.md#n041>) · 작업 | 독립 한글에서 복합 코퍼스 일괄 검수 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
-| [N042](<16-architecture-and-validation.md#n042>) · 작업 | 한글·Jueony 인쇄/PDF 조판 비교 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
-| [N043](<16-architecture-and-validation.md#n043>) · 작업 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
-| [N044](<16-architecture-and-validation.md#n044>) · 작업 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
-| [N045](<16-architecture-and-validation.md#n045>) · 작업 | 기관 배포용 완전 오프라인 자산/허용 서버 정책 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N041](<16-architecture-and-validation.md#n041>) · 작업 | 독립 한글에서 복합 코퍼스 일괄 검수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N042](<16-architecture-and-validation.md#n042>) · 작업 | 한글·Jueony 인쇄/PDF 조판 비교 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N043](<16-architecture-and-validation.md#n043>) · 작업 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N044](<16-architecture-and-validation.md#n044>) · 작업 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N045](<16-architecture-and-validation.md#n045>) · 작업 | 기관 배포용 완전 오프라인 자산/허용 서버 정책 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 
@@ -367,12 +367,12 @@
 <summary>N041 · 독립 한글에서 복합 코퍼스 일괄 검수</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 문서/쪽/표/그림/필드/폰트·저장/재열기·결함별 증거
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [04-compatibility-validation.md](<../04-compatibility-validation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 합성 본문·쪽 경계·표·그림·필드·명시 글꼴의 HWP/HWPX open→같은 형식 save→reopen·production preservation evidence·published layout·기능 최소조건·입력 SHA 불변
+- 다음 작업: 합성 5종×HWP/HWPX 10/10과 manifest 계약 3/3을 통과했다. 같은 Jueony Rust/WASM 엔진의 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서와 공개 문서 코퍼스의 독립 비교는 남아 부분이다.
+- 근거: [04-compatibility-validation.md](<../04-compatibility-validation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SYNTHETIC_ENGINE_CORPUS_RUNNER_2026_11_09`
 
 </details>
 
@@ -380,13 +380,13 @@
 <summary>N042 · 한글·Jueony 인쇄/PDF 조판 비교</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 같은 폰트/DPI/용지·쪽 수/줄바꿈/개체·차이 분류
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 Jueony published layout baseline·쪽 수/텍스트 재조판/개체 위치 결함 분류·교차 생산자와 글꼴 지문 fail-closed
+- 다음 작업: 계약 4/4와 2쪽 표·그림·필드 복합 문서의 HWP/HWPX baseline 2/2를 통과했다. 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 fingerprint 비교는 실행하지 않아 부분이다.
 - 상위 항목: [B019](<15-output-and-tools.md#b019>) 인쇄 미리 보기
-- 근거: [04-compatibility-validation.md](<../04-compatibility-validation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [04-compatibility-validation.md](<../04-compatibility-validation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;JUEONY_PRINT_LAYOUT_BASELINE_2026_11_09`
 
 </details>
 
@@ -394,13 +394,13 @@
 <summary>N043 · 실제 Windows 파일 picker·권한·외부 수정</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 취소·read-only·이동/삭제·외부 hash 충돌·원본 보존
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: picker 취소 no-op와 봉인 증거 preflight 뒤 temp write/flush·final probe/revalidate·atomic compare-replace/readback을 순서화하고 race에는 replace 0회·실패에는 cleanup을 요구하며 committed 뒤 readback 문제는 save-state-uncertain과 reopen으로 분류해 원본 불변을 주장하지 않음
+- 다음 작업: 정책·coordinator 15/15와 strict TypeScript 검사를 통과했다. 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증은 미연결·미실행이라 부분이다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;WINDOWS_FILE_PREFLIGHT_POLICY_2026_11_09;WINDOWS_ATOMIC_SAVE_COORDINATOR_2026_11_09`
 
 </details>
 
@@ -408,13 +408,13 @@
 <summary>N044 · 비정상 종료·저장 실패·복구 통합</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: disk full·권한·손상·부분 write·원본/복구본 유지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157의 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증
+- 다음 작업: 실제 Edge 3 scenarios PASS이며 page/console/external/missing resource가 모두 0이었다. 실제 app boot/shell 주입과 Tauri/Windows 비정상 종료·사용자 문서 복구는 남아 부분이다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [indexeddb-recovery-checkpoint-n044.ts](<../../apps/editor/src/adapters/storage/indexeddb-recovery-checkpoint-n044.ts>) · [recovery-checkpoint-lifecycle-n044.ts](<../../apps/editor/src/composition/recovery-checkpoint-lifecycle-n044.ts>) · [verify-recovery-checkpoint-browser-n044.mjs](<../../apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs>) · [recovery-checkpoint-browser-n044.ts](<../../apps/editor/scripts/fixtures/recovery-checkpoint-browser-n044.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;RECOVERY_CHECKPOINT_TRANSACTION_2026_11_09;INDEXEDDB_RECOVERY_CHECKPOINT_CAS_2026_11_09;RECOVERY_CHECKPOINT_LIFECYCLE_2026_11_09;EDGE_INDEXEDDB_RECOVERY_VERIFICATION_2026_11_09`
 
 </details>
 
@@ -422,12 +422,12 @@
 <summary>N045 · 기관 배포용 완전 오프라인 자산/허용 서버 정책</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 폰트/WASM/런타임·외부 요청0·기관 endpoint allowlist·고지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [06-license-inventory.md](<../06-license-inventory.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 로컬 WASM·런타임·폰트·third-party notices·hash와 기관 endpoint allowlist를 fail-closed 검사하고 외부 URL을 분류하는 오프라인 번들 감사 계약
+- 다음 작업: commit 7d2bea41 기준 WebView2 고정 버전 오프라인 manifest에 정확한 버전·아키텍처·로컬 경로·SHA-256·license/notice 바이트와 링크 검증을 추가하고 7/7을 통과했다. 범위 버전·경로 탈출·변조·누락은 fail-closed다. 최종 설치본의 실제 runtime 로딩·패키지 서명·기관 allowlist/배포 승인과 AI 제외 endpoint 확인은 남아 FAIL/PARTIAL 배포 차단을 유지한다.
+- 근거: [06-license-inventory.md](<../06-license-inventory.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [offline-font-source-patches.mjs](<../../apps/editor/scripts/integration/offline-font-source-patches.mjs>) · [offline-font-source-patches.test.ts](<../../apps/editor/tests/offline-font-source-patches.test.ts>) · [n045-offline-contract.mjs](<../../apps/editor/scripts/lib/n045-offline-contract.mjs>) · [n045-offline-contract.test.ts](<../../apps/editor/tests/n045-offline-contract.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;OFFLINE_BUNDLE_AUDIT_2026_11_09;CDN_FONT_LITERALS_REMOVED_256;EXTERNAL_ENDPOINTS_REMAINING_5;WEBVIEW2_FIXED_RUNTIME_MANIFEST_2026_11_09;FAIL_OFFLINE_BUNDLE`
 
 </details>
 

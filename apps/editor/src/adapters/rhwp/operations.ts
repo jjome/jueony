@@ -95,10 +95,14 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
     const read=()=>readStructure(doc).tables.find(t=>t.section===table.section&&t.paragraph===table.paragraph&&t.control===table.control);
     const live=read();
-    const needsAxisProof=(t:Table)=>t.cells.some(c=>c.rowSpan>1||c.columnSpan>1||c.axisPicture||c.axisFieldSignature||c.properties.fieldName);
+    const needsAxisProof=(t:Table)=>t.pagination?.repeatHeader===true||t.cells.some(c=>c.rowSpan>1||c.columnSpan>1||c.axisPicture||c.axisFieldSignature||c.properties.fieldName);
     if(!live)throw new Error('대상 표가 없어졌습니다.');
     const checkAxis=needsAxisProof(table)||needsAxisProof(live);
-    if(checkAxis&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
+    if(checkAxis&&table.pagination?.repeatHeader===true&&(typeof snapshot.revision!=='string'||!snapshot.revision))
+      throw new Error('반복 제목 표를 편집할 문서 revision을 확인하지 못했습니다.');
+    if(checkAxis&&JSON.stringify({rows:table.rows,columns:table.columns,cells:table.cells,headerRows:table.headerRows,pagination:table.pagination})!==
+        JSON.stringify({rows:live.rows,columns:live.columns,cells:live.cells,headerRows:live.headerRows,pagination:live.pagination}))
+      throw new Error('표의 병합 범위·제목 행·반복 설정이나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
     const proof=checkAxis?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[],copyMetrics,snapshot.revision):undefined;
     const formulas=checkAxis?prepareAxisFormulaUpdates(doc,live,expected):undefined;
     const undo=proof?doc.saveSnapshot():undefined;
@@ -107,8 +111,18 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
         delete_table_row:'deleteTableRow', delete_table_column:'deleteTableColumn'}[axis.kind];
       if (insert) checked(doc[method](...base, Math.min(axis.index, size-1), axis.index===size));
       else checked(doc[method](...base, axis.index));
-      const updated = read();
+      let updated = read();
       if (!updated) throw new Error('변경한 표를 확인하지 못했습니다.');
+      if(row&&insert&&table.pagination?.repeatHeader===true){
+        const expectedHeaderRows=expected.headerRows;
+        if(!Number.isSafeInteger(expectedHeaderRows))throw new Error('삽입 뒤 반복 제목 행 수를 확인하지 못했습니다.');
+        for(const cell of updated.cells.filter(c=>c.row===axis.index)){
+          const isHeader=cell.row<(expectedHeaderRows as number);
+          if(cell.properties.isHeader!==isHeader)
+            checked(doc.setCellProperties(...base,cell.index,JSON.stringify({isHeader})));
+        }
+        updated=read();if(!updated)throw new Error('제목 표시를 반영한 표를 확인하지 못했습니다.');
+      }
       proof?.(updated,true);
       if ('values' in axis) for (const cell of updated.cells) {
         if ((row ? cell.row : cell.column) !== axis.index) continue;

@@ -28,7 +28,8 @@ export function projectEditorSettings(value: unknown): Record<string, any> {
     font: { fontSets, showRecentFonts: bool(font.showRecentFonts), recentFontCount: number(font.recentFontCount, 1, 5) },
     theme: { mode: choice(theme.mode, ['system', 'light', 'dark']), skin: choice(theme.skin, ['default', 'flat', 'oldschool']), skinChosen: bool(theme.skinChosen) },
     dialog: { picturePropsKeepRatio: bool(dialog.picturePropsKeepRatio), showPdfPrintGuidance: bool(dialog.showPdfPrintGuidance) },
-    view: { ...Object.fromEntries(['showParagraphMarks', 'showControlCodes', 'clipView', 'toolbarBasic', 'toolbarFormat'].map(key => [key, bool(view[key])])), pageArrangement,
+    view: { ...Object.fromEntries(['showParagraphMarks', 'showControlCodes', 'clipView', 'toolbarBasic', 'toolbarFormat'].map(key => [key, bool(view[key])])),
+      pageOutline: view.pageOutline === undefined ? true : bool(view.pageOutline), pageArrangement,
       pageMovement: { direction: choice(movement.direction, ['vertical', 'horizontal']), wheelHorizontal: bool(movement.wheelHorizontal) }, zoomFitMode: choice(view.zoomFitMode, ['none', 'fitWidth', 'fitPage']) },
     autosave: { recoveryEnabled: bool(autosave.recoveryEnabled), recoveryIntervalMinutes: number(autosave.recoveryIntervalMinutes, 1, 120), idleSaveEnabled: bool(autosave.idleSaveEnabled), idleDelaySeconds: number(autosave.idleDelaySeconds, 5, 600) },
   };

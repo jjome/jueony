@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
-| 검증 | 완료 0/25 · 부분 24 · 미검증 1 | 완료 0/18 · 부분 6 · 미검증 12 |
+| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 18 |
+| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 9 · 미검증 9 |
 | Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기를 검증함. 번호·개요·사용자 탭·테두리·배경·특수 영역과 UI·Agent·한글 비교는 남음.
-- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
-- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 독립 도메인·저장·단축키 기반을 검증함. 설정 UI·스타일마당 미리보기/적용·실제 단축키 설치부·Agent·한글 비교는 남음.
+- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — commit 9b948d38 기준 CharShape 참조가 없는 7수준 heads·format·start graph를 기존 동일 정의로만 remap하고 구역 binding이 일치할 때 문단 수준을 이식했다. 패치 Rust/WASM에서 HWP/HWPX 저장·재열기·exact-byte undo/redo·충돌·stale·setter 실패 rollback 선별 3/3을 통과했다. CharShape/font/BorderFill 참조 graph 복제·새 정의 생성·구역 binding 변경·고급 BorderFill·특수 영역·UI·한글 비교는 남아 부분이다.
+- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — commit 4e1fcd17 기준 실제 격리 Edge 157 DOM 드롭다운→format:apply-style→실제 InputHandler→공식 @rhwp/core 0.8.7 WASM 적용을 검증했다. HWP/HWPX 선택 범위와 exact byte undo/redo·저장 재열기·stale/race write 0 및 page/console/external/missing 0을 통과했다. 전체 앱 shell과 정식 CommandDispatcher 전체 부팅·한글 비교·Agent 연결은 남아 부분이다.
+- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — commit 4ac67c16 기준 공식 npm WASM과 실제 격리 Edge DOM에서 capability unavailable 빈 문서의 경고·확인란 표시와 미확인 confirm 차단·확인 후 apply 정확히 1회·stale evidence 재차단·nonblank 무경고를 1/1로 검증했고 외부 요청·page/console 오류·누락 리소스는 모두 0이었다. 기존 custom Rust/WASM HWP/HWPX 및 portable/style 회귀 14/14와 build 678 modules를 유지한다. 실제 앱 shell 메뉴 진입·한글 비교·Agent 연결은 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -48,7 +48,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B080](<07-formatting-and-styles.md#b080>) · 범위 | 문단 띠 | ☐ stub | ☐ 미검증 | ☐ 미연결 |
+| [B080](<07-formatting-and-styles.md#b080>) · 범위 | 문단 띠 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
@@ -136,7 +136,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B183](<07-formatting-and-styles.md#b183>) · 범위 | 문단 첫 글자 장식 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B183](<07-formatting-and-styles.md#b183>) · 범위 | 문단 첫 글자 장식 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-10"></a>
 
@@ -145,7 +145,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B109](<07-formatting-and-styles.md#b109>) · 범위 | 문단 여백·첫줄 빠른키 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N022](<07-formatting-and-styles.md#n022>) · 작업 | 문단 여백 복합키의 한글 차이 해결 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N022](<07-formatting-and-styles.md#n022>) · 작업 | 문단 여백 복합키의 한글 차이 해결 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-11"></a>
 
@@ -153,7 +153,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B184](<07-formatting-and-styles.md#b184>) · 범위 | 스타일마당 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B184](<07-formatting-and-styles.md#b184>) · 범위 | 스타일마당 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [N013](<07-formatting-and-styles.md#n013>) · 작업 | 스타일마당과 사용자 번호키 재할당 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-12"></a>
@@ -184,12 +184,13 @@
 <summary>B080 · 문단 띠</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ stub / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 명령은 등록됐지만 canExecute=false, 빈 execute.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `STUB;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 한글 도움말 규격에 맞춰 높이 300 HWPUNIT·문단 너비·검정 채움·테두리 없음의 문단 기준 사각형으로 생성한다.
+- 다음 작업: 단일단 최상위 본문에서 기존 shape 모델 생성·속성 검증·snapshot rollback/undo·본문 보존·HWP/HWPX 저장 재열기와 byte-exact undo를 검증했다. 다단 계산·Studio insert:para-band 명령 배선·UI·한글 직접 비교는 남음.
+- UI 명령: `insert:para-band`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [paragraph-band-b080.ts](<../../apps/editor/src/adapters/rhwp/paragraph-band-b080.ts>) · [paragraph-band-b080.test.ts](<../../apps/editor/tests/paragraph-band-b080.test.ts>)
+- 원래 기록: `PARTIAL;PARAGRAPH_BAND_SHAPE_ROUNDTRIP_PASS_2026_11_09;STUDIO_COMMAND_STUB_PENDING`
 
 </details>
 
@@ -406,12 +407,12 @@
 <summary>B183 · 문단 첫 글자 장식</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 전용 편집 UI·명령 연결 없음. 단락 시작 장식과 줄 배치·저장 구현.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 엔진이 실제 보존하는 HWPX 그림 기반 dropcapstyle이 이미 존재할 때만 안전하게 다룬다.
+- 다음 작업: 기존 HWPX picture-backed 드롭캡의 조회·DoubleLine/TripleLine/Margin 변경·snapshot undo·저장 재열기를 실제 WASM에서 검증했다. 신규 드롭캡 생성·HWP 보존/편집·전용 UI·Agent 명령 연결과 한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [paragraph-drop-cap-b183.ts](<../../apps/editor/src/adapters/rhwp/paragraph-drop-cap-b183.ts>) · [paragraph-drop-cap-b183.test.ts](<../../apps/editor/tests/paragraph-drop-cap-b183.test.ts>)
+- 원래 기록: `PARTIAL;EXISTING_HWPX_PICTURE_DROP_CAP_PASS_2026_11_09;CREATE_HWP_UI_AGENT_PENDING`
 
 </details>
 
@@ -419,12 +420,12 @@
 <summary>B184 · 스타일마당</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 한 쪽의 완전한 일반 본문 문단 지우기·설정 유지·단일 undo·안전 저장 구현. 본문 없는 문단 하나의 구역은 별도 명령으로 삭제하며 남은 구역 설정 보존. 유일한 구역/공백/복잡한 문서 차단. 걸친 문단·표·개체·여러 쪽 삭제와 자동 정리 남음. HWPX 파일 캐럿은 미지원, 로컬 상태 복원은 검증.
-- 근거: [result.json](<../evidence/empty-section-2026-10-14/empty-native/result.json>) · [result.json](<../evidence/empty-section-2026-10-14/empty-browser/result.json>) · [59-empty-body-section-removal.md](<../59-empty-body-section-removal.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 기관 스타일 프로필·스타일 패키지·번호키 배정과 문서 적용을 안전한 가져오기/미리보기/원자 적용 계약으로 제공한다.
+- 다음 작업: 프로필 저장·portable JSON 가져오기/내보내기·충돌/stale/readback 차단·HWP/HWPX 적용 및 snapshot undo·번호키 스타일 ID 재결합을 선별 검사 16개로 재검증했다. 실제 앱 shell 메뉴 진입·전체 스타일마당 UI·한글 직접 비교·Agent 연결은 남음.
+- 근거: [style-gallery-profile.ts](<../../apps/editor/src/modules/document/domain/style-gallery-profile.ts>) · [style-gallery-portable.ts](<../../apps/editor/src/adapters/browser/style-gallery-portable.ts>) · [style-gallery-controller.ts](<../../apps/editor/src/adapters/rhwp/style-gallery-controller.ts>) · [style-gallery-profile.test.ts](<../../apps/editor/tests/style-gallery-profile.test.ts>) · [style-gallery-controller.test.ts](<../../apps/editor/tests/style-gallery-controller.test.ts>) · [style-gallery-binding.test.ts](<../../apps/editor/tests/style-gallery-binding.test.ts>) · [style-gallery-portable-n013.test.ts](<../../apps/editor/tests/style-gallery-portable-n013.test.ts>)
+- 원래 기록: `PARTIAL;STYLE_GALLERY_CORE_REVERIFIED_2026_11_09;SHELL_HANCOM_AGENT_PENDING`
 
 </details>
 
@@ -707,11 +708,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·기존 본문/정의 불변·중간 실패 전체 롤백
-- 다음 작업: 포터블 JSON과 HWP/HWPX 저장·재열기를 검증함. 번호·개요·사용자 탭·테두리·배경·특수 영역과 UI·Agent·한글 비교는 남음.
+- 완료 범위: portable v1의 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 TabDef/기본 BorderFill·basic character BorderFill과 CharShape 참조가 없는 완전한 7수준 개요 정의·문단 binding의 원본 인증·대상 remap·중간 실패 전체 rollback
+- 다음 작업: commit 9b948d38 기준 CharShape 참조가 없는 7수준 heads·format·start graph를 기존 동일 정의로만 remap하고 구역 binding이 일치할 때 문단 수준을 이식했다. 패치 Rust/WASM에서 HWP/HWPX 저장·재열기·exact-byte undo/redo·충돌·stale·setter 실패 rollback 선별 3/3을 통과했다. CharShape/font/BorderFill 참조 graph 복제·새 정의 생성·구역 binding 변경·고급 BorderFill·특수 영역·UI·한글 비교는 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [style-package-native.ts](<../../apps/editor/src/adapters/rhwp/style-package-native.ts>) · [style-package-character-border-n011.test.ts](<../../apps/editor/tests/style-package-character-border-n011.test.ts>) · [style-transfer-n011-outline-binding.ts](<../../apps/editor/src/adapters/rhwp/style-transfer-n011-outline-binding.ts>) · [style-transfer-n011-outline-binding.test.ts](<../../apps/editor/tests/style-transfer-n011-outline-binding.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08;STYLE_BORDER_BEHAVIOR_FLAGS_2026_11_08;PORTABLE_TABDEF_BASIC_BORDERFILL_2026_11_09;BASIC_CHARACTER_BORDERFILL_2026_11_09;CHARSHAPE_FREE_OUTLINE_BINDING_TRANSFER_2026_11_09;COMPLETE_REFERENCED_LIST_GRAPH_API_BLOCKED_2026_11_09`
 
 </details>
 
@@ -721,11 +722,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 직접 모양 복사와 정의 ID 연결을 구분·재열기 전파
-- 다음 작업: 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
+- 완료 범위: 저장 글자 스타일과 직접 서식을 타입으로 분리하고 stored character-style reference의 capture·검증·UI 적용 시점 재해석·stale/race fail-closed·정의 변경 재열기 전파
+- 다음 작업: commit 4e1fcd17 기준 실제 격리 Edge 157 DOM 드롭다운→format:apply-style→실제 InputHandler→공식 @rhwp/core 0.8.7 WASM 적용을 검증했다. HWP/HWPX 선택 범위와 exact byte undo/redo·저장 재열기·stale/race write 0 및 page/console/external/missing 0을 통과했다. 전체 앱 shell과 정식 CommandDispatcher 전체 부팅·한글 비교·Agent 연결은 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [stored-character-style-ui-consumer-n012.ts](<../../apps/editor/src/adapters/rhwp/stored-character-style-ui-consumer-n012.ts>) · [stored-character-style-ui-consumer-n012.test.ts](<../../apps/editor/tests/stored-character-style-ui-consumer-n012.test.ts>) · [style-flow-patch.test.ts](<../../apps/editor/tests/style-flow-patch.test.ts>) · [stored-character-style-browser-n012.test.ts](<../../apps/editor/tests/stored-character-style-browser-n012.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08;STUDIO_STORED_STYLE_CAPTURE_2026_11_09;STORED_STYLE_UI_CONSUMER_2026_11_09;STORED_STYLE_EDGE_UI_ROUNDTRIP_2026_11_09`
 
 </details>
 
@@ -735,11 +736,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 기관 프로필 v1·갤러리/이름/번호키 충돌·재실행 수명·손상/상위 버전 보호·정확한 이름 해석
-- 다음 작업: 독립 도메인·저장·단축키 기반을 검증함. 설정 UI·스타일마당 미리보기/적용·실제 단축키 설치부·Agent·한글 비교는 남음.
+- 완료 범위: 기관 프로필 v1·preview/apply·post-import digest·설정 저장·read-only 소비와 Ctrl+1~Ctrl+0 keymap/UI에서 profile/document/style stale·IME·대화상자·표/개체/특수 story를 fail-closed하고 portable profile/package JSON UI import/export를 CAS·rollback 계약으로 연결한다. 내용 없는 새 문서는 stored-time fingerprint와 created/modified 상태를 mutation 전에 고정해 typed warning·acknowledgement·stale 차단을 적용한다.
+- 다음 작업: commit 4ac67c16 기준 공식 npm WASM과 실제 격리 Edge DOM에서 capability unavailable 빈 문서의 경고·확인란 표시와 미확인 confirm 차단·확인 후 apply 정확히 1회·stale evidence 재차단·nonblank 무경고를 1/1로 검증했고 외부 요청·page/console 오류·누락 리소스는 모두 0이었다. 기존 custom Rust/WASM HWP/HWPX 및 portable/style 회귀 14/14와 build 678 modules를 유지한다. 실제 앱 shell 메뉴 진입·한글 비교·Agent 연결은 남아 부분이다.
 - 상위 항목: [B184](<07-formatting-and-styles.md#b184>) 스타일마당
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08;STYLE_GALLERY_CONTROLLER_2026_11_08;ATOMIC_STYLE_SHORTCUT_PROFILE_2026_11_09;STYLE_SHORTCUT_CONSUMER_2026_11_09;POST_IMPORT_SHORTCUT_BINDING_2026_11_09;STYLE_SHORTCUT_UI_2026_11_09;FULL_BUILD_2026_11_09;EDGE_SMOKE_2026_11_09;EMPTY_DOCUMENT_STORED_TIME_WARNING_2026_11_09;PORTABLE_STYLE_PACKAGE_UI_2026_11_09;STORED_TIME_WARNING_EVIDENCE_2026_11_09;STYLE_PACKAGE_DIALOG_EDGE_2026_11_09`
 
 </details>
 
@@ -747,13 +748,13 @@
 <summary>N022 · 문단 여백 복합키의 한글 차이 해결</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 기록된 개별 delta와 복합 조합 차이를 각각 재현
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 기존 실제 한글 저장 증거에 맞춰 Ctrl+F7을 양쪽 여백 증가·Ctrl+F8을 감소로 교정하고 공개 단축키 표의 반대 매핑 차이는 감사 경고 2건으로 유지했다. 문단 계산·IME·navigation 포함 회귀 37/37을 통과했다. 공개 표와 설치본 차이의 근본 원인·한글 재비교는 남아 부분이다.
 - 상위 항목: [B109](<07-formatting-and-styles.md#b109>) 문단 여백·첫줄 빠른키
-- 근거: [38-paragraph-selection-state-result.md](<../38-paragraph-selection-state-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [38-paragraph-selection-state-result.md](<../38-paragraph-selection-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;INSTALLED_PARAGRAPH_SPACING_KEYS_2026_11_08`
 
 </details>
 

@@ -1,0 +1,169 @@
+diff --git a/src/document_core/commands/object_ops/shape.rs b/src/document_core/commands/object_ops/shape.rs
+index a9a9c181..f707ee36 100644
+--- a/src/document_core/commands/object_ops/shape.rs
++++ b/src/document_core/commands/object_ops/shape.rs
+@@ -274,9 +274,18 @@ impl DocumentCore {
+                 crate::model::table::VerticalAlign::Center => "Center",
+                 crate::model::table::VerticalAlign::Bottom => "Bottom",
+             };
++            let direction = if tb.list_attr & 0x07 == 1 {
++                if tb.vertical_all {
++                    "VerticalAll"
++                } else {
++                    "Vertical"
++                }
++            } else {
++                "Horizontal"
++            };
+             format!(
+-                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\",\"tbVerticalAlignKnown\":{}",
+-                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va, (tb.list_attr >> 5) & 0x03 != 3
++                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\",\"tbVerticalAlignKnown\":{},\"tbTextDirection\":\"{}\"",
++                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va, (tb.list_attr >> 5) & 0x03 != 3, direction
+             )
+         } else {
+             String::new()
+@@ -593,6 +602,23 @@ impl DocumentCore {
+                         tb.list_attr = (tb.list_attr & !(0x03 << 5)) | (code << 5);
+                     }
+                 }
++                if let Some(v) = json_str(props_json, "tbTextDirection") {
++                    match v.as_str() {
++                        "Horizontal" => {
++                            tb.list_attr &= !0x07;
++                            tb.vertical_all = false;
++                        }
++                        "Vertical" => {
++                            tb.list_attr = (tb.list_attr & !0x07) | 1;
++                            tb.vertical_all = false;
++                        }
++                        "VerticalAll" => {
++                            tb.list_attr = (tb.list_attr & !0x07) | 1;
++                            tb.vertical_all = true;
++                        }
++                        _ => {}
++                    }
++                }
+             }
+         }
+ 
+@@ -672,9 +698,18 @@ impl DocumentCore {
+                 crate::model::table::VerticalAlign::Center => "Center",
+                 crate::model::table::VerticalAlign::Bottom => "Bottom",
+             };
++            let direction = if tb.list_attr & 0x07 == 1 {
++                if tb.vertical_all {
++                    "VerticalAll"
++                } else {
++                    "Vertical"
++                }
++            } else {
++                "Horizontal"
++            };
+             format!(
+-                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\",\"tbVerticalAlignKnown\":{}",
+-                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va, (tb.list_attr >> 5) & 0x03 != 3
++                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\",\"tbVerticalAlignKnown\":{},\"tbTextDirection\":\"{}\"",
++                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va, (tb.list_attr >> 5) & 0x03 != 3, direction
+             )
+         } else {
+             String::new()
+@@ -955,6 +990,23 @@ impl DocumentCore {
+                         tb.list_attr = (tb.list_attr & !(0x03 << 5)) | (code << 5);
+                     }
+                 }
++                if let Some(v) = json_str(props_json, "tbTextDirection") {
++                    match v.as_str() {
++                        "Horizontal" => {
++                            tb.list_attr &= !0x07;
++                            tb.vertical_all = false;
++                        }
++                        "Vertical" => {
++                            tb.list_attr = (tb.list_attr & !0x07) | 1;
++                            tb.vertical_all = false;
++                        }
++                        "VerticalAll" => {
++                            tb.list_attr = (tb.list_attr & !0x07) | 1;
++                            tb.vertical_all = true;
++                        }
++                        _ => {}
++                    }
++                }
+             }
+         }
+ 
+@@ -2837,6 +2889,20 @@ mod resize_clamp_tests {
+         }
+     }
+ 
++    fn first_shape_ref(core: &DocumentCore) -> (usize, usize) {
++        core.document.sections[0]
++            .paragraphs
++            .iter()
++            .enumerate()
++            .find_map(|(para_idx, para)| {
++                para.controls
++                    .iter()
++                    .position(|control| matches!(control, Control::Shape(_)))
++                    .map(|control_idx| (para_idx, control_idx))
++            })
++            .expect("shape control")
++    }
++
+     /// 리사이즈 핸들을 반대편 너머로 잡아끌 때 studio가 width=0 을 보내도
+     /// 도형 공통 크기는 MIN_SHAPE_SIZE 이상을 유지해야 한다.
+     #[test]
+@@ -2900,6 +2966,53 @@ mod resize_clamp_tests {
+         assert_eq!(common.height, 8000);
+     }
+ 
++    #[test]
++    fn textbox_direction_is_queryable_and_roundtrips_supported_formats() {
++        let mut core = DocumentCore::from_bytes(include_bytes!(
++            "../../../../samples/hwpx/footnote-tbox-01.hwpx"
++        ))
++        .expect("load textbox fixture");
++        let (para, ctrl) = first_shape_ref(&core);
++
++        core.set_shape_properties_native(0, para, ctrl, r#"{"tbTextDirection":"Vertical"}"#)
++            .expect("set vertical");
++        let props = core
++            .get_shape_properties_native(0, para, ctrl)
++            .expect("query vertical");
++        assert!(props.contains(r#""tbTextDirection":"Vertical""#));
++
++        let hwp = core.export_hwp_with_adapter().expect("export HWP");
++        let mut hwp_reopened = DocumentCore::from_bytes(&hwp).expect("reopen HWP");
++        let (hwp_para, hwp_ctrl) = first_shape_ref(&hwp_reopened);
++        let hwp_props = hwp_reopened
++            .get_shape_properties_native(0, hwp_para, hwp_ctrl)
++            .expect("query reopened HWP");
++        assert!(hwp_props.contains(r#""tbTextDirection":"Vertical""#));
++
++        hwp_reopened
++            .set_shape_properties_native(
++                0,
++                hwp_para,
++                hwp_ctrl,
++                r#"{"tbTextDirection":"VerticalAll"}"#,
++            )
++            .expect("set vertical all");
++        let hwpx = hwp_reopened.export_hwpx_native().expect("export HWPX");
++        let hwpx_reopened = DocumentCore::from_bytes(&hwpx).expect("reopen HWPX");
++        let (hwpx_para, hwpx_ctrl) = first_shape_ref(&hwpx_reopened);
++        let hwpx_props = hwpx_reopened
++            .get_shape_properties_native(0, hwpx_para, hwpx_ctrl)
++            .expect("query reopened HWPX");
++        assert!(hwpx_props.contains(r#""tbTextDirection":"VerticalAll""#));
++
++        core.set_shape_properties_native(0, para, ctrl, r#"{"tbTextDirection":"Horizontal"}"#)
++            .expect("set horizontal");
++        let props = core
++            .get_shape_properties_native(0, para, ctrl)
++            .expect("query horizontal");
++        assert!(props.contains(r#""tbTextDirection":"Horizontal""#));
++    }
++
+     /// group_shapes_native 는 그룹으로 묶이는 컨트롤보다 앞서 문단에 남아있는 텍스트의
+     /// char_offsets 를 건드리면 안 된다. 삽입 지점(safe_offset) 이전 항목은 그대로 두고
+     /// 그 이후만 +8 시프트해야 한다(create_shape_control_native 와 동일 규약, shape.rs:1519).

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 3 · 재점검 1 | 완료 0/30 · 부분 18 · 미구현 12 |
-| 검증 | 완료 4/11 · 부분 4 · 미검증 3 | 완료 0/30 · 부분 2 · 미검증 28 |
+| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 29 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 15 · 미검증 15 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **재점검** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사와 object>cells>table>document 우선순위를 구현해 P의 표 셀/개체 충돌을 제거했고 단축키·navigation 34/34를 통과했다. 쪽 번호·매크로 기록·글자 스타일 해제 pending 3건과 머리말/각주/미주/글상자 story 정책·한글 비교는 남아 부분이다.
+- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 reachability·fail-closed capability gate에 더해 실제 생성한 Studio UI에서 미지원 자리표시 명령이 메뉴·문맥 메뉴 disabled·리본/빠른 메뉴 미노출·dispatcher disabled로 유지되고 UI dispatch·execute·native write·성공 이벤트가 모두 0임을 Edge로 확인했다. 891ac4d0 기준 Edge 1/1과 HWP/HWPX 불변 회귀 5/5를 통과했다. 실제 native API·durable model·undo/HWP·HWPX adapter와 dirty build.mjs를 건드리지 않는 정식 build hook·한글 비교는 남아 부분이다.
+- **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
+- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 7df5d8fb·454073eb·cd4ef484 기준 HWP/HWPX 저장·재열기·undo/redo·실패 bytes 불변 Rust 3/3, adapter·대화상자·실제 tracked Studio seam 10/10, 전체 엔진 패치 연쇄 적용, strict TypeScript·경계 diagnostics 0을 통과했다. dirty build.mjs를 건드리지 않아 정식 build hook 호출은 아직 미연결이며 기존 컨트롤 교체·다구역/특수 story·매크로·한글 비교도 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -49,9 +49,9 @@
 | [B043](<12-ui-and-shortcuts.md#b043>) · 범위 | 조판 부호 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B044](<12-ui-and-shortcuts.md#b044>) · 범위 | 문단 부호 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B045](<12-ui-and-shortcuts.md#b045>) · 범위 | 투명 선 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B046](<12-ui-and-shortcuts.md#b046>) · 범위 | 쪽 윤곽 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B047](<12-ui-and-shortcuts.md#b047>) · 범위 | 교정 부호·그림 표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B048](<12-ui-and-shortcuts.md#b048>) · 범위 | 메모 표시·안내선 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B046](<12-ui-and-shortcuts.md#b046>) · 범위 | 쪽 윤곽 | ☑ 완료 | ◐ 부분 | ☐ 미연결 |
+| [B047](<12-ui-and-shortcuts.md#b047>) · 범위 | 교정 부호·그림 표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B048](<12-ui-and-shortcuts.md#b048>) · 범위 | 메모 표시·안내선 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
@@ -59,13 +59,13 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B049](<12-ui-and-shortcuts.md#b049>) · 범위 | 한자 발음 표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B049](<12-ui-and-shortcuts.md#b049>) · 범위 | 한자 발음 표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B050](<12-ui-and-shortcuts.md#b050>) · 범위 | 격자 표시 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B051](<12-ui-and-shortcuts.md#b051>) · 범위 | 격자 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B052](<12-ui-and-shortcuts.md#b052>) · 범위 | 개체 이동 안내선 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B053](<12-ui-and-shortcuts.md#b053>) · 범위 | 문서 보기 색 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B052](<12-ui-and-shortcuts.md#b052>) · 범위 | 개체 이동 안내선 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B053](<12-ui-and-shortcuts.md#b053>) · 범위 | 문서 보기 색 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B055](<12-ui-and-shortcuts.md#b055>) · 범위 | 서식 도구 상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B056](<12-ui-and-shortcuts.md#b056>) · 범위 | 도구 상자 사용자 설정 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B056](<12-ui-and-shortcuts.md#b056>) · 범위 | 도구 상자 사용자 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B057](<12-ui-and-shortcuts.md#b057>) · 범위 | 스타일 작업 창 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-3"></a>
@@ -75,10 +75,10 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B058](<12-ui-and-shortcuts.md#b058>) · 범위 | 탐색 작업 창 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B059](<12-ui-and-shortcuts.md#b059>) · 범위 | 책갈피·개요·클립보드 작업 창 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B060](<12-ui-and-shortcuts.md#b060>) · 범위 | 번역·사전·스크립트 작업 창 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B062](<12-ui-and-shortcuts.md#b062>) · 범위 | 편집 화면 분할 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B063](<12-ui-and-shortcuts.md#b063>) · 범위 | 문서 창 배열 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B059](<12-ui-and-shortcuts.md#b059>) · 범위 | 책갈피·개요·클립보드 작업 창 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B060](<12-ui-and-shortcuts.md#b060>) · 범위 | 번역·사전·스크립트 작업 창 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B062](<12-ui-and-shortcuts.md#b062>) · 범위 | 편집 화면 분할 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B063](<12-ui-and-shortcuts.md#b063>) · 범위 | 문서 창 배열 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
 
@@ -87,7 +87,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B054](<12-ui-and-shortcuts.md#b054>) · 범위 | 기본 도구 상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [N019](<12-ui-and-shortcuts.md#n019>) · 작업 | 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N019](<12-ui-and-shortcuts.md#n019>) · 작업 | 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-5"></a>
 
@@ -96,7 +96,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B061](<12-ui-and-shortcuts.md#b061>) · 범위 | 문서 탭·상황선·눈금자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [N023](<12-ui-and-shortcuts.md#n023>) · 작업 | 큰 DPI·배율·좁은 화면 전체 환경 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N023](<12-ui-and-shortcuts.md#n023>) · 작업 | 큰 DPI·배율·좁은 화면 전체 환경 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-6"></a>
 
@@ -104,8 +104,8 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B148](<12-ui-and-shortcuts.md#b148>) · 범위 | 글자판 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B150](<12-ui-and-shortcuts.md#b150>) · 범위 | 사용자 설정 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B148](<12-ui-and-shortcuts.md#b148>) · 범위 | 글자판 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B150](<12-ui-and-shortcuts.md#b150>) · 범위 | 사용자 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B151](<12-ui-and-shortcuts.md#b151>) · 범위 | 환경 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B152](<12-ui-and-shortcuts.md#b152>) · 범위 | 스킨 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
@@ -132,7 +132,7 @@
 | [G016](<12-ui-and-shortcuts.md#g016>) · 작업 | 문서 탭 순환과 활성 탭 소유 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G017](<12-ui-and-shortcuts.md#g017>) · 작업 | 채팅 Enter 전송·Shift+Enter 줄바꿈 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G018](<12-ui-and-shortcuts.md#g018>) · 작업 | 미지원 기능의 성공 표시 차단 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
-| [N020](<12-ui-and-shortcuts.md#n020>) · 작업 | 한글 대화상자 활성화 오류 재현·해결 | ? 재점검 | ☐ 미검증 | — 해당 없음 |
+| [N020](<12-ui-and-shortcuts.md#n020>) · 작업 | 한글 대화상자 활성화 오류 재현·해결 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-9"></a>
 
@@ -220,12 +220,12 @@
 <summary>B046 · 쪽 윤곽</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 페이지 여백 숨김 경로 대조 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 앱 보기 설정·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 한 렌더 트랜잭션으로 토글한다. 문서 revision·dirty·undo·저장 bytes에는 관여하지 않는다.
+- 다음 작업: HWP/HWPX 바이트 비변경·재열기와 고정 upstream 통합 patch 11/11·격리 전체 build·실제 Edge 메뉴/상태바 클릭과 교차 탭 동기화 smoke를 통과했다. 빈 문서 stored-time 초기화는 현재 엔진에서 경고가 발생해 소유 HWPX를 연 뒤 검증했으며 이 제한과 한글 비교는 남았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `PAGE_OUTLINE_VIEW_2026_11_09;FULL_BUILD_2026_11_09;EDGE_SMOKE_2026_11_09;EMPTY_DOCUMENT_STORED_TIME_WARNING_2026_11_09;PARTIAL_VERIFICATION`
 
 </details>
 
@@ -233,12 +233,13 @@
 <summary>B047 · 교정 부호·그림 표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 표시 옵션 미연결
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재 문단 부호와 조판 부호는 실제 명령·설정·렌더러까지 연결됐지만 그림 표시/숨기기는 완료 범위가 아님.
+- 다음 작업: Ctrl+G+C와 Ctrl+G+T가 실제 Studio 명령으로 해석되고 WASM 표시 상태·사용자 설정·document-view-changed를 거쳐 페이지 렌더 트리에 문단 끝 부호와 제어 라벨을 출력함을 검증. 그림 가시성 상태·이미지 렌더 필터·설정/메뉴 연결과 한글 직접 비교는 남음.
+- UI 명령: `view:ctrl-mark;view:para-mark`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [view-marks-b047.test.ts](<../../apps/editor/tests/view-marks-b047.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_PARAGRAPH_CONTROL_MARK_RENDER_PASS_2026_11_09`
 
 </details>
 
@@ -246,12 +247,12 @@
 <summary>B048 · 메모 표시·안내선</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 주석 구조 지원과 UI는 별개
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. B092의 검증된 본문 point memo만 view-state로 투영한다.
+- 다음 작업: commit 77e4a472 기준 메모 표시 on/off와 안내선 anchor 상태를 document identity·revision·목록 fingerprint로 재검증한다. stale·malformed·범위 메모·특수 story는 fail-closed이며 HWP/HWPX 바이트와 편집 history 호출이 변하지 않음을 3/3으로 확인했다. 실제 Studio overlay·메뉴/단축키·설정 저장과 한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [memo-view-state-b048.ts](<../../apps/editor/src/adapters/rhwp/memo-view-state-b048.ts>) · [memo-view-state-b048.test.ts](<../../apps/editor/tests/memo-view-state-b048.test.ts>)
+- 원래 기록: `PARTIAL;BODY_POINT_MEMO_VIEW_STATE_PASS_2026_11_09;STUDIO_OVERLAY_PENDING`
 
 </details>
 
@@ -259,12 +260,12 @@
 <summary>B049 · 한자 발음 표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 발음 데이터·설정 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적으로 주입된 offline·ko-KR 사전만 사용해 본문 viewport 한자 원문의 발음 overlay를 만들고 문서 identity·revision·범위·원문·provider fingerprint를 재검증하며 문서 바이트를 변경하지 않는다.
+- 다음 작업: 커밋 98426582에서 실제 HWP/HWPX export와 undo snapshot 불변 4/4 통과. 실제 발음 사전 데이터와 Studio 표시 UI·설정은 미구현.
+- 근거: [hanja-pronunciation-overlay-b049.ts](<../../apps/editor/src/adapters/rhwp/hanja-pronunciation-overlay-b049.ts>) · [hanja-pronunciation-overlay-b049.test.ts](<../../apps/editor/tests/hanja-pronunciation-overlay-b049.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_HANJA_PRONUNCIATION_OVERLAY_2026_11_09`
 
 </details>
 
@@ -300,12 +301,12 @@
 <summary>B052 · 개체 이동 안내선</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 표시·설정 하위 항목 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 용지·다른 개체의 좌/중/우·상/중/하 기준으로 확대율을 반영해 안내선과 선택적 스냅을 계산한다.
+- 다음 작업: 좌표·개체 수 검증·사용자 설정·전용 오버레이와 실제 WASM HWP/HWPX export 바이트 불변을 검증했다. Studio의 실제 pointer drag/resize 명령 경로 배선과 한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [object-movement-guides-b052.ts](<../../apps/editor/src/adapters/browser/object-movement-guides-b052.ts>) · [object-movement-guides-b052.test.ts](<../../apps/editor/tests/object-movement-guides-b052.test.ts>)
+- 원래 기록: `PARTIAL;GUIDE_GEOMETRY_VIEW_CONTRACT_PASS_2026_11_09;DRAG_RESIZE_WIRING_PENDING`
 
 </details>
 
@@ -313,12 +314,12 @@
 <summary>B053 · 문서 보기 색</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 앱 테마와 다른 문서 보기 기능
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 작업 영역·용지 색상은 문서 모델과 분리한 사용자 설정으로만 다루며 HWP/HWPX 저장 바이트를 변경하지 않는다.
+- 다음 작업: 색상 검증·사용자별 저장·미리보기·취소·저장 실패 롤백과 실제 WASM HWP/HWPX export 바이트 불변을 검증했다. 실제 설정 대화상자와 시작 시 초기화 배선 및 한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-view-colors-b053.ts](<../../apps/editor/src/adapters/browser/document-view-colors-b053.ts>) · [document-view-colors-b053.test.ts](<../../apps/editor/tests/document-view-colors-b053.test.ts>)
+- 원래 기록: `PARTIAL;UI_ONLY_VIEW_COLOR_CONTRACT_PASS_2026_11_09;RUNTIME_WIRING_PENDING`
 
 </details>
 
@@ -354,12 +355,12 @@
 <summary>B056 · 도구 상자 사용자 설정</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 단축키/메뉴 사용자 편집 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 등록된 명령만 사용자별로 표시·숨김·재배치하고 필수 명령과 저장 실패를 fail-close한다.
+- 다음 작업: 버전 설정 저장·복원·기본값·미리보기·취소·DOM 투영과 실제 WASM HWP/HWPX export 바이트 불변을 검증했다. 기존 리본/빠른 도구 상자 명령 목록 배선·설정 대화상자·한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [toolbar-customization-b056.ts](<../../apps/editor/src/adapters/browser/toolbar-customization-b056.ts>) · [toolbar-customization-b056.test.ts](<../../apps/editor/tests/toolbar-customization-b056.test.ts>)
+- 원래 기록: `PARTIAL;TOOLBAR_CUSTOMIZATION_CONTRACT_PASS_2026_11_09;CHROME_DIALOG_WIRING_PENDING`
 
 </details>
 
@@ -395,12 +396,12 @@
 <summary>B059 · 책갈피·개요·클립보드 작업 창</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 대화상자 기능과 작업창 구분
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 검증된 본문 책갈피·개요와 업무별 클립보드 기록을 하나의 읽기 전용 작업 창 상태로 투영하고 문서 identity·revision·목록 fingerprint·workspace scope를 재검증한다.
+- 다음 작업: a0a381ab 선택 검사 5/5 및 실제 HWP/HWPX 바이트·undo snapshot 불변 통과. Studio 작업 창 UI와 설정 저장 연결은 남음.
+- 근거: [bookmark-outline-clipboard-pane-b059.ts](<../../apps/editor/src/adapters/browser/bookmark-outline-clipboard-pane-b059.ts>) · [bookmark-outline-clipboard-pane-b059.test.ts](<../../apps/editor/tests/bookmark-outline-clipboard-pane-b059.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_READ_ONLY_TASK_PANE_STATE_2026_11_09`
 
 </details>
 
@@ -408,12 +409,12 @@
 <summary>B060 · 번역·사전·스크립트 작업 창</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 외부 의존 포함 하위 조사 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: dictionary·translation·script-macro 중 명시적 offline 기능만 등록하고 문서 identity·instance·revision·active 소유권을 재검증하며 열기·탭 전환·닫기 상태를 비밀 없는 1KB 이하 설정 스키마로 보존한다.
+- 다음 작업: 커밋 6754cd5e에서 실제 HWP/HWPX export 바이트·기존 undo snapshot 불변과 설정 재열기 4/4 통과. 실제 작업 창 DOM·도구 데이터·번역/매크로 실행 배선은 미구현.
+- 근거: [offline-tool-pane-b060.ts](<../../apps/editor/src/adapters/browser/offline-tool-pane-b060.ts>) · [offline-tool-pane-b060.test.ts](<../../apps/editor/tests/offline-tool-pane-b060.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_TOOL_PANE_STATE_2026_11_09`
 
 </details>
 
@@ -434,12 +435,12 @@
 <summary>B062 · 편집 화면 분할</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: Agent 패널 분할과 별개 기능
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 두 viewport가 동일 document owner·identity·instance·revision·mutation coordinator를 공유해야 하며 복제 엔진은 차단한다.
+- 다음 작업: 가로/세로·비율·활성 뷰·닫기/복원·사용자 설정과 cloned/stale/중복 뷰 차단 및 실제 WASM HWP/HWPX export 바이트 불변을 검증했다. shell DOM/iframe 생성·스크롤/선택 동기화·한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-split-view-b062.ts](<../../apps/editor/src/adapters/iframe/document-split-view-b062.ts>) · [document-split-view-b062.test.ts](<../../apps/editor/tests/document-split-view-b062.test.ts>)
+- 원래 기록: `PARTIAL;SHARED_DOCUMENT_SPLIT_CONTRACT_PASS_2026_11_09;SHELL_IFRAME_WIRING_PENDING`
 
 </details>
 
@@ -447,12 +448,12 @@
 <summary>B063 · 문서 창 배열</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 단일 host iframe 탭 기반
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 다중 문서 창 descriptor와 OS batch callback의 안전 계약만 구현한다.
+- 다음 작업: commit 28efb1ae 기준 가로/세로 바둑판·계단식 계획과 document identity·revision·window epoch 재검증·단일 batch 적용·readback 실패 전체 rollback을 5/5로 확인했다. 한 창·hidden·modal·이동 불가·중복·stale은 callback 전에 차단한다. 실제 native host callback·메뉴 UI·한글 창 배열 비교는 미연결이라 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-window-arrangement-b063.ts](<../../apps/editor/src/adapters/browser/document-window-arrangement-b063.ts>) · [document-window-arrangement-b063.test.ts](<../../apps/editor/tests/document-window-arrangement-b063.test.ts>)
+- 원래 기록: `PARTIAL;SAFE_WINDOW_LAYOUT_CONTRACT_PASS_2026_11_09;NATIVE_HOST_WIRING_PENDING`
 
 </details>
 
@@ -460,12 +461,12 @@
 <summary>B148 · 글자판 설정</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: Windows IME 사용; 한글의 별도 자판 관리 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: system-ime·두벌식·세벌식390·로마자의 앱 내부 전역 선택만 버전·크기 제한 설정으로 보존하고 활성 문서 identity·instance와 IME 조합 상태를 재검증한다.
+- 다음 작업: 커밋 71eeb1b6에서 실제 HWP/HWPX export 바이트·재열기·기존 undo snapshot 불변과 설정 손상/저장 실패 차단 4/4 통과. Windows IME·한글 글자판 자체 변경·Studio UI는 미구현.
+- 근거: [keyboard-profile-b148.ts](<../../apps/editor/src/adapters/browser/keyboard-profile-b148.ts>) · [keyboard-profile-b148.test.ts](<../../apps/editor/tests/keyboard-profile-b148.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_APP_LOCAL_KEYBOARD_PROFILE_2026_11_09`
 
 </details>
 
@@ -473,12 +474,12 @@
 <summary>B150 · 사용자 설정</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 메뉴/도구/키매핑 사용자 편집 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 메뉴·도구 모음·키매핑만 포함하는 이식 가능 v1 사용자 프로필과 allowlist·크기 제한·단축키 충돌 검사·revision CAS·원자적 롤백 저장소를 제공한다.
+- 다음 작업: 0bed1a17·3418b2da 선택 검사 6/6 및 strict TypeScript·모듈 경계 검사 통과. 실제 설정 UI와 Studio 명령 소비 연결은 남음.
+- 근거: [user-profile-b150.ts](<../../apps/editor/src/modules/preferences/application/user-profile-b150.ts>) · [index.ts](<../../apps/editor/src/modules/preferences/public/index.ts>) · [atomic-user-profile-repository-b150.ts](<../../apps/editor/src/adapters/browser/atomic-user-profile-repository-b150.ts>) · [user-profile-b150.test.ts](<../../apps/editor/tests/user-profile-b150.test.ts>)
+- 원래 기록: `PARTIAL;PASS;PORTABLE_USER_CUSTOMIZATION_PROFILE_2026_11_09`
 
 </details>
 
@@ -645,13 +646,13 @@
 <summary>N019 · 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 하위 dialog/표·개체·특수 영역·disabled 조건까지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 정적 reachability·fail-closed capability gate에 더해 실제 생성한 Studio UI에서 미지원 자리표시 명령이 메뉴·문맥 메뉴 disabled·리본/빠른 메뉴 미노출·dispatcher disabled로 유지되고 UI dispatch·execute·native write·성공 이벤트가 모두 0임을 Edge로 확인했다. 891ac4d0 기준 Edge 1/1과 HWP/HWPX 불변 회귀 5/5를 통과했다. 실제 native API·durable model·undo/HWP·HWPX adapter와 dirty build.mjs를 건드리지 않는 정식 build hook·한글 비교는 남아 부분이다.
 - 상위 항목: [B054](<12-ui-and-shortcuts.md#b054>) 기본 도구 상자
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [insert-placeholder-capability-n019.ts](<../../apps/editor/src/shortcuts/insert-placeholder-capability-n019.ts>) · [insert-placeholder-command-patches-n019.mjs](<../../apps/editor/scripts/integration/insert-placeholder-command-patches-n019.mjs>) · [insert-placeholder-capability-n019.test.ts](<../../apps/editor/tests/insert-placeholder-capability-n019.test.ts>) · [insert-placeholder-studio-browser-n019.test.ts](<../../apps/editor/tests/insert-placeholder-studio-browser-n019.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08;INSERT_PLACEHOLDER_CAPABILITY_GATE_2026_11_09;INSERT_PLACEHOLDER_ACTUAL_UI_DISABLED_2026_11_09`
 
 </details>
 
@@ -659,13 +660,13 @@
 <summary>N020 · 한글 대화상자 활성화 오류 재현·해결</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 일반 권한·modal 소유·foreground 정책 증거; 실패 우회 검증
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: capture/foreground/modal owner/session/integrity/input binding 증거 수집에서 정책 판정·최대 1회 refresh·activate·post-activation 증거 재검증·semantic input까지 순서화하고 모든 drift와 권한 실패를 입력 전에 fail-closed
+- 다음 작업: 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [39-native-dialog-investigation.md](<../39-native-dialog-investigation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [39-native-dialog-investigation.md](<../39-native-dialog-investigation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;NATIVE_DIALOG_ACTIVATION_POLICY_2026_11_09;NATIVE_DIALOG_ACTIVATION_COORDINATOR_2026_11_09`
 
 </details>
 
@@ -675,11 +676,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한컴 기본 매핑·선택/IME/대화상자/OS 예약키 조합
-- 다음 작업: 177개 binding 감사와 object>cells>table>document 우선순위를 구현해 P의 표 셀/개체 충돌을 제거했고 단축키·navigation 34/34를 통과했다. 쪽 번호·매크로 기록·글자 스타일 해제 pending 3건과 머리말/각주/미주/글상자 story 정책·한글 비교는 남아 부분이다.
+- 완료 범위: 한컴 기본 매핑과 exact story 경계에 단일 구역 최상위 본문의 PageNumberPos Rust/WASM·snapshot adapter·Ctrl+N,P 대화상자와 pinned Studio exact-seam 등록을 연결하고 특수 story/다구역/기존 control/IME/stale owner는 snapshot 전에 fail-closed
+- 다음 작업: 7df5d8fb·454073eb·cd4ef484 기준 HWP/HWPX 저장·재열기·undo/redo·실패 bytes 불변 Rust 3/3, adapter·대화상자·실제 tracked Studio seam 10/10, 전체 엔진 패치 연쇄 적용, strict TypeScript·경계 diagnostics 0을 통과했다. dirty build.mjs를 건드리지 않아 정식 build hook 호출은 아직 미연결이며 기존 컨트롤 교체·다구역/특수 story·매크로·한글 비교도 남아 부분이다.
 - 상위 항목: [B169](<08-tables.md#b169>) 첫 셀·셀 블록
-- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08`
+- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [page-number-position-n021.ts](<../../apps/editor/src/adapters/rhwp/page-number-position-n021.ts>) · [page-number-position-dialog-n021.ts](<../../apps/editor/src/adapters/browser/page-number-position-dialog-n021.ts>) · [page-number-position-n021-patches.mjs](<../../apps/editor/scripts/integration/page-number-position-n021-patches.mjs>) · [page-number-position-n021.test.ts](<../../apps/editor/tests/page-number-position-n021.test.ts>) · [page-number-position-n021-studio-patches.test.ts](<../../apps/editor/tests/page-number-position-n021-studio-patches.test.ts>) · [zzzzzzzzzzzzzzzzzzz-page-number-position.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzz-page-number-position.patch>) · [verify-document-engine-package.mjs](<../../scripts/verify-document-engine-package.mjs>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09;SPECIAL_STORY_SAFE_GLOBALS_2026_11_09;PAGE_NUMBER_POSITION_ENGINE_2026_11_09;PAGE_NUMBER_POSITION_DIALOG_2026_11_09`
 
 </details>
 
@@ -687,13 +688,13 @@
 <summary>N023 · 큰 DPI·배율·좁은 화면 전체 환경</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 125/150/200%·다중 모니터·좌표/선택·보기 수명
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: visualViewport CSS 좌표의 DOM 경계 clamp·상단 flip·resize/scroll 재배치·devicePixelRatio 이중 적용 방지와 다중 browser surface에서 활성 문서 identity·instance·geometry sequence가 정확히 일치하는 evidence 기반 popup 배치
+- 다음 작업: commit 833239ac 기준 다중 surface·음수 CSS 좌표·활성 문서 owner·geometry sequence를 검증하고 native/device-pixel 좌표 추측을 차단했다. 신규+기존 선별 7/7과 strict adapter TypeScript·경계 검사를 통과했다. 기존 Edge 6 scenarios 증거는 유지하며 이번 headless 재실행은 격리 프로필 사용 중이라 시작 전에 차단됐다. 실제 Windows OS DPI·다중 모니터·native 좌표·한글 비교는 남아 부분이다.
 - 상위 항목: [B061](<12-ui-and-shortcuts.md#b061>) 문서 탭·상황선·눈금자
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [viewport-placement-browser-n023.html](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.html>) · [viewport-placement-browser-n023.ts](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.ts>) · [verify-viewport-placement-browser-n023.mjs](<../../apps/editor/scripts/verify-viewport-placement-browser-n023.mjs>) · [viewport-placement-n023-evidence.ts](<../../apps/editor/src/adapters/browser/viewport-placement-n023-evidence.ts>) · [viewport-placement-n023-evidence.test.ts](<../../apps/editor/tests/viewport-placement-n023-evidence.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;VISUAL_VIEWPORT_MENU_PLACEMENT_2026_11_09;EDGE_VIEWPORT_PLACEMENT_2026_11_09;MULTI_SURFACE_CSS_EVIDENCE_2026_11_09;NATIVE_DPI_COORDINATES_BLOCKED_2026_11_09`
 
 </details>
 

@@ -32,6 +32,12 @@ export function subdivisionFieldOwners(doc:any,table:Table):Map<number,number> {
     throw invalid();
   const previousEnd=new Map<string,number>();
   for(const f of fields)if(!f.cellField){
+    // A zero-length ClickHere has neither a painted guide/value nor an
+    // independently addressable range after neighboring cell indices move.
+    // Keep it read-only until an explicit empty-field storage proof exists.
+    if(!Number.isSafeInteger(f.startCharIdx)||!Number.isSafeInteger(f.endCharIdx)||
+        f.startCharIdx<0||f.startCharIdx>f.endCharIdx||
+        f.startCharIdx===f.endCharIdx && f.guide==='') throw invalid();
     const paragraph=f.listId+'/'+f.paraInList;
     if((previousEnd.get(paragraph)??-1)>=f.startCharIdx) throw invalid();
     previousEnd.set(paragraph,f.endCharIdx);

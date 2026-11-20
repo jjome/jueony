@@ -16,7 +16,7 @@ test('relative paragraph values use native 2x HWPUNIT without flattening existin
 
 test('official paragraph key aliases and repeat events resolve the same relative command',()=>{
  const resolver=new HangulKeyResolver(),ctx={table:false,cells:false,object:false};
- for(const [keys,operation] of [['Ctrl+Alt+F5','left-less'],['Ctrl+Shift+E','left-less'],['Ctrl+Alt+F6','left-more'],['Ctrl+Shift+G','left-more'],['Ctrl+Alt+F7','right-more'],['Ctrl+Shift+D','right-more'],['Ctrl+Alt+F8','right-less'],['Ctrl+Shift+F','right-less'],['Ctrl+F5','indent-less'],['Ctrl+Shift+O','indent-less'],['Ctrl+F6','indent-more'],['Ctrl+Shift+I','indent-more'],['Ctrl+F7','both-less'],['Ctrl+F8','both-more']]){
+ for(const [keys,operation] of [['Ctrl+Alt+F5','left-less'],['Ctrl+Shift+E','left-less'],['Ctrl+Alt+F6','left-more'],['Ctrl+Shift+G','left-more'],['Ctrl+Alt+F7','right-more'],['Ctrl+Shift+D','right-more'],['Ctrl+Alt+F8','right-less'],['Ctrl+Shift+F','right-less'],['Ctrl+F5','indent-less'],['Ctrl+Shift+O','indent-less'],['Ctrl+F6','indent-more'],['Ctrl+Shift+I','indent-more'],['Ctrl+F7','both-more'],['Ctrl+F8','both-less']]){
   const parts=keys.split('+'),key=parts.at(-1)!;
   const e={key,code:key.length===1?'Key'+key:key,ctrlKey:true,altKey:parts.includes('Alt'),shiftKey:parts.includes('Shift'),metaKey:false,repeat:true,isComposing:false};
   assert.equal(resolver.resolve(e,ctx).binding?.params?.operation,operation,keys);

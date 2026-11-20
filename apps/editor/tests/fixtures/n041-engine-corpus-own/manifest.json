@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "corpusId": "n041-synthetic-engine-corpus-v1",
+  "generatedSynthetic": true,
+  "cases": [
+    {
+      "id": "C01",
+      "label": "기본 본문과 명시 글꼴",
+      "builder": "body-font",
+      "formats": ["hwp", "hwpx"],
+      "requiredEvidence": ["text", "section/0/paragraph/0"],
+      "expected": {"minimumPages": 1, "minimumTables": 0, "minimumPictures": 0, "minimumFields": 0, "fontFamily": "함초롬바탕"}
+    },
+    {
+      "id": "C02",
+      "label": "쪽 경계와 용지 설정",
+      "builder": "page-boundary",
+      "formats": ["hwp", "hwpx"],
+      "requiredEvidence": ["text", "section/0/page", "section/0/definition"],
+      "expected": {"minimumPages": 2, "minimumTables": 0, "minimumPictures": 0, "minimumFields": 0, "fontFamily": "함초롬바탕"}
+    },
+    {
+      "id": "C03",
+      "label": "표와 셀 내용·서식",
+      "builder": "table",
+      "formats": ["hwp", "hwpx"],
+      "requiredEvidence": ["text", "controls", "cells"],
+      "expected": {"minimumPages": 1, "minimumTables": 1, "minimumPictures": 0, "minimumFields": 0, "fontFamily": "함초롬바탕"}
+    },
+    {
+      "id": "C04",
+      "label": "내장 PNG 그림 자산",
+      "builder": "picture",
+      "formats": ["hwp", "hwpx"],
+      "requiredEvidence": ["controls", "objects", "image-resources"],
+      "expected": {"minimumPages": 1, "minimumTables": 0, "minimumPictures": 1, "minimumFields": 0, "fontFamily": "함초롬바탕"}
+    },
+    {
+      "id": "C05",
+      "label": "본문 누름틀 필드",
+      "builder": "field",
+      "formats": ["hwp", "hwpx"],
+      "requiredEvidence": ["text", "controls", "fields"],
+      "expected": {"minimumPages": 1, "minimumTables": 0, "minimumPictures": 0, "minimumFields": 1, "fontFamily": "함초롬바탕"}
+    }
+  ]
+}

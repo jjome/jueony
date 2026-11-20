@@ -1,8 +1,71 @@
 import { TextTransformDialog } from '../browser/text-transform-dialog.ts';
 import { PlainTextDialog } from '../browser/plain-text-dialog.ts';
+import { SymbolDialogB090, createSymbolRecentStoreB090 } from '../browser/symbol-dialog-b090.ts';
 import { executeTextTransform, preflightTextTransform, readTextTransformPlan } from './text-transform-native.ts';
 import { executePlainText, preflightPlainText, readPlainTextPlan } from './plain-text-native.ts';
+import { readMultiParagraphPlainTextPlan, replaceMultiParagraphPlainText } from './multi-paragraph-plain-text.ts';
+import type { MultiParagraphPlainTextPlan, MultiParagraphPlainTextReceipt, MultiParagraphTextRange } from './multi-paragraph-plain-text.ts';
 import type { TextTransform } from '../../modules/document/public/text-transform.ts';
+import { applySymbolInsertionB090, captureSymbolInsertionB090, validateSymbolB090, type SymbolInsertionPlanB090 } from './symbol-insertion-b090.ts';
+
+const same = (left: unknown, right: unknown): boolean => JSON.stringify(left) === JSON.stringify(right);
+const revision = (value: unknown): string => {
+  if ((typeof value !== 'string' && typeof value !== 'number') || String(value).length === 0) throw new Error('문서 revision을 확인하지 못했습니다.');
+  return String(value);
+};
+const rootPoint = (value: any): boolean => Boolean(value && value.parentParaIndex === undefined && !value.isTextBox
+  && [value.sectionIndex, value.paragraphIndex, value.charOffset].every((part: unknown) => Number.isSafeInteger(part) && Number(part) >= 0));
+export const isMultiParagraphBodySelection = (value: any): value is MultiParagraphTextRange => Boolean(value && rootPoint(value.start) && rootPoint(value.end)
+  && (value.start.sectionIndex !== value.end.sectionIndex || value.start.paragraphIndex !== value.end.paragraphIndex));
+
+export class MultiParagraphPlainTextCommand {
+  readonly type = 'jueonyMultiParagraphPlainText';
+  readonly timestamp = Date.now();
+  private receipt?: MultiParagraphPlainTextReceipt;
+  private caret?: { sectionIndex: number; paragraphIndex: number; charOffset: number };
+  private executed = false;
+  private readonly seed: MultiParagraphPlainTextPlan;
+  private readonly currentRevision: () => string | number;
+  private readonly currentSelection: () => MultiParagraphTextRange;
+  private readonly currentIdentity: () => string;
+  private readonly identity: string;
+
+  constructor(
+    seed: MultiParagraphPlainTextPlan,
+    currentRevision: () => string | number,
+    currentSelection: () => MultiParagraphTextRange,
+    currentIdentity: () => string,
+    identity: string,
+  ) { this.seed = seed; this.currentRevision = currentRevision; this.currentSelection = currentSelection; this.currentIdentity = currentIdentity; this.identity = identity; }
+
+  execute(wasm: any) {
+    if (!this.identity || this.currentIdentity() !== this.identity || !same(this.currentSelection(), this.seed.range))
+      throw new Error('문서 identity 또는 선택이 바뀌었습니다. 골라 붙이기를 다시 여세요.');
+    const liveRevision = revision(this.currentRevision());
+    const plan = this.executed ? readMultiParagraphPlainTextPlan(wasm, this.seed.range, this.seed.text, liveRevision) : this.seed;
+    if (!this.executed && liveRevision !== this.seed.revision) throw new Error('문서 revision이 바뀌었습니다. 골라 붙이기를 다시 여세요.');
+    const receipt = replaceMultiParagraphPlainText(wasm, plan, () => revision(this.currentRevision()), this.currentSelection);
+    this.receipt = receipt; this.caret = receipt.caret; this.executed = true;
+    return { ...receipt.caret };
+  }
+
+  undo() {
+    if (!this.receipt?.undo()) throw new Error('다중 문단 골라 붙이기를 안전하게 되돌리지 못했습니다.');
+    this.receipt = undefined;
+    return { ...this.seed.range.end };
+  }
+
+  discard(): void { this.receipt?.discard(); this.receipt = undefined; }
+  snapshotResourceCount(): number { return this.receipt ? 1 : 0; }
+  isNoOp(): boolean { return false; }
+  retainOnFailure(): boolean { return false; }
+  mergeWith(): null { return null; }
+  selectionBefore() { return { start: { ...this.seed.range.start }, end: { ...this.seed.range.end }, blockPhase: null }; }
+  selectionAfter() {
+    const caret = this.caret ?? this.seed.range.start;
+    return { start: { ...caret }, end: { ...caret }, blockPhase: null };
+  }
+}
 
 export function installBasicTextCommands(registry: any, input: () => any, eventBus: any): void {
   const safe = (context: any) => {
@@ -14,8 +77,8 @@ export function installBasicTextCommands(registry: any, input: () => any, eventB
   const automation = () => (window as any).rhwpStudio.automation, api = () => (window as any).jueonyEditor;
   const selection = () => { const ih = input(), position = ih.getCursorPosition(); return ih.getSelection() ?? { start: position, end: position }; };
   function guard(context: (value: any) => boolean) {
-    const revision = api().revision(), before = JSON.stringify(selection());
-    return () => { if (api().busy() || api().revision() !== revision || !context(automation().getContext()) || JSON.stringify(selection()) !== before) throw new Error('문서나 선택이 바뀌었습니다. 창을 다시 여세요.'); };
+    const editor = api(), openedRevision = editor.revision(), identity = editor.documentIdentity?.(), before = JSON.stringify(selection());
+    return () => { if (editor.busy() || editor.revision() !== openedRevision || editor.documentIdentity?.() !== identity || !context(automation().getContext()) || JSON.stringify(selection()) !== before) throw new Error('문서나 선택이 바뀌었습니다. 창을 다시 여세요.'); };
   }
   const transformCan = (context: any) => safe(context) && input().cursor.hasSelection();
   registry.register({ id: 'edit:transform-text', label: '글자 바꾸기 (대소문자·전각/반각)', opensDialog: true, canExecute: transformCan,
@@ -33,10 +96,46 @@ export function installBasicTextCommands(registry: any, input: () => any, eventB
   });
   const plainCan = (context: any) => safe(context) && !context.inTable;
   const insert = (text: string, current: () => void) => {
-    current(); const plan = readPlainTextPlan(input().wasm, selection(), text); preflightPlainText(input().wasm, plan); current();
-    input().executeOperation({ kind: 'snapshot', operationType: 'jueonyPlainText', operation: (wasm: any) => executePlainText(wasm, plan) }); eventBus.emit('command-state-changed');
+    current(); const ih = input(), range = structuredClone(selection());
+    if (isMultiParagraphBodySelection(range)) {
+      const editor = api();
+      if (typeof editor?.revision !== 'function' || typeof editor?.documentIdentity !== 'function') throw new Error('문서 identity와 revision을 확인할 수 없어 여러 문단을 바꾸지 않았습니다.');
+      const identity = editor.documentIdentity(), openedRevision = revision(editor.revision());
+      if (typeof identity !== 'string' || !identity) throw new Error('문서 identity를 확인할 수 없어 여러 문단을 바꾸지 않았습니다.');
+      const plan = readMultiParagraphPlainTextPlan(ih.wasm, range, text, openedRevision);
+      current();
+      if (input() !== ih || editor.documentIdentity() !== identity) throw new Error('문서가 바뀌었습니다. 골라 붙이기를 다시 여세요.');
+      ih.executeOperation({ kind: 'command', command: new MultiParagraphPlainTextCommand(plan, () => editor.revision(), () => structuredClone(selection()), () => editor.documentIdentity(), identity) });
+    } else {
+      const plan = readPlainTextPlan(ih.wasm, range, text); preflightPlainText(ih.wasm, plan); current();
+      ih.executeOperation({ kind: 'snapshot', operationType: 'jueonyPlainText', operation: (wasm: any) => executePlainText(wasm, plan) });
+    }
+    eventBus.emit('command-state-changed');
   };
   registry.register({ id: 'edit:paste-special', label: '골라 붙이기 (텍스트만)', opensDialog: true, canExecute: plainCan, execute: () => { const current = guard(plainCan); new PlainTextDialog(text => insert(text, current)).show(); } });
+  const symbolCan = (context: any) => {
+    try {
+      const editor = api(), ih = input();
+      if (!safe(context) || context.inTable || ih?.active !== true || ih.cursor.hasSelection()
+        || typeof editor?.revision !== 'function') return false;
+      captureSymbolInsertionB090(ih, context, revision(editor.revision()), '·');
+      return true;
+    } catch { return false; }
+  };
+  registry.register({
+    id: 'insert:symbols', label: '문자표', icon: 'icon-symbols', shortcutLabel: 'Ctrl+F10', opensDialog: true, canExecute: symbolCan,
+    execute: () => {
+      const editor = api(), ih = input(), context = automation().getContext(), openedRevision = revision(editor.revision());
+      const seed = captureSymbolInsertionB090(ih, context, openedRevision, '·');
+      let store;
+      try { store = createSymbolRecentStoreB090(window.localStorage); } catch { store = undefined; }
+      new SymbolDialogB090(symbol => {
+        const plan: SymbolInsertionPlanB090 = Object.freeze({ ...seed, symbol: validateSymbolB090(symbol) });
+        applySymbolInsertionB090(input(), automation().getContext(), revision(editor.revision()), plan, store);
+        eventBus.emit('command-state-changed');
+      }, store).show();
+    },
+  });
   const characters = [
     ['insert:nonbreaking-space', '묶음 빈 칸 (Unicode)', '\u00a0'],
     ['insert:fixed-space', '고정폭 빈 칸 (Unicode)', '\u2007'],

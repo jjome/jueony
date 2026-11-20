@@ -1,8 +1,45 @@
 import {validateTextBoxBookmark} from './textbox-bookmark.ts';
-import type { SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark } from '../public/contracts.ts';
+import {validateEndnoteSelectionBookmark} from './endnote-bookmark.ts';
+import type { SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, ObjectSelectionBookmark, ObjectSelectionEntry, RootClickHereFieldSelectionBookmarkN016 } from '../public/contracts.ts';
 import {validateBodyCaret} from './body-caret.ts';
 const integer = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 2147483647;
 const digest = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+function objectSelection(value:any):ObjectSelectionBookmark|undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || value.kind !== 'object-selection'
+    || !Array.isArray(value.objects) || value.objects.length < 1 || value.objects.length > 32
+    || !integer(value.active) || value.active !== value.objects.length - 1 || !digest(value.documentFingerprint)) return;
+  const objects:ObjectSelectionEntry[]=[];
+  const keys=new Set<string>();
+  for (const item of value.objects) {
+    if (!item || typeof item !== 'object' || Array.isArray(item) || !integer(item.section) || !integer(item.paragraph)
+      || !integer(item.control) || !['shape','group','image','equation'].includes(item.type) || !digest(item.objectFingerprint)) return;
+    const key=`${item.section}:${item.paragraph}:${item.control}:${item.type}`;
+    if(keys.has(key))return;keys.add(key);
+    objects.push({section:item.section,paragraph:item.paragraph,control:item.control,type:item.type,objectFingerprint:item.objectFingerprint});
+  }
+  const images=objects.every(object=>object.type==='image');
+  const equations=objects.every(object=>object.type==='equation');
+  if(images||equations){if(objects.length<2)return;}
+  else if(!objects.every(object=>object.type==='shape'||object.type==='group')||(objects.length===1&&objects[0].type!=='group'))return;
+  return {version:1,kind:'object-selection',objects,active:value.active,documentFingerprint:value.documentFingerprint};
+}
+function rootClickHereFieldSelection(value:any):RootClickHereFieldSelectionBookmarkN016|undefined {
+ if(!value||typeof value!=='object'||Array.isArray(value)||value.version!==1||value.kind!=='root-clickhere-field-selection'
+  ||!integer(value.fieldId)||value.fieldId===0||!integer(value.section)||!integer(value.start)||!integer(value.end)||value.end<=value.start
+  ||!['forward','backward'].includes(value.direction)||!digest(value.fieldFingerprint)||!digest(value.paragraphFingerprint)||!digest(value.selectionFingerprint))return;
+ if(value.owner==='cell'){
+  if(!integer(value.parentParagraph)||!integer(value.listId)||value.listId===0||!Array.isArray(value.path)||value.path.length<1||value.path.length>8
+   ||!value.path.every((entry:any)=>integer(entry?.controlIndex)&&integer(entry?.cellIndex)&&integer(entry?.cellParaIndex))
+   ||!digest(value.ownerFingerprint)||!digest(value.geometryFingerprint))return;
+  return {version:1,kind:'root-clickhere-field-selection',owner:'cell',fieldId:value.fieldId,section:value.section,parentParagraph:value.parentParagraph,
+   listId:value.listId,path:value.path.map((entry:any)=>({controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex})),start:value.start,end:value.end,
+   direction:value.direction,ownerFingerprint:value.ownerFingerprint,fieldFingerprint:value.fieldFingerprint,paragraphFingerprint:value.paragraphFingerprint,
+   geometryFingerprint:value.geometryFingerprint,selectionFingerprint:value.selectionFingerprint};
+ }
+ if(value.owner!==undefined||!integer(value.paragraph))return;
+ return {version:1,kind:'root-clickhere-field-selection',fieldId:value.fieldId,section:value.section,paragraph:value.paragraph,start:value.start,end:value.end,
+  direction:value.direction,fieldFingerprint:value.fieldFingerprint,paragraphFingerprint:value.paragraphFingerprint,selectionFingerprint:value.selectionFingerprint};
+}
 function point(value: any): SessionPoint | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const caret = validateBodyCaret(value.caret); if (!caret) return;
@@ -24,6 +61,9 @@ function sameCell(a: Extract<SessionPoint,{kind:'cell'}>, b: Extract<SessionPoin
 }
 export function validateSessionCursor(value: any): SessionCursor | undefined {
   if(value?.kind==='textbox')return validateTextBoxBookmark(value);
+  if(value?.kind==='endnote-selection')return validateEndnoteSelectionBookmark(value);
+  if(value?.kind==='object-selection')return objectSelection(value);
+  if(value?.kind==='root-clickhere-field-selection')return rootClickHereFieldSelection(value);
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const focus = point(value.focus); if (!focus) return;
   if (value.kind === 'header-footer' || value.kind === 'footnote') {

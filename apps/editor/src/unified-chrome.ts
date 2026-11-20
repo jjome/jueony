@@ -1,4 +1,5 @@
 import type {DocumentInteractionFacade as Editor,EditorMenuItem as MenuItem} from './modules/document/public/index.ts';
+import {currentVisualViewport,placeViewportPopup} from './adapters/browser/viewport-placement.ts';
 
 /** Navigation excludes disabled entries and wraps only arrow keys. */
 export function menuNavigationIndex(enabled:boolean[],current:number,key:string):number {
@@ -32,10 +33,10 @@ export function installUnifiedChrome(options:{menus:HTMLElement;tools:HTMLElemen
  });
  function position(detail:HTMLDetailsElement){
   const popup=detail.querySelector<HTMLElement>(':scope > .unified-menu-popup'),summary=detail.querySelector<HTMLElement>(':scope > summary');if(!popup||!summary)return;
-  const anchor=summary.getBoundingClientRect(),viewport=window.visualViewport;
-  const width=viewport?.width??window.innerWidth,height=viewport?.height??window.innerHeight,left=viewport?.offsetLeft??0,top=viewport?.offsetTop??0;
-  popup.style.maxWidth=`${Math.max(0,width-16)}px`;popup.style.left=`${Math.max(left+8,Math.min(anchor.left,left+width-popup.offsetWidth-8))}px`;
-  popup.style.top=`${anchor.bottom}px`;popup.style.maxHeight=`${Math.max(0,top+height-anchor.bottom-8)}px`;
+  const anchor=summary.getBoundingClientRect();
+  const placement=placeViewportPopup(anchor,{width:popup.offsetWidth,height:popup.offsetHeight},currentVisualViewport(window));
+  popup.style.maxWidth=`${placement.maxWidth}px`;popup.style.left=`${placement.left}px`;
+  popup.style.top=`${placement.top}px`;popup.style.maxHeight=`${placement.maxHeight}px`;popup.dataset.viewportSide=placement.side;
  }
  function open(detail:HTMLDetailsElement,key?:string){
   if(!topMenus().some(item=>item.open))returnFocus=document.activeElement instanceof HTMLElement?document.activeElement:null;
@@ -107,7 +108,10 @@ export function installUnifiedChrome(options:{menus:HTMLElement;tools:HTMLElemen
  };
  document.addEventListener('keydown',keydown,{signal});
  document.addEventListener('pointerdown',e=>{if(!options.menus.contains(e.target as Node))close();},{signal});
- window.addEventListener('resize',()=>{for(const detail of topMenus())if(detail.open)position(detail);},{signal});
+ const reposition=()=>{for(const detail of topMenus())if(detail.open)position(detail);};
+ window.addEventListener('resize',reposition,{signal});
+ window.visualViewport?.addEventListener('resize',reposition,{signal});
+ window.visualViewport?.addEventListener('scroll',reposition,{signal});
  const dispose=()=>{disposed=true;close();abort.abort();if(installations.get(options.menus)===dispose)installations.delete(options.menus);};
  installations.set(options.menus,dispose);
  return {refresh,dispose};

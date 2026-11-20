@@ -6,8 +6,9 @@ export type { DocumentViewport, DocumentViewAdapterOptions } from '../ports/view
 export { preferenceChangedPaths } from '../domain/merge.ts';
 export { defaultDocumentDefaults, validateDocumentDefaults } from '../domain/document-defaults.ts';
 export { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
-export type {SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, HeaderFooterBookmark, FootnoteBookmark} from './contracts.ts';
+export type {SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, HeaderFooterBookmark, FootnoteBookmark, EndnotePoint, EndnoteRestoreTarget, EndnoteSelectionBookmark, ObjectSelectionBookmark, ObjectSelectionEntry, RestorableObjectRef, RestorableObjectType, RootClickHereFieldSelectionBookmarkN016} from './contracts.ts';
 export {validateSessionCursor} from '../domain/session-cursor.ts';
+export {validateEndnoteSelectionBookmark} from '../domain/endnote-bookmark.ts';
 export {createDocumentViewJournal,VIEW_JOURNAL_KEY} from '../application/view-journal.ts';
 export type {ViewJournalEntry} from '../application/view-journal.ts';
 export { createPreferencesFacade, createPreferencesFacade as createPreferencesPersistence } from '../application/persistence.ts';
@@ -38,3 +39,17 @@ export { FONT_SET_LANGUAGES, validateFontSet, validateFontSetLibrary, prepareFon
 export { commitFontSetChange } from '../application/font-sets.ts';
 export type { PreferenceLifetimeContract, PreferenceScope, PreferenceBackup, PreferenceValidation, PreferenceVersion, NonPersistentStateContract } from '../domain/preference-lifetime.ts';
 export { preferenceLifetimeContracts, nonPersistentStateContracts } from '../domain/preference-lifetime.ts';
+export {
+  USER_PROFILE_FORMAT_B150,
+  USER_PROFILE_VERSION_B150,
+  UserProfileErrorB150,
+  captureUserProfileB150,
+  exportUserProfileB150,
+  importUserProfileB150,
+  mergeUserProfilesB150,
+} from '../application/user-profile-b150.ts';
+export type {
+  UserProfileB150,
+  UserProfilePolicyB150,
+  UserProfileScopeB150,
+} from '../application/user-profile-b150.ts';

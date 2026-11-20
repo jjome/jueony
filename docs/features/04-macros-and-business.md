@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 2 · 미구현 3 |
-| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 2 · 미검증 3 |
+| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 5 |
+| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 5 |
 | Agent 연결 | 연결 3/6 · 부분 0 · 미연결 3 | 연결 0/5 · 부분 0 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -50,7 +50,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B004](<04-macros-and-business.md#b004>) · 범위 | 문서 시작 도우미 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B004](<04-macros-and-business.md#b004>) · 범위 | 문서 시작 도우미 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-3"></a>
 
@@ -66,7 +66,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B141](<04-macros-and-business.md#b141>) · 범위 | 메일 머지 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B141](<04-macros-and-business.md#b141>) · 범위 | 메일 머지 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-5"></a>
 
@@ -74,7 +74,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B142](<04-macros-and-business.md#b142>) · 범위 | 스크립트 매크로 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B142](<04-macros-and-business.md#b142>) · 범위 | 스크립트 매크로 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [N039](<04-macros-and-business.md#n039>) · 작업 | 수동 편집 동작의 매크로 기록·재생 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-6"></a>
@@ -110,12 +110,12 @@
 <summary>B004 · 문서 시작 도우미</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 초기 작성 경로 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 빈 문서·정확한 recent fingerprint·승인된 로컬 HWP/HWPX 템플릿만 새 문서 owner로 열도록 제한한다.
+- 다음 작업: catalog/workspace/choice fingerprint 재검증·단일 실행·취소·malformed completion 차단·불투명 최근 선택 저장과 실제 WASM HWP/HWPX 활성 문서 바이트 불변을 검증했다. 실제 시작 화면·recent/template host 배선·한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-start-assistant-b004.ts](<../../apps/editor/src/adapters/browser/document-start-assistant-b004.ts>) · [document-start-assistant-b004.test.ts](<../../apps/editor/tests/document-start-assistant-b004.test.ts>)
+- 원래 기록: `PARTIAL;SAFE_START_ASSISTANT_CONTRACT_PASS_2026_11_09;UI_HOST_WIRING_PENDING`
 
 </details>
 
@@ -137,12 +137,12 @@
 <summary>B141 · 메일 머지</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 자료 원본·필드·일괄 결과 보존
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 명시적 로컬 행과 검증된 필드로 독립 문서 사본을 만드는 안전 코어만 구현한다.
+- 다음 작업: commit 91af64ca 기준 template revision·fingerprint·필드 스키마와 행/열/값/출력 이름 한도를 검증하고 각 행을 독립 clone에서 치환·재조회·export한 뒤 transactional stage·commit한다. 실제 WASM HWP/HWPX 두 사본 저장·재열기와 원본 바이트 불변·stale/중간 실패 전체 rollback을 4/4로 확인했다. 실제 파일시스템 transactional output port·UI·한글 비교는 미연결이라 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [mail-merge-b141.ts](<../../apps/editor/src/modules/document/application/mail-merge-b141.ts>) · [mail-merge-b141.test.ts](<../../apps/editor/tests/mail-merge-b141.test.ts>)
+- 원래 기록: `PARTIAL;TRANSACTIONAL_MAIL_MERGE_CORE_PASS_2026_11_09;FILESYSTEM_UI_WIRING_PENDING`
 
 </details>
 
@@ -150,13 +150,13 @@
 <summary>B142 · 스크립트 매크로</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 한글 스크립트/키 입력 녹화는 미지원. Jueony 지원 AI 명령 저장·재실행 매크로는 별도 구현(28번 문서)
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 안전 명령 카탈로그·기록/직렬화·원자적 재생 코어만 구현됐으며 실제 Studio 디스패처 이벤트·UI·저장 수명은 완료 범위가 아님.
+- 다음 작업: 성공한 등록 명령만 기록하고 IME/선택/raw 키/실패 명령을 차단한다. bounded canonical JSON과 document identity/revision preflight를 적용하고 재생 전체를 단일 snapshot undo 거래로 요구하며 실패·중지·취소 시 전체 rollback을 검증함. Studio CommandDispatcher 성공 이벤트와 외부 snapshot raw-step 실행 seam·녹화 UI·영구 저장 연결은 남음.
 - UI 명령: `pending:macro-record`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [script-macro-b142.ts](<../../apps/editor/src/modules/script-macros/domain/script-macro-b142.ts>) · [script-macro-runtime-b142.ts](<../../apps/editor/src/adapters/rhwp/script-macro-runtime-b142.ts>) · [script-macro-runtime-b142.test.ts](<../../apps/editor/tests/script-macro-runtime-b142.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_SAFE_RECORD_REPLAY_CORE_PASS_2026_11_09`
 
 </details>
 

@@ -1,0 +1,14 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -21,7 +21,10 @@
+         if !matches!(p.controls.get(range.control_idx), Some(Control::Field(f))
+             if f.field_type == FieldType::ClickHere && f.memo_paragraphs.is_empty())
+             || !seen.insert(range.control_idx) || range.inner_slot_count != 0
+-            || range.start_char_idx > range.end_char_idx || range.end_char_idx > length
++            || range.start_char_idx > range.end_char_idx
++            || range.start_char_idx == range.end_char_idx && matches!(p.controls.get(range.control_idx),
++                Some(Control::Field(f)) if f.guide_text().unwrap_or("").is_empty())
++            || range.end_char_idx > length
+             || previous_end.is_some_and(|end| end >= range.start_char_idx) { return false; }
+         previous_end = Some(range.end_char_idx);
+     }

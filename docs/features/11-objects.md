@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/18 · 부분 11 · 미구현 7 |
-| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 2 · 미검증 16 |
+| 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/18 · 부분 12 · 미구현 6 |
+| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 6 · 미검증 12 |
 | Agent 연결 | 해당 없음 1 | 연결 0/18 · 부분 0 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -50,8 +50,8 @@
 | [B065](<11-objects.md#b065>) · 범위 | 그림 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B066](<11-objects.md#b066>) · 범위 | 그리기마당·스크린샷·OCR | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B070](<11-objects.md#b070>) · 범위 | 차트 생성 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B071](<11-objects.md#b071>) · 범위 | 차트 데이터 편집 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B072](<11-objects.md#b072>) · 범위 | 글상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B071](<11-objects.md#b071>) · 범위 | 차트 데이터 편집 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B072](<11-objects.md#b072>) · 범위 | 글상자 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B073](<11-objects.md#b073>) · 범위 | 멀티미디어 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B074](<11-objects.md#b074>) · 범위 | 수식 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
@@ -64,7 +64,7 @@
 | [B075](<11-objects.md#b075>) · 범위 | 글맵시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B076](<11-objects.md#b076>) · 범위 | OLE 개체 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B079](<11-objects.md#b079>) · 범위 | 캡션 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B082](<11-objects.md#b082>) · 범위 | 글자 겹치기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B082](<11-objects.md#b082>) · 범위 | 글자 겹치기 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
 
@@ -75,7 +75,7 @@
 | [B174](<11-objects.md#b174>) · 범위 | 개체 속성 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B175](<11-objects.md#b175>) · 범위 | 개체 묶기·풀기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B176](<11-objects.md#b176>) · 범위 | 개체 순서 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B177](<11-objects.md#b177>) · 범위 | 개체 배치 앞·뒤 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B177](<11-objects.md#b177>) · 범위 | 개체 배치 앞·뒤 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B178](<11-objects.md#b178>) · 범위 | 개체 크기·위치 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-5"></a>
@@ -162,13 +162,13 @@
 <summary>B071 · 차트 데이터 편집</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 유형·축·범례·보존 범위 추가 검수
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 기존 category/scatter 차트의 공유 단일 단계 label에서 단일 숫자 cache 값·동일 차트의 2~128개 숫자 값 원자 일괄 변경·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증 뒤 dry-run·snapshot rollback으로 편집한다. Studio 제목줄의 차트 데이터 창은 단일 값·계열명·범주명 명령을 실행한다.
+- 다음 작업: 일괄 값 adapter 13/13에서 HWP/HWPX 저장·재열기·exact undo·부분 실패 전체 rollback과 원본 c:f 수식·유형·축·범례·unknown OOXML·비차트 자산 보존을 확인했다. 기존 Studio 명령 14/14·격리 build 663 modules와 실제 Edge 단일 값 저장 바이트·UI 재열기도 통과했다. 실제 UI 다중 선택·여러 차트/복합 label/수식 자체 변경·up/down bars·Agent 연결·한글 비교는 남았다. 검수 빌드에서 favicon 404와 빈 문서 stored-time 초기화의 공식 WASM API 불일치가 별도 제한으로 관찰됐다.
 - UI 명령: `insert:chart-data-edit`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `WIRED;SCOPED_CHART_VALUE_EDIT_2026_11_09;SCOPED_CHART_VALUE_BATCH_2026_11_09;SCOPED_CHART_SERIES_NAME_2026_11_09;SCOPED_CHART_CATEGORY_NAME_2026_11_09;SCOPED_CHART_STUDIO_UI_2026_11_09;PARTIAL`
 
 </details>
 
@@ -176,13 +176,13 @@
 <summary>B072 · 글상자</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 기본 글상자 있음. 세로쓰기·영문 방향·한 줄 입력·필드 이름·양식 모드 비활성.
+- 다음 작업: 기본 글상자와 Horizontal·Vertical·VerticalAll 조회/변경을 Rust 엔진에 추가하고 HWP 세로쓰기·HWPX VERTICALALL 저장 재열기를 검증함. 실제 UI 연결과 한 줄 입력·필드 이름·양식 모드는 남음.
 - UI 명령: `insert:textbox`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-direction-api.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-direction-api.patch>)
+- 원래 기록: `PARTIAL;SCOPED_RUST_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -257,12 +257,12 @@
 <summary>B082 · 글자 겹치기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 전용 대화상자 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. CharOverlap 모델·코덱·렌더러의 기존 보존만 확인됐으며 편집 기능은 구현되지 않았다.
+- 다음 작업: commit ddb71dea 기준 공개 엔진에 getCharOverlapListV1·insertCharOverlapAtSelectionV1·removeCharOverlapV1과 snapshot history 계약이 없음을 감사했다. 설치 엔진의 capability 차단과 HWP/HWPX 바이트 불변·소스 증거 3/3을 확인했다. 일반 문자 대체나 성공 위장은 만들지 않았으며 네이티브 조회·삽입·삭제 API와 범위 검증이 생길 때까지 미구현이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [character-overlap-capability-b082.ts](<../../apps/editor/src/adapters/rhwp/character-overlap-capability-b082.ts>) · [character-overlap-capability-b082.test.ts](<../../apps/editor/tests/character-overlap-capability-b082.test.ts>)
+- 원래 기록: `MISSING;CHAR_OVERLAP_MODEL_CODEC_RENDER_ONLY_AUDIT_PASS_2026_11_09;EDIT_APIS_MISSING`
 
 </details>
 
@@ -312,12 +312,13 @@
 <summary>B177 · 개체 배치 앞·뒤</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 본문 선택 동작이 대신 실행되지 않게 점검
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 최상위 단일 도형의 맨 앞·맨 뒤와 역연산 undo만 검증됐으며 그림·표·수식은 완료 범위가 아님.
+- 다음 작업: Rust z-order 변경·절대 복원 쌍과 Studio 명령이 단일 도형에서 연결됨. Shift+PageUp/Shift+PageDown은 개체 문맥에서만 명령으로 해석되고 본문에서는 네이티브 선택 동작을 유지함. HWP/HWPX 저장·재열기 2종 통과. 그림·표·수식 및 다중·중첩 개체 배치는 남음.
+- UI 명령: `insert:arrange-front;insert:arrange-back`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [object-z-order-b177.test.ts](<../../apps/editor/tests/object-z-order-b177.test.ts>)
+- 원래 기록: `PARTIAL;PARTIAL;SHAPE_Z_ORDER_HWP_HWPX_REOPEN_PASS_2026_11_09`
 
 </details>
 

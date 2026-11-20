@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 23 · 미구현 1 |
-| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 13 · 미검증 11 |
+| 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 24 |
+| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 17 · 미검증 7 |
 | Agent 연결 | 연결 28/33 · 부분 5 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 첫칸에 보존한다. HWP 원본하위트리 레코드와 HWPX XML을 정확히 대조하고 실제Canvas 채팅·저장재열기를 확인했다. 빈/겹친필드·개체혼합캡션·일반복합셀 분할은 남았다.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 빈문단·한글·이모지 커서 조회를 수정했다. 캡션이 부모 셀 bbox로 잘못 잡히는 결함도 해결하고 양 형식 재열기를 확인했다. 캡션 직접 텍스트 변경·필드·개체·복합 구역은 남았다.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 추가 감사에서 ClickHere half-open end caret 소유권과 복수 owner가 모호하고 nested cell의 line/cursor/paragraph/picture ByPath 증거 API 및 복합 개체 source↔run/cursor interleave 증거가 없음을 확인해 시험 변경을 모두 되돌렸다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 같은 owner·문단에서 정확히 한 plain scalar로 분리된 두 filled ClickHere는 ID·range·full path·value·marker controlIndex/raw position·stored position을 교차 검증한 뒤 일반/중첩 셀 분할에 보존한다. commit aa2ac0b3 기준 HWP/HWPX 재열기·exact undo/redo와 관련 회귀 44/44를 통과했다. 완전히 보이지 않는 0길이 이웃과 boundary-touch/실제 overlap은 engine inner owner 식별이 불가능해 mutation 전에 차단한다. object 혼합·caption field·실제 앱·한글 직접 비교는 남아 부분이다.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. Left/Right 중첩 캡션도 full path와 live·portable geometry를 재검증하며 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit e67ca6ee 기준 custom engine HWP/HWPX 저장·재열기·undo/redo 선별 검사는 18 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱·한글 직접 비교는 fail-closed로 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -50,7 +50,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B067](<08-tables.md#b067>) · 범위 | 표 만들기 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
+| [B067](<08-tables.md#b067>) · 범위 | 표 만들기 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [A031](<08-tables.md#a031>) · 작업 | 새 단순 표 생성 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 
 <a id="work-2"></a>
@@ -59,7 +59,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B068](<08-tables.md#b068>) · 범위 | 표 그리기·지우개 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B068](<08-tables.md#b068>) · 범위 | 표 그리기·지우개 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B069](<08-tables.md#b069>) · 범위 | 문자열-표 변환 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-3"></a>
@@ -182,10 +182,10 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B169](<08-tables.md#b169>) · 범위 | 첫 셀·셀 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B169](<08-tables.md#b169>) · 범위 | 첫 셀·셀 블록 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B171](<08-tables.md#b171>) · 범위 | 칸 전체 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B172](<08-tables.md#b172>) · 범위 | 줄 전체 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B173](<08-tables.md#b173>) · 범위 | 셀 이동·표 안 탭 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B173](<08-tables.md#b173>) · 범위 | 셀 이동·표 안 탭 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-14"></a>
 
@@ -222,13 +222,13 @@
 <summary>B067 · 표 만들기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ◐ 부분.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 키는 입력 대화상자; 메뉴는 격자
+- 다음 작업: 8×10 격자·1~256 키 입력·4096칸 상한과 비어 있지 않은 최상위 본문 문단의 중간/끝 삽입을 단일 snapshot으로 구현하고 앞뒤 텍스트·글자 서식·HWP/HWPX 재열기를 검증함. 실제 Studio table:create 경로·글 있는 문단 offset 0·다구역·고급 크기 옵션은 남음.
 - UI 명령: `table:create`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [table-create-b067.ts](<../../apps/editor/src/adapters/rhwp/table-create-b067.ts>) · [table-create-b067.test.ts](<../../apps/editor/tests/table-create-b067.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_BODY_INSERT_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -236,12 +236,12 @@
 <summary>B068 · 표 그리기·지우개</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 기본 생성과 별도
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한 쪽의 잠금 해제된 빈 단순 표에서 인접 단위 셀 경계를 지우고 검증된 병합 셀의 원래 격자를 다시 그리며 identity·revision·table topology fingerprint를 재검증한다.
+- 다음 작업: 커밋 0a2baf63에서 실제 HWP/HWPX 재열기와 정확한 undo·redo·실패 rollback 4/4 통과. 자유 그리기 UI와 내용이 있거나 복잡한 셀은 미지원.
+- 근거: [table-boundary-tool-b068.ts](<../../apps/editor/src/adapters/rhwp/table-boundary-tool-b068.ts>) · [table-boundary-tool-b068.test.ts](<../../apps/editor/tests/table-boundary-tool-b068.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_EMPTY_TABLE_BOUNDARY_TOOL_2026_11_09`
 
 </details>
 
@@ -292,12 +292,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 셀 블록 L/C 연결 및 테두리/배경 초기 탭 전달 구현. 실제 한글 문맥·혼합 셀 비교 필요.
+- 다음 작업: L/C의 단일·다중 셀 owner와 InputHandler·cursor·WASM bbox 증거를 교차 검증하고 보호·중첩·비직사각·병합 경계·선택 drift는 대화상자 전에 차단한다. 정식 Studio hook·실제 서식 적용·한글 비교는 남아 부분이다.
 - UI 명령: `table:border-each`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>)
-- 원래 기록: `PARTIAL;UNIT_TESTED_NATIVE_PENDING`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [cell-border-shortcut-capability-b154-b155.ts](<../../apps/editor/src/shortcuts/cell-border-shortcut-capability-b154-b155.ts>) · [cell-border-shortcut-capability-b154-b155.test.ts](<../../apps/editor/tests/cell-border-shortcut-capability-b154-b155.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_SHORTCUT_CAPABILITY_2026_11_09`
 
 </details>
 
@@ -306,12 +306,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 셀 블록 B/F 연결 및 테두리/배경 초기 탭 전달 구현. 실제 한글 문맥·혼합 셀 비교 필요.
+- 다음 작업: B/F의 복수 exact owner와 InputHandler·cursor·WASM bbox 증거를 교차 검증하고 보호·중첩·비직사각·병합 경계·선택 drift는 대화상자 전에 차단한다. 정식 Studio hook·실제 서식 적용·한글 비교는 남아 부분이다.
 - UI 명령: `table:border-one`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>)
-- 원래 기록: `PARTIAL;UNIT_TESTED_NATIVE_PENDING`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [cell-border-shortcut-capability-b154-b155.ts](<../../apps/editor/src/shortcuts/cell-border-shortcut-capability-b154-b155.ts>) · [cell-border-shortcut-capability-b154-b155.test.ts](<../../apps/editor/tests/cell-border-shortcut-capability-b154-b155.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_SHORTCUT_CAPABILITY_2026_11_09`
 
 </details>
 
@@ -504,12 +504,12 @@
 <summary>B169 · 첫 셀·셀 블록</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 엔진 F5 있음; 표 개체/Shift+F5 세부 다름
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: F5 1→2→3단계와 Shift+F5 즉시 확장을 exact owner/path/selection/reason/excluded 상태와 실패 전체 rollback으로 검증했다. 정식 Studio hook·전체 선택 조합·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [cell-selection-shortcuts-b169.ts](<../../apps/editor/src/shortcuts/cell-selection-shortcuts-b169.ts>) · [cell-selection-shortcuts-b169.test.ts](<../../apps/editor/tests/cell-selection-shortcuts-b169.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_CELL_SELECTION_SHORTCUT_2026_11_09`
 
 </details>
 
@@ -545,12 +545,12 @@
 <summary>B173 · 셀 이동·표 안 탭</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 엔진 이동 경로 존재; 문서 탭 순환 충돌 검수
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: 일반 Tab·Shift+Tab과 문서 Ctrl+Tab 소유권을 분리하고 단순 최상위 표 마지막 셀에서 실제 insertTableRow·단일 snapshot·서식 fingerprint·새 첫 셀 이동·rollback을 검증했다. HWP/HWPX 재열기도 통과했다. 실제 InputHandler가 정확한 증거를 공급하고 transition을 전역 undo 이력에 채택하는 연결은 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [table-cell-tab-routing-b173.ts](<../../apps/editor/src/shortcuts/table-cell-tab-routing-b173.ts>) · [table-cell-tab-routing-b173.test.ts](<../../apps/editor/tests/table-cell-tab-routing-b173.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_ATOMIC_APPEND_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -943,11 +943,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
+- 다음 작업: 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 추가 감사에서 ClickHere half-open end caret 소유권과 복수 owner가 모호하고 nested cell의 line/cursor/paragraph/picture ByPath 증거 API 및 복합 개체 source↔run/cursor interleave 증거가 없음을 확인해 시험 변경을 모두 되돌렸다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;PICTURE_FIELD_WRAP_2026_11_08`
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;PICTURE_FIELD_WRAP_2026_11_08;NESTED_CELL_BYPATH_BLOCKED_2026_11_09`
 
 </details>
 
@@ -958,11 +958,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 첫칸에 보존한다. HWP 원본하위트리 레코드와 HWPX XML을 정확히 대조하고 실제Canvas 채팅·저장재열기를 확인했다. 빈/겹친필드·개체혼합캡션·일반복합셀 분할은 남았다.
+- 다음 작업: 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 같은 owner·문단에서 정확히 한 plain scalar로 분리된 두 filled ClickHere는 ID·range·full path·value·marker controlIndex/raw position·stored position을 교차 검증한 뒤 일반/중첩 셀 분할에 보존한다. commit aa2ac0b3 기준 HWP/HWPX 재열기·exact undo/redo와 관련 회귀 44/44를 통과했다. 완전히 보이지 않는 0길이 이웃과 boundary-touch/실제 overlap은 engine inner owner 식별이 불가능해 mutation 전에 차단한다. object 혼합·caption field·실제 앱·한글 직접 비교는 남아 부분이다.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
-- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
+- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;EMPTY_NEIGHBOR_FIELD_GUARD_2026_11_08;MULTI_CLICKHERE_SPLIT_2026_11_09`
 
 </details>
 
@@ -971,13 +971,13 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 캡션의 전체 조상 경로·구역과 빈문단·한글·이모지 커서 조회를 수정했다. 캡션이 부모 셀 bbox로 잘못 잡히는 결함도 해결하고 양 형식 재열기를 확인했다. 캡션 직접 텍스트 변경·필드·개체·복합 구역은 남았다.
+- 다음 작업: 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. Left/Right 중첩 캡션도 full path와 live·portable geometry를 재검증하며 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit e67ca6ee 기준 custom engine HWP/HWPX 저장·재열기·undo/redo 선별 검사는 18 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱·한글 직접 비교는 fail-closed로 남아 부분이다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - Agent 명령: `set_table_cell,insert_table_row,delete_table_row,insert_table_column,delete_table_column`
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;NESTED_CAPTION_TEXT_2026_11_08;MULTIPARAGRAPH_CAPTION_2026_11_09;EMPTY_CAPTION_FILL_2026_11_09;MULTIRUN_CAPTION_2026_11_09;MULTIBLANK_CAPTION_2026_11_09;UNICODE_SCALAR_CAPTION_2026_11_09;LEFT_RIGHT_CAPTION_2026_11_09`
 
 </details>
 
@@ -986,13 +986,13 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 반복그림제목의 병합열 변경과 안전한 제목행 삽입삭제를 지원한다. 실제Canvas 제목행1→2→1·원본그림4개/표시5개와 양형식 저장재열기를 검증했다. 마지막제목/본문·제목span교차·그림/필드/병합주셀삭제·잘린/부동/회전/캡션그림은 남았다.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 반복 제목행의 마지막 제목행·첫 본문행 경계와 비병합 연속 제목 구간 index 0에서 삽입·삭제하고 제목/본문 분류·행 span·셀 값·원본 문서 구조를 재검증하며 HWP/HWPX 저장·재열기와 exact undo/redo를 보존
+- 다음 작업: commit d0a04fcd는 새 제품 기능을 추가한 것이 아니라 비병합 연속 제목 구간의 index 0 삽입·삭제가 이미 지원됨을 증명했다. HWP/HWPX 재열기·exact undo/redo·insert/delete proof·save rollback 선별 15/15와 기존 제목 경계 회귀를 통과했다. crossing span은 rowSpan>1 병합이므로 계속 fail-closed이며 필드·그림/개체·병합/복합 주 셀 삭제와 한글 직접 비교는 남아 부분이다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [table-title-boundary-n007.test.ts](<../../apps/editor/tests/table-title-boundary-n007.test.ts>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;TABLE_TITLE_BOUNDARY_2026_11_09;NONMERGED_TITLE_SEGMENT_2026_11_09`
 
 </details>
 

@@ -1,7 +1,13 @@
 import {readFile,writeFile,cp} from 'node:fs/promises';
 import {join} from 'node:path';
+import {applyPageOutlinePatches} from './page-outline-patches.mjs';
+import {applyStyleShortcutUiPatches} from './style-shortcut-ui-patches.mjs';
+import {applyHeaderFooterClipboardPatches} from './header-footer-clipboard-patches.mjs';
+import {applyChartDataEditUiPatches} from './chart-data-edit-ui-patches.mjs';
+import {applyOfflineFontSourcePatches} from './offline-font-source-patches.mjs';
 // Pinned upstream integration only. Product policies live in modules/adapters.
 export async function applyStudioPatches({root,upstream,app}){
+await applyOfflineFontSourcePatches({root});
 function replaceOnce(text, before, after, label) {
   if (text.split(before).length !== 2) throw new Error(`소스 패치 기준 불일치: ${label}`);
   return text.replace(before, after);
@@ -75,12 +81,13 @@ function jueonyApplyPreferences(paths: string[]) {
   if(paths.some(path => path === 'font' || path.startsWith('font.'))) toolbar?.initFontDropdown(currentDocumentFonts);
   if (wasm.pageCount > 0) {
     applySavedTextMarkSettings();
-    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement)/.test(path))) jueonyPendingView = true;
+    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement|pageOutline)/.test(path))) jueonyPendingView = true;
     const view = userSettings.getViewSettings();
+    syncPageOutlineMenu(view.pageOutline);
     const container = document.getElementById('scroll-container');
     if (jueonyPendingView && container && container.clientWidth > 0) {
       jueonyPendingView = false;
-      eventBus.emit('page-view-settings-changed', { arrangement: view.pageArrangement, pageMovement: view.pageMovement });
+      eventBus.emit('page-view-settings-changed', { arrangement: view.pageArrangement, pageMovement: view.pageMovement, pageOutline: view.pageOutline });
       // Existing tabs own their zoom; the stored fit rule initializes new documents only.
     }
     eventBus.emit('document-view-changed');
@@ -165,7 +172,7 @@ scalarCursor=replaceOnce(scalarCursor,"this._fnCharOffset = (info.texts[this._fn
 scalarCursor=replaceOnce(scalarCursor,'const charCount = currentText.length;','const charCount = [...currentText].length;','note Right scalar offset');
 scalarCursor=replaceOnce(scalarCursor,'this._fnCharOffset = prevText.length;','this._fnCharOffset = [...prevText].length;','note previous scalar offset');
 await writeFile(join(root,'src/engine/cursor.ts'),scalarCursor);
-caretInput = "import { paragraphSpacingChange } from '../jueony/shortcuts/paragraph-spacing.ts';\nimport {createParagraphSpacingReader} from '../jueony/adapters/rhwp/paragraph-spacing.ts';\n" + caretInput;
+caretInput = "import { paragraphSpacingChange } from '../jueony/shortcuts/paragraph-spacing.ts';\nimport {createParagraphSpacingReader} from '../jueony/adapters/rhwp/paragraph-spacing.ts';\nimport {restoreStudioTextBoxCursorN014} from '../jueony/adapters/rhwp/session-textbox-studio-restore-n014.ts';\n" + caretInput;
 caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }', `  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }
 
   /** Relative values per paragraph, preflighted then recorded as one atomic undo step. */
@@ -202,10 +209,8 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
     return { cursor: this.cursor, wasm: this.wasm,
       getCursorPosition: () => this.cursor.getPosition(),
       restoreSessionTextBox: (saved: import('../jueony/modules/preferences/public/index.ts').TextBoxBookmark): boolean => {
-        this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitBlockSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
-        const point=(caret:typeof saved.caret):DocumentPosition=>({sectionIndex:caret.section,paragraphIndex:caret.paragraph,charOffset:caret.offset,parentParaIndex:saved.focus.caret.paragraph,controlIndex:saved.control,cellIndex:0,cellParaIndex:caret.paragraph,cellPath:[{controlIndex:saved.control,cellIndex:0,cellParaIndex:caret.paragraph}],isTextBox:true});
-        if(saved.anchor){this.cursor.moveTo(point(saved.anchor));this.cursor.setAnchor();}
-        this.cursor.moveTo(point(saved.caret));this.cursor.resetPreferredX();this.updateCaret();this.eventBus.emit('command-state-changed');return true;
+        if(!restoreStudioTextBoxCursorN014({cursor:this.cursor,wasm:this.wasm},saved))return false;
+        this.updateCaret();this.eventBus.emit('command-state-changed');return true;
       },
       restoreSessionHeaderFooter: (saved: import('../jueony/modules/preferences/public/index.ts').HeaderFooterBookmark) => {
         this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
@@ -225,11 +230,48 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
         this.cursor.setFnCursorPosition(saved.caret.paragraph,saved.caret.offset);
         this.updateCaret();this.eventBus.emit('footnoteModeChanged',true);this.eventBus.emit('command-state-changed');return true;
       },
+      restoreSessionEndnoteSelection: (target: import('../jueony/modules/preferences/public/index.ts').EndnoteRestoreTarget): boolean => {
+        let edit:ReturnType<typeof this.wasm.getNoteEditInfo>;
+        try{edit=this.wasm.getNoteEditInfo(target.section,target.parent,target.control);}catch{return false;}
+        if(!edit?.ok||edit.kind!=='endnote'||edit.pageNum!==target.page||edit.footnoteIndex!==target.index||edit.virtualParaIndex!==target.virtualParagraph)return false;
+        const original=this.cursor.getPosition();
+        const abort=()=>{const wasNote=this.cursor.isInFootnote();this.cursor.exitFootnoteMode();this.cursor.moveTo(original);this.cursor.clearSelection();this.updateCaret();if(wasNote)this.eventBus.emit('footnoteModeChanged',false);this.eventBus.emit('command-state-changed');return false;};
+        try{
+          this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitBlockSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+          this.cursor.moveTo({sectionIndex:target.section,paragraphIndex:target.parent,charOffset:0});
+          this.cursor.enterFootnoteMode(target.section,target.parent,target.control,target.index,target.page);
+          if(target.anchor){this.cursor.setFnCursorPosition(target.anchor.paragraph,target.anchor.offset);this.cursor.setFnAnchor();}
+          this.cursor.setFnCursorPosition(target.focus.paragraph,target.focus.offset);
+          if(!this.cursor.isInFootnote()||this.cursor.fnSectionIdx!==target.section||this.cursor.fnParaIdx!==target.parent||this.cursor.fnControlIdx!==target.control||this.cursor.fnPageNum!==target.page||this.cursor.fnFootnoteIndex!==target.index||this.cursor.fnInnerParaIdx!==target.focus.paragraph||this.cursor.fnCharOffset!==target.focus.offset)return abort();
+          const selection=this.cursor.getFootnoteSelection();
+          if(target.anchor){if(!selection||selection.pageNum!==target.page||selection.footnoteIndex!==target.index||selection.anchor.fnParaIdx!==target.anchor.paragraph||selection.anchor.charOffset!==target.anchor.offset||selection.focus.fnParaIdx!==target.focus.paragraph||selection.focus.charOffset!==target.focus.offset)return abort();}
+          else if(selection)return abort();
+          this.updateCaret();this.eventBus.emit('footnoteModeChanged',true);this.eventBus.emit('command-state-changed');return true;
+        }catch{return abort();}
+      },
       restoreSessionPictureObject: (ref: {sec:number;ppi:number;ci:number;type:'image'}) => {
         this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();
         this.cursor.moveTo({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0});
         this.cursor.enterPictureObjectSelectionDirect(ref.sec,ref.ppi,ref.ci,'image');
         this.updateCaret();this.eventBus.emit('picture-object-selection-changed',true);this.eventBus.emit('command-state-changed');return true;
+      },
+      restoreSessionObjectSelection: (refs: import('../jueony/modules/preferences/public/index.ts').RestorableObjectRef[]) => {
+        if(!Array.isArray(refs)||refs.length<1||refs.length>32)return false;
+        try{
+          this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+          for(let index=0;index<refs.length;index++){
+            const ref=refs[index];
+            if(index===0)this.cursor.enterPictureObjectSelectionDirect(ref.section,ref.paragraph,ref.control,ref.type);
+            else this.cursor.togglePictureObjectSelection(ref.section,ref.paragraph,ref.control,ref.type);
+          }
+          const restored=this.cursor.getSelectedPictureRefs();
+          if(restored.length!==refs.length||!refs.every((ref,index)=>{const actual=restored[index];return actual?.sec===ref.section&&actual.ppi===ref.paragraph&&actual.ci===ref.control&&actual.type===ref.type;})){
+            this.cursor.exitPictureObjectSelection();return false;
+          }
+          this.renderPictureObjectSelection();this.updateCaret();this.eventBus.emit('picture-object-selection-changed',true);this.eventBus.emit('command-state-changed');return true;
+        }catch{
+          this.cursor.exitPictureObjectSelection();return false;
+        }
       },
       restoreSessionTableObject: (ref: {sec:number;ppi:number;ci:number}) => {
         this.cursor.clearSelection(); this.cursor.exitCellSelectionMode();
@@ -442,5 +484,10 @@ fileSystem = replaceOnce(fileSystem,
   'const writable = await handle.createWritable();\n  await writable.write(blob);\n  await writable.close();',
   'await writeSnapshot(handle, blob);', 'save transaction guard');
 await writeFile(join(root, 'src/command/file-system-access.ts'), fileSystem);
+
+await applyPageOutlinePatches({root});
+await applyStyleShortcutUiPatches({root});
+await applyHeaderFooterClipboardPatches({root});
+await applyChartDataEditUiPatches({root});
 
 }

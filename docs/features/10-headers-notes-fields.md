@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **9/9** · 부분 0 | 완료 0/11 · 부분 8 · 미구현 3 |
-| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 2 · 미검증 9 |
+| 구현 | 완료 🟢 **9/9** · 부분 0 | 완료 0/11 · 부분 9 · 미구현 2 |
+| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 6 · 미검증 5 |
 | Agent 연결 | 연결 🟢 **8/8** · 부분 0 · 해당 없음 1 | 연결 0/11 · 부분 2 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -40,12 +40,12 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B077](<10-headers-notes-fields.md#b077>) · 범위 | 필드 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B078](<10-headers-notes-fields.md#b078>) · 범위 | 양식 개체 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B078](<10-headers-notes-fields.md#b078>) · 범위 | 양식 개체 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B086](<10-headers-notes-fields.md#b086>) · 범위 | 미주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B088](<10-headers-notes-fields.md#b088>) · 범위 | 날짜·시간·파일명 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
+| [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 | [B095](<10-headers-notes-fields.md#b095>) · 범위 | 하이퍼링크 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-2"></a>
@@ -103,12 +103,12 @@
 <summary>B078 · 양식 개체</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 양식 개체 신규 생성/속성 UI 없음. 기존 Form 읽기·값 설정 API 존재와 구분.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 실제 upstream HWP의 최상위 본문 CheckBox·RadioButton·ComboBox·Edit 기존 양식 개체 값을 공개 Form API로 읽고 strict CAS 검증 뒤 편집한다. 문서 identity/instance/revision/source format·control name/type/enabled·properties/items SHA-256·원값 지문을 검증하고 form mode·조합 중·암호 문서/story·disabled/read-only/password Edit·PushButton을 변경 전에 차단하며 실패 시 snapshot rollback한다.
+- 다음 작업: commit 7acfe5f9 기준 신규 5/5와 strict TypeScript·모듈 경계 검사를 통과했다. 실제 HWP/HWPX 저장·재열기에서 값과 byte-exact undo/redo를 확인했다. 신규 생성·삭제·속성 편집·셀 내부 양식·PushButton 동작·UI·Agent 연결·앱 재시작·한글 직접 비교는 남아 부분이다.
+- 근거: [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [form-object-value-b078.ts](<../../apps/editor/src/adapters/rhwp/form-object-value-b078.ts>) · [form-object-value-b078.test.ts](<../../apps/editor/tests/form-object-value-b078.test.ts>)
+- 원래 기록: `PARTIAL;NOT_RUN;TOP_LEVEL_FORM_VALUE_EDIT_2026_11_09`
 
 </details>
 
@@ -144,13 +144,13 @@
 <summary>B087 · 각주·미주 모양</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 각주·미주 입력/일부 모양 있음. 미주 내용 번호 작은 크기 옵션 비활성.
+- 다음 작업: 미주에 이어 각주 내용 번호 작은 크기의 전용 Rust shape API를 추가하고 section 소유·문서/revision/shape fingerprint·snapshot undo/redo를 보호했다. 새 고정 WASM에서 각주 HWP/HWPX 저장 재열기와 정확한 undo/redo를 검증함. 실제 각주·미주 대화상자 연결과 다른 모양 옵션은 남음.
 - UI 명령: `insert:endnote-shape`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [endnote-content-number-size-b087.ts](<../../apps/editor/src/adapters/rhwp/endnote-content-number-size-b087.ts>) · [endnote-content-number-size-b087.test.ts](<../../apps/editor/tests/endnote-content-number-size-b087.test.ts>) · [footnote-content-number-size-b087.ts](<../../apps/editor/src/adapters/rhwp/footnote-content-number-size-b087.ts>) · [footnote-content-number-size-b087.test.ts](<../../apps/editor/tests/footnote-content-number-size-b087.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-number-size-api.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-number-size-api.patch>)
+- 원래 기록: `PARTIAL;SCOPED_FOOTNOTE_ENDNOTE_WASM_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -172,12 +172,12 @@
 <summary>B089 · 덧말</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 발음/루비 표현 보존 별도
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. Rust 모델과 HWP/HWPX 코덱의 기존 Ruby 보존만 확인됐으며 편집·표시 기능은 구현되지 않았다.
+- 다음 작업: commit 812f8c84 기준 공개 WASM에 getRubyContext·insertRubyEx·removeRubyEx가 없고 renderer에 Control::Ruby 배치 경로가 없음을 감사했다. stale·보호·비본문·중첩·혼합·잘못된 범위를 선차단하고 실제 WASM의 snapshot·HWP/HWPX 바이트·재열기 본문 불변 4/4를 확인했다. 보이지 않는 Ruby나 일반 문자열 대체는 만들지 않았으며 API와 renderer가 함께 구현되기 전까지 미구현이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [ruby-capability-b089.ts](<../../apps/editor/src/adapters/rhwp/ruby-capability-b089.ts>) · [ruby-capability-b089.test.ts](<../../apps/editor/tests/ruby-capability-b089.test.ts>)
+- 원래 기록: `MISSING;RUBY_MODEL_CODEC_ONLY_AUDIT_PASS_2026_11_09;EDIT_AND_RENDER_APIS_MISSING`
 
 </details>
 
@@ -185,12 +185,12 @@
 <summary>B093 · 상호 참조</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 필드 업데이트 포함 구현 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 안전한 책갈피 상호참조 계약은 있으나 현재 Rust/WASM 삽입 API가 없어 실제 기능은 미구현이다.
+- 다음 작업: commit 0e5fd9c4 기준 일반 본문의 유일한 명명 책갈피에 대한 identity·revision·bookmark fingerprint·보호·story·중복·명령 형식 검사와 snapshot rollback 계약을 만들었다. fake port 7/7은 삽입·표시 갱신·undo/redo·실패 복원을 검증하지만 실제 엔진에는 insertCrossReferenceB093가 없어 capability가 mutation 전에 차단된다. 실제 Rust/WASM HWP/HWPX 저장·재열기·renderer·UI·한글 비교는 NOT_RUN이며 일반 텍스트 대체도 만들지 않았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [cross-reference-b093.ts](<../../apps/editor/src/adapters/rhwp/cross-reference-b093.ts>) · [cross-reference-b093.test.ts](<../../apps/editor/tests/cross-reference-b093.test.ts>)
+- 원래 기록: `MISSING;SAFE_CROSS_REFERENCE_CONTRACT_FAKE_PORT_PASS_2026_11_09;NATIVE_INSERT_API_MISSING`
 
 </details>
 

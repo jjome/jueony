@@ -32,6 +32,25 @@ function ownerXml(d:any){
   }
   assert.fail('Missing original owner XML');
 }
+function separatedLeafFields(){
+  const doc=fieldSubdivisionNestedTable(HwpDocument),path=JSON.stringify([{controlIndex:0,cellIndex:0,cellParaIndex:1},
+    {controlIndex:0,cellIndex:0,cellParaIndex:0}]);
+  try{
+    assert.equal(JSON.parse(doc.insertTextInCellByPath(0,1,path,2,'QZ')).ok,true);
+    const field=JSON.parse(doc.insertClickHereFieldByPath(0,1,path,3,'둘째','설명','보조',true));
+    assert.equal(field.ok,true);assert.equal(JSON.parse(doc.setFieldValue(field.fieldId,'병')).ok,true);
+    return doc;
+  }catch(error){doc.free();throw error;}
+}
+function overlappingLeafFields(){
+  const doc=fieldSubdivisionNestedTable(HwpDocument),path=JSON.stringify([{controlIndex:0,cellIndex:0,cellParaIndex:1},
+    {controlIndex:0,cellIndex:0,cellParaIndex:0}]);
+  try{
+    const field=JSON.parse(doc.insertClickHereFieldByPath(0,1,path,1,'겹침','설명','내부',true));
+    assert.equal(field.ok,true);assert.equal(JSON.parse(doc.setFieldValue(field.fieldId,'병')).ok,true);
+    return doc;
+  }catch(error){doc.free();throw error;}
+}
 
 for(const ext of ['hwp','hwpx'])test(ext+' retains two filled leaf fields, exact formats and ranges; overflow or changed value restores the original',async()=>{
   const source=fieldSubdivisionNestedTable(HwpDocument),d=new HwpDocument(bytes(source,ext));source.free();
@@ -69,6 +88,42 @@ for(const ext of ['hwp','hwpx'])test(ext+' retains two filled leaf fields, exact
       assert.throws(()=>executeDocumentOperations(d,before,validateEditOperations([operation],before)),/보존|누름틀|달라졌/);
       assert.equal(changed,true);assert.deepEqual(bytes(d,ext),old);assert.deepEqual(inspect(d),original);assert.deepEqual(rawOwner(d),records);
     }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' retains two same-owner fields separated by one verified plain scalar',()=>{
+  const source=separatedLeafFields(),d=new HwpDocument(bytes(source,ext));source.free();
+  try{
+    const before=snapshot(d,ext),original=inspect(d),old=bytes(d,ext),undo=d.saveSnapshot();let redo:any;
+    const sameOwner=original.fields.find((value:any)=>value.fields.length===2);
+    assert.ok(sameOwner);assert.deepEqual(sameOwner.fields.map((field:any)=>
+      [field.fieldId,field.value,field.startCharIdx,field.endCharIdx]),[[1,'😀',1,2],[3,'병',3,4]]);
+    assert.equal(before.tableSubdivisionSources![operation.target].editable,true);
+    try{
+      executeDocumentOperations(d,before,validateEditOperations([operation],before));
+      const saved=bytes(d,ext);redo=d.saveSnapshot();const copy=new HwpDocument(saved);
+      try{assert.deepEqual(inspect(d),original);assert.deepEqual(inspect(copy),original);
+        assert.deepEqual(readStructure(copy).nestedTables,before.structure!.nestedTables);
+      }finally{copy.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,ext),old);assert.deepEqual(inspect(d),original);
+      d.restoreSnapshot(redo);assert.deepEqual(bytes(d,ext),saved);assert.deepEqual(inspect(d),original);
+    }finally{if(redo!==undefined)d.discardSnapshot(redo);d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' rejects actual overlapping field ranges before subdivision',()=>{
+  const source=overlappingLeafFields(),d=new HwpDocument(bytes(source,ext));source.free();
+  try{
+    const fields=JSON.parse(d.getFieldList()),sameOwner=fields.filter((field:any)=>field.listId===fields[0].listId)
+      .sort((a:any,b:any)=>a.startCharIdx-b.startCharIdx||a.fieldId-b.fieldId);
+    assert.equal(sameOwner.length,2);assert.ok(sameOwner[0].startCharIdx<sameOwner[1].endCharIdx&&
+      sameOwner[1].startCharIdx<sameOwner[0].endCharIdx);
+    const before=bytes(d,ext),state=snapshot(d,ext);
+    assert.equal(state.tableSubdivisionSources![operation.target].editable,false);
+    assert.throws(()=>executeDocumentOperations(d,state,[operation]));assert.deepEqual(bytes(d,ext),before);
+    const copy=new HwpDocument(bytes(d,ext));
+    try{assert.deepEqual(JSON.parse(copy.getFieldList()),fields);assert.equal(snapshot(copy,ext).tableSubdivisionSources![operation.target].editable,false);}
+    finally{copy.free();}
   }finally{d.free();}
 });
 

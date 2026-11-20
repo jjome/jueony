@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { hangulBindings, HangulKeyResolver, keyContextPriority, type Binding, type KeyContext } from '../src/shortcuts/keymap.ts';
 import {
   auditCommandReachability,
+  auditParagraphSpacingShortcuts,
   auditRequiredContexts,
   auditShortcutMatrix,
   effectiveSpecialScopes,
@@ -80,10 +81,15 @@ test('N021 enumerates intentional document/special overrides instead of calling 
 test('N021 records all pending shortcuts and no other command is treated as pending', () => {
   const pending = auditShortcutMatrix(hangulBindings).filter(item => item.category === 'pending');
   assert.deepEqual(pending.map(item => item.commands[0]).sort(), [
-    'pending:clear-char-style',
     'pending:macro-record',
     'pending:page-number-dialog',
   ]);
+});
+
+test('N021 Ctrl+- reaches the guarded character-style reset command', () => {
+  const binding = hangulBindings.find(item => item.keys === 'Ctrl+-');
+  assert.equal(binding?.command, 'ext:jueony-clear-char-style');
+  assert.equal(resolveBinding(binding!).binding?.command, 'ext:jueony-clear-char-style');
 });
 
 test('every binding is reachable in its minimal context and repeat policy is enforced', () => {
@@ -109,19 +115,16 @@ test('capture installation contains the IME 229 and AltGraph guards outside the 
   assert.match(source, /getModifierState\?\.\('AltGraph'\)/);
   assert.match(source, /!candidate\.binding\?\.nativeClipboard/);
   assert.match(source, /stopImmediatePropagation\(\)/);
+  assert.equal(source.match(/resolveShortcutAtInputBoundaryN021\(/g)?.length, 2);
+  assert.doesNotMatch(source, /resolver\.resolve\(/);
 });
 
-test('N021 exposes special-story context gaps without claiming feature completion', () => {
-  assert.deepEqual(effectiveSpecialScopes, ['table', 'cells', 'object']);
+test('N021 models special-story contexts without claiming story-specific command support', () => {
+  assert.deepEqual(effectiveSpecialScopes, ['table', 'cells', 'object', 'header-footer', 'footnote', 'endnote', 'textbox']);
   const gaps = auditRequiredContexts(effectiveSpecialScopes, [
     'table', 'cells', 'object', 'header-footer', 'footnote', 'endnote', 'textbox',
   ]);
-  assert.deepEqual(gaps.map(item => item.id), [
-    'N021-CONTEXT-MODEL-MISSING-header-footer',
-    'N021-CONTEXT-MODEL-MISSING-footnote',
-    'N021-CONTEXT-MODEL-MISSING-endnote',
-    'N021-CONTEXT-MODEL-MISSING-textbox',
-  ]);
+  assert.deepEqual(gaps, []);
 });
 
 test('registry reachability audit distinguishes pending reservations from missing commands', () => {
@@ -132,4 +135,37 @@ test('registry reachability audit distinguishes pending reservations from missin
   ];
   const findings = auditCommandReachability(sample, new Set(['known:command']));
   assert.deepEqual(findings.map(item => item.id), ['N021-UNREGISTERED-document-f2-missing-command']);
+});
+
+test('N022 follows recorded installed-Hangul F7/F8 evidence and retains the public-table divergence', () => {
+  const nativeRecord = JSON.parse(readFileSync(resolve(root, '../../docs/evidence/navigation-history-2026-10-12/native-key-sequence.json'), 'utf8'));
+  const recorded = new Map(nativeRecord.sequence.map((item: { key: string; file: string }) => [item.key, item.file]));
+  assert.equal(recorded.get('Ctrl+F7'), 'both-f7.hwpx');
+  assert.equal(recorded.get('Ctrl+F8'), 'both-f8.hwpx');
+  const spacingRecord = JSON.parse(readFileSync(resolve(root, '../../docs/evidence/navigation-history-2026-10-12/native-spacing.json'), 'utf8'));
+  const margins = new Map(spacingRecord.files.map((item: any) => [item.file, item.paragraphs[0].margins.case]));
+  assert.deepEqual(margins.get('both-f7.hwpx'), {
+    left: { value: '100', unit: 'HWPUNIT' }, right: { value: '100', unit: 'HWPUNIT' }, intent: { value: '100', unit: 'HWPUNIT' },
+  });
+  assert.deepEqual(margins.get('both-f8.hwpx'), {
+    left: { value: '0', unit: 'HWPUNIT' }, right: { value: '0', unit: 'HWPUNIT' }, intent: { value: '100', unit: 'HWPUNIT' },
+  });
+
+  const installedEvidence = [
+    { keys: 'Ctrl+F7', operation: 'both-more', source: 'installed-hangul-2024' },
+    { keys: 'Ctrl+F8', operation: 'both-less', source: 'installed-hangul-2024' },
+  ];
+  assert.deepEqual(auditParagraphSpacingShortcuts(hangulBindings, installedEvidence), []);
+
+  const publicTable = [
+    { keys: 'Ctrl+F7', operation: 'both-less', source: 'public-shortcut-table' },
+    { keys: 'Ctrl+F8', operation: 'both-more', source: 'public-shortcut-table' },
+  ];
+  assert.deepEqual(
+    auditParagraphSpacingShortcuts(hangulBindings, publicTable).map(item => item.id),
+    [
+      'N022-PARAGRAPH-SPACING-ctrl-f7-public-shortcut-table',
+      'N022-PARAGRAPH-SPACING-ctrl-f8-public-shortcut-table',
+    ],
+  );
 });

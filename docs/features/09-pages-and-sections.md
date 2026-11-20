@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **23/23** · 부분 0 | 완료 0/18 · 부분 17 · 미구현 1 |
-| 검증 | 완료 0/23 · 부분 23 | 완료 0/18 · 부분 10 · 미검증 8 |
+| 구현 | 완료 🟢 **23/23** · 부분 0 | 완료 0/18 · 부분 18 |
+| 검증 | 완료 0/23 · 부분 23 | 완료 0/18 · 부분 12 · 미검증 6 |
 | Agent 연결 | 연결 12/17 · 부분 5 · 해당 없음 6 | 연결 0/18 · 부분 8 · 미연결 10 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -57,12 +57,12 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B112](<09-pages-and-sections.md#b112>) · 범위 | 글자 방향 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B116](<09-pages-and-sections.md#b116>) · 범위 | 쪽 번호 매기기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B116](<09-pages-and-sections.md#b116>) · 범위 | 쪽 번호 매기기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B117](<09-pages-and-sections.md#b117>) · 범위 | 새 번호 시작 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B120](<09-pages-and-sections.md#b120>) · 범위 | 쪽 나누기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B121](<09-pages-and-sections.md#b121>) · 범위 | 단 나누기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B123](<09-pages-and-sections.md#b123>) · 범위 | 단 설정 나누기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B126](<09-pages-and-sections.md#b126>) · 범위 | 원고지·라벨 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B126](<09-pages-and-sections.md#b126>) · 범위 | 원고지·라벨 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B127](<09-pages-and-sections.md#b127>) · 범위 | 쪽 삭제 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-3"></a>
@@ -229,12 +229,12 @@
 <summary>B116 · 쪽 번호 매기기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 번호 필드/새 번호와 쪽 번호 위치 설정 구분
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: 단일 구역 최상위 본문의 현재 쪽·전체 쪽 AutoNumber를 snapshot 명령과 HWP/HWPX 저장·재열기로 검증했다. 정식 Studio 메뉴 연결·다구역·특수 story·기존 필드 교체·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [number-fields-b116.ts](<../../apps/editor/src/adapters/rhwp/number-fields-b116.ts>) · [number-fields-b116.test.ts](<../../apps/editor/tests/number-fields-b116.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_ENGINE_REOPEN_2026_11_09`
 
 </details>
 
@@ -368,12 +368,12 @@
 <summary>B126 · 원고지·라벨</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 다른 작성 양식 미연결
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 빈 새 문서에 1~100칸 라벨 격자를 실제 표로 생성하고 라벨 문구와 셀 mm 크기를 적용하며 owner·revision·계획 fingerprint를 재검증한다.
+- 다음 작업: 9453956c 선택 검사 4/4 및 실제 HWP/HWPX 재열기·정확한 undo/redo·중간 실패 rollback 통과. 원고지 전용 용지·칸 API와 UI는 남음.
+- 근거: [label-sheet-b126.ts](<../../apps/editor/src/adapters/rhwp/label-sheet-b126.ts>) · [label-sheet-b126.test.ts](<../../apps/editor/tests/label-sheet-b126.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_LABEL_SHEET_GRID_2026_11_09`
 
 </details>
 

@@ -18,7 +18,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N033](<03-references-and-rag.md#n033>) **검색 순위·구본 우선 문제와 무답 판별** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N033](<03-references-and-rag.md#n033>) **검색 순위·구본 우선 문제와 무답 판별** — IU02-A: 고정21파일·22질문에서 한국어 토큰화·현재/구본 권위·무답 판별 비교; top1·MRR 개선·recall8 비하락·무답 오탐 감소 후 채택
 - **구현** [N034](<03-references-and-rag.md#n034>) **표 숫자·셀/문단 좌표 기반 출처** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 - **구현** [N037](<03-references-and-rag.md#n037>) **실제 모델의 근거·인용·prompt injection 평가** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 
@@ -129,8 +129,8 @@
 - 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
 - 완료 범위: 정답 근거 top1·최신 개정·no-answer 지표와 회귀
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>)
+- 다음 작업: IU02-A: 고정21파일·22질문에서 한국어 토큰화·현재/구본 권위·무답 판별 비교; top1·MRR 개선·recall8 비하락·무답 오탐 감소 후 채택
+- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>
@@ -155,8 +155,8 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
 - 완료 범위: 폴더 변경/삭제·권한·업무 범위·hash·취소·비활성 정책
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>)
+- 다음 작업: IU02-B: IU02-A 비교 후 호스트 저장 Port·SQLite FTS5 증분 색인 연결; 실제 런타임·재시작·변경/삭제·권한 해제·취소·업무/채팅 격리 검증
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>
@@ -168,8 +168,8 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
 - 완료 범위: 현재 baseline 대비 품질·속도·폐쇄망 모델 자산 검증 후 채택
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>)
+- 다음 작업: IU02-A: 기존 lexical과 이음 한국어 토큰화·BM25를 같은 추출·scope에서 비교; 순위·무답·지연·자원 지표 기록, 임베딩/hybrid는 별도 실험
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>

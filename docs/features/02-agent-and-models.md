@@ -324,8 +324,8 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
 - 완료 범위: 최대 비용/횟수·진행·취소·오류·중복 실행·atomic 경계
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>)
+- 다음 작업: IU03-A: ModelGateway 도구 요청/결과 계약과 읽기·찾기 loop를 연결; 모델4회·읽기8회·180초·최종편집1회 예산, 실제 도구 결과 기반 후속 호출과 공급자 검증
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>
@@ -337,8 +337,8 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
 - 완료 범위: 이미 변경한 요청의 무조건 재시도 금지·partial state 기록
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>)
+- 다음 작업: IU03-B: 동일 호출 반복·연속오류2회·취소·예산 중단, 사용자 편집·문서 전환 보호와 journal·receipt·요청 undo를 검증; 기존 single/bounded 유지
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>

@@ -1,5 +1,6 @@
 import {sha256} from '@noble/hashes/sha2.js';
 import {rememberedFileFingerprint,setRememberedFileFingerprint} from './fingerprints.ts';
+import {SaveSourceConflictError} from '../../modules/document-files/public/index.ts';
 import type {Handle,Writable} from './fingerprints.ts';
 
 export type BoundSaveHandle=Handle&{name:string;getFile():Promise<Blob>;queryPermission?(options:{mode:'readwrite'}):Promise<string>};
@@ -15,19 +16,19 @@ export type BoundSaveDependencies={
  write(handle:Handle,blob:Blob):Promise<void>;
  /** Existing file-command completion; invoked only after acknowledged readback. */
  complete(format:'hwp'|'hwpx',handle:BoundSaveHandle):void;
+ acknowledgeVerifiedSave?(revision:string,sha256:string):void;
 };
 const hash=(value:unknown)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(value))),v=>v.toString(16).padStart(2,'0')).join('');
 class BoundSavePreflightError extends Error {}
 const rejected=(message:string)=>new BoundSavePreflightError(message);
 const safeWriteReasons=new Set([
- '다른 프로그램에서 원본 파일을 변경했습니다. 다른 이름으로 저장하거나 원본을 다시 열어 주세요.',
  '저장한 파일의 내용이 문서 사본과 일치하지 않습니다. 편집 내용은 열린 문서에 남아 있습니다. 다른 이름으로 저장해 주세요.',
  '저장 준비 중 문서가 바뀌었습니다. 다시 저장해 주세요.',
  '저장 중 활성 문서의 소유 정보가 바뀌었습니다.',
 ]);
 function safeReason(cause:unknown){
  if(cause instanceof Error){
-  if(cause instanceof BoundSavePreflightError||safeWriteReasons.has(cause.message))return cause.message;
+  if(cause instanceof BoundSavePreflightError||cause instanceof SaveSourceConflictError||safeWriteReasons.has(cause.message))return cause.message;
   if(cause.name==='AbortError')return '저장 요청이 취소되었습니다.';
   if(cause.name==='PreservationError')return '문서 의미 또는 배치 보존 검사를 통과하지 못했습니다.';
  }
@@ -96,6 +97,7 @@ export function createBoundDocumentSave(deps:BoundSaveDependencies){
     assertOwner();const completed=deps.read();
     if(completed.handle!==handle||completed.instance!==initial.instance||completed.revision!==revision||completed.name!==initial.name||completed.dirty||!deps.locked())throw rejected('파일 기록 후 문서 완료 상태를 확인하지 못했습니다.');
     setRememberedFileFingerprint(handle,acknowledged);
+    deps.acknowledgeVerifiedSave?.(revision,acknowledged);
     return{status:'saved',beforeRevision:expected.revision,afterRevision:revision,beforeConnection:expected.connection,afterConnection:binding()!.connection};
    }catch(cause){
     const error=Error((writeAttempted||completionAttempted?'저장 도중 오류가 발생했습니다. 원본에 일부 또는 전체가 기록됐을 수 있어 완료로 보고하지 않습니다.':'파일 기록 전에 저장을 거절했습니다.')+' '+safeReason(cause));

@@ -1,13 +1,13 @@
 import type {SaveSnapshot} from '../public/contracts.ts';
 import type {SnapshotSinkPort,SnapshotWriteDependencies} from '../ports/snapshot-write.ts';
-import {assertSaveRevision} from '../domain/save-revision.ts';
+import {assertSaveRevision,SaveSourceConflictError} from '../domain/save-revision.ts';
 /** Serializes file writes for one editor; all environment effects are injected. */
 export function createSnapshotWriter(deps: SnapshotWriteDependencies) {
  let saving=false;
  async function assertFileUnchanged(sink:SnapshotSinkPort) {
   const expected=sink.readRememberedFingerprint();
   if(!expected||!sink.readBytes)return;
-  if(await deps.fingerprint(await sink.readBytes())!==expected)throw new Error('다른 프로그램에서 원본 파일을 변경했습니다. 다른 이름으로 저장하거나 원본을 다시 열어 주세요.');
+  if(await deps.fingerprint(await sink.readBytes())!==expected)throw new SaveSourceConflictError();
  }
  return {async write(sink:SnapshotSinkPort,snapshot:SaveSnapshot):Promise<void> {
   const {expectedRevision:expected,bytes}=snapshot;

@@ -20,7 +20,7 @@ const results = [], pageErrors = [], externalRequests = [];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const pass = (name, detail) => { results.push({ name, ...(detail ? { detail } : {}) }); console.log('PASS', name); };
 async function launch() {
-  browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, userDataDir: profile, protocolTimeout: 45000, defaultViewport: { width: 1600, height: 1100 }, args: ['--no-first-run', '--disable-background-networking', '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows'] });
+  browser = await puppeteer.launch({ executablePath: process.env.JUEONY_TEST_BROWSER ?? 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, userDataDir: profile, protocolTimeout: 45000, defaultViewport: { width: 1600, height: 1100 }, args: ['--no-first-run', '--disable-background-networking', '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows'] });
   page = await browser.newPage();
   page.on('pageerror', error => pageErrors.push(String(error)));
   page.on('dialog', dialog => dialog.accept());

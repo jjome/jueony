@@ -3,7 +3,7 @@ type Operation=Extract<ControlOp,{kind:'format_table_cells'}>;
 /** Row commands address complete rows. Heights are exact requested results;
  * native content minima must be checked after layout, never silently accepted. */
 export function rowHeightPlan(op:Operation,s:Snapshot):{table:Table;heights:number[];updates:{cellIdx:number;height:number}[];total:number} {
- if(!/\.hwpx$/iu.test(s.name))throw new Error('AI 행 높이는 현재 HWPX 원본만 지원합니다.');
+ if(!/\.hwpx?$/iu.test(s.name))throw new Error('AI 행 높이 편집에는 HWP 또는 HWPX 문서가 필요합니다.');
  const table=s.structure?.tables.find(t=>t.id===op.target),source=s.rowHeightSources?.[op.target],p=op.properties;
  if(!table||!/^s\d+p\d+t\d+$/u.test(op.target)||source?.editable!==true||!/^[a-f0-9]{64}$/u.test(source.fingerprint??''))throw new Error('조회된 높이 편집 가능 본문 단순 표가 필요합니다.');
  const equal=Object.hasOwn(p,'equalizeRows');

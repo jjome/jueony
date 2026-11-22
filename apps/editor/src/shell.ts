@@ -16,45 +16,69 @@ import {connectDocumentFrame} from './adapters/iframe/document-client.ts';
 import type {DocumentFrameClient} from './adapters/iframe/document-client.ts';
 import {installUnifiedChrome} from './unified-chrome.ts';
 import {createXmlDocuments,XML_WORKSPACE_COMMAND} from './adapters/browser/xml-workspace.ts';
+import {showOfficeCopyDialog} from './adapters/browser/office-copy-dialog.ts';
+import {showWorkTemplateCopyDialog} from './adapters/browser/work-template-dialog.ts';
+import {showInstitutionTemplateDialog} from './adapters/browser/institution-template-dialog.ts';
+import {showInstitutionReviewDialog} from './adapters/browser/institution-review-dialog.ts';
+import {createInstitutionReviewBundle} from './adapters/files/institution-review-bundle.ts';
+import {readWorkTemplate} from './modules/document/public/work-templates.ts';
 import {showXmlDocumentDialog} from './ui/xml-document-dialog.ts';
 import {createXmlRecoveryStore,indexedDbXmlRecoveryRecords} from './adapters/storage/xml-recovery.ts';
-import {createAutomationFacade} from './modules/automation/public/index.ts';
+import {createAutomationFacade,suggestTemplateNarratives,suggestWorkTemplateDraft} from './modules/automation/public/index.ts';
 import type {CommandTemplate,CommandMacro} from './modules/automation/public/index.ts';
 import {installDocumentDefaultsPanel} from './ui/document-defaults-panel.ts';
-import {agent} from './composition/agent.ts';
-import {classifyAgentFailure} from './modules/agent/public/index.ts';
+import {classifyAgentFailure,type AgentEvent} from './modules/agent/public/index.ts';
 import {createRecoveryCoordinator,normalizeRecoverySettings,createDocumentViewJournal} from './modules/preferences/public/index.ts';
 import {readRecoverySettings,watchRecoverySettings,browserRecoveryClock} from './adapters/browser/recovery-settings.ts';
 
-import {assertRecoveryRecord,partitionRecoveryRecords} from './modules/document-files/public/index.ts';
+import {assertRecoveryRecord} from './modules/document-files/public/index.ts';
 import {recoveryIntegrity} from './adapters/storage/recovery-integrity.ts';
+import {createSerializedWriter} from './adapters/storage/serialized-writer.ts';
 import {createSessionFacade,createSessionGuard,shouldProtectExit} from './modules/session/public/index.ts';
 import type {StoredFileConnection} from './file-connection.ts';
-import {describeStructure} from './modules/document/public/index.ts';
 import {installPaneResize} from './pane-layout.ts';
 
 import {uid} from './mvp/model.ts';
 import {createWorkspaceFacade} from './modules/workspace/public/index.ts';
 import type {AppState,Receipt,Run,SavedDocument,ModelConfig,Snapshot} from './mvp/model.ts';
-import {permission,readReferences} from './adapters/files/references.ts';
+import {permission,resolveReferenceOrigin} from './adapters/files/references.ts';
 import type {Reference} from './mvp/references.ts';
+import type {SourceAddress} from './modules/references/public/index.ts';
+import {installAlignmentMacros} from './ui/alignment-macros.ts';
+import {supportsDocumentTools} from './modules/connections/public/index.ts';
 import {createWorkbenchServices} from './composition/workbench.ts';
+import {createReferenceIndexRefresh} from './composition/reference-index-refresh.ts';
+import {createWorkspaceRecovery} from './composition/workspace-recovery.ts';
+import {createDocumentFileActions} from './composition/document-file-actions.ts';
+import {createCitationNavigation} from './composition/reference-citations.ts';
+import {readWorkspaceReferences} from './composition/workspace-reference-reader.ts';
+import {prepareAgentContext} from './composition/agent-context.ts';
 
 
 import {installConnectionsPanel} from './ui/connections-panel.ts';
+import {readCommandMacroParameters,renderCommandMacros,showCommandMacroParameters} from './ui/command-macros.ts';
+import {renderChatMessages,runStatusLabels} from './ui/chat-messages.ts';
+import {createReferencePanel} from './ui/reference-panel.ts';
+import {showReferenceCitation} from './ui/reference-citation-dialog.ts';
+import {reviewReferenceChanges} from './ui/reference-change-review.ts';
+import {chooseNativeExit} from './ui/native-exit-dialog.ts';
 import {installDocumentTabCycle} from './adapters/browser/document-tab-cycle.ts';
 import {TemporaryReferences} from './adapters/files/temporary-references.ts';
 
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
-const {store,connections:port,modelGateway}=createWorkbenchServices();
+const {store,connections:port,modelGateway,agent,references:referenceIndex,runRepository,macroRepository}=createWorkbenchServices();
 let state:AppState,activeTab:Tab|undefined,restoring=false,persistError=false,closing=false,stateWrites=0;
+const runHistory=runRepository(()=>state);
+const workspaceWrites=createSerializedWriter();
+const macros=macroRepository(()=>state,persistWorkspaceState,workspaceWrites);
+let folderWrites=0;
 let running:{controller:AbortController;run:Run}|undefined;
 const nativeHost=installNativeFilePickers(window);
 let documentWindow=mainDocumentWindow;
 let agentFilePending=false;const agentFileAuthority=Symbol('agent-current-workspace-tab-action');
 let nativeExitPending=false,nativeExit:ReturnType<typeof installNativeExitProtection>|undefined;
 type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<DocumentFrameClient|null>;api:DocumentFrameClient|null;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>;recovery?:ReturnType<typeof createRecoveryCoordinator>;disposeTabCycle?:()=>void;cachedDocument?:SavedDocument};
-const tabs:Tab[]=[];const loaded=new Set<string>();let recoveryWarning=false;let selected:Reference[]=[];
+const tabs:Tab[]=[];let recoveryWarning=false;let selected:Reference[]=[];
 const viewJournal=createDocumentViewJournal({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)});
 const viewClocks=new Map<string,number>();let viewJournalError=false;
 function viewStamp(tab:Tab){const stored=tab.cachedDocument?.viewUpdatedAt;const value=Math.max(Date.now(),viewClocks.get(tab.id)??0,Number.isSafeInteger(stored)?stored!:0)+1;viewClocks.set(tab.id,value);return value;}
@@ -68,8 +92,6 @@ function checkpointExitView(){
 }
 const temporary=new TemporaryReferences();
 const automation=createAutomationFacade();
-const phaseLabels:Record<string,string>={generating:'초안 생성',reviewing:'계획 검토',validated:'명령 확인',ready:'적용 준비',applying:'문서 적용',completed:'완료',stopped:'중단'};
-const runLabels:Record<Run['status'],string>={preparing_context:'자료 읽는 중',generating:'모델 응답 대기',validating:'명령 검증 중',applying:'문서 적용 중',completed:'완료',cancelled:'취소됨',conflict:'문서 변경 충돌',failed_no_change:'실패 · 적용 없음',failed_rolled_back:'실패 · 변경 복원됨',failed_partial:'실패 · 부분 적용 확인 필요',interrupted:'이전 실행 중단됨'};
 const status=(text:string)=>{$('app-status').textContent=text;$('app-status').title=text;};
 const error=(e:unknown)=>status(readDocumentFailure(e).message);
 let recoverySettings=normalizeRecoverySettings(undefined);
@@ -106,9 +128,46 @@ const xmlDocuments=createXmlDocuments({canOpen:()=>Boolean(state)&&!closing&&!re
 }});
 const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?xmlDocuments.wrap(documentWindows.wrap(lifecycle.wrap(nativeRecents?.wrap(api)??api))):undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id===XML_WORKSPACE_COMMAND)return xmlDocuments.execute(id);if(id==='file:new-doc'||id==='file:new-tab'||id==='file:restore-document-window')return documentWindows.execute(id,params);if(id==='ext:jueony-close'||id==='file:exit')return lifecycle.execute(id);if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
 const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{if(agentFilePending){status('Agent 문서 탭 작업을 마친 뒤 실행하세요.');return;}try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
-async function persist(){stateWrites++;try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}finally{stateWrites--;}}
+const alignmentRequest='불러온 정렬 기록 적용';
+const manualEditRequest='불러온 편집 기록 적용';
+const manualMacroRequests=[alignmentRequest,manualEditRequest];
+const alignmentMacros=installAlignmentMacros({active:()=>activeTab,blocked:()=>Boolean(running||closing||restoring||agentFilePending),persist:persistTab,on,status,error,
+ queueRequest(includeText){
+  const input=$<HTMLTextAreaElement>('request-input');
+  const current=input.value.split('\n',1)[0],prompt=includeText?manualEditRequest:alignmentRequest;
+  if(current!==prompt)input.value=[prompt,manualMacroRequests.includes(current)?input.value.slice(current.length).trimStart():input.value].filter(Boolean).join('\n');
+  input.focus();
+ },
+ library:()=>({workspaceId:work().id,records:macros.manual.list(work().id)}),
+ replaceRecord(record,remove=false){
+  return remove?macros.manual.remove(record.workspaceId,record.id):macros.manual.append(record);
+ },});
+function persist(){return macros.persist();}
+async function persistWorkspaceState(folders=state.folders){
+ stateWrites++;
+ try{await store.save({...state,folders});persistError=false;}
+ catch(e){persistError=true;throw e;}
+ finally{stateWrites--;}
+}
+async function changeFolderLinks(workspaceId:string,update:(folders:AppState['folders'])=>AppState['folders']|Promise<AppState['folders']>){
+ folderWrites++;
+ try{
+  return await workspaceWrites.run(async()=>{
+   if(work().id!==workspaceId||restoring||closing)return false;
+   const folders=await update(state.folders);
+   if(folders===state.folders||work().id!==workspaceId||restoring||closing)return false;
+   await persistWorkspaceState(folders);
+   state.folders=folders;
+   return true;
+  });
+ }finally{folderWrites--;}
+}
 const navigation=createSessionGuard(()=>({closing,restoring,runStatus:running?.run.status}),()=>running?.controller.abort(),status);
-const cancelNavigation=()=>{if(agentFilePending){status('Agent 문서 탭 작업 중에는 업무와 문서를 전환하지 않습니다.');return false;}return navigation.canNavigate();};
+const cancelNavigation=()=>{
+ if(agentFilePending){status('Agent 문서 탭 작업 중에는 업무와 문서를 전환하지 않습니다.');return false;}
+ if(folderWrites){status('폴더 연결 정보를 저장하고 있습니다.');return false;}
+ return navigation.canNavigate();
+};
 function options(select:HTMLSelectElement,items:{value:string;text:string}[],value?:string){select.replaceChildren(...items.map(item=>{const o=document.createElement('option');o.value=item.value;o.textContent=item.text;return o;}));if(value&&items.some(x=>x.value===value))select.value=value;}
 const connectionUI=installConnectionsPanel({port,models:()=>state.models,replaceModels:models=>{state.models=models;},chat,isRunning:()=>Boolean(running),persist,renderModels,status,error,uid});
 function renderModels(){
@@ -119,85 +178,147 @@ function renderModels(){
  const models=state.models.filter(m=>group(m)===($('provider-select') as HTMLSelectElement).value);
  options($('model-select'),models.length?models.map(m=>({value:m.id,text:m.modelId})):[{value:'',text:'모델 등록'}],selectedModel?.id);
 }
+function renderActiveChat(){
+ const current=chat();
+ $('chat-title').textContent=current.title;
+ for(const item of $('chat-list').querySelectorAll<HTMLButtonElement>('.chat-item')){
+  const active=item.dataset.chatId===current.id;
+  item.classList.toggle('active',active);
+  if(active)item.setAttribute('aria-current','true');
+  else item.removeAttribute('aria-current');
+ }
+ renderModels();
+ renderMessages();
+ renderReferences();
+}
 function render(){
  options($('workspace-select'),state.workspaces.map(w=>({value:w.id,text:w.name})),work().id);
  $('app-shell').classList.toggle('sidebar-hidden',Boolean(state.sidebarHidden));$('app-shell').classList.toggle('focus-mode',Boolean(state.focusMode));$('focus-mode').setAttribute('aria-pressed',String(Boolean(state.focusMode)));
  $<HTMLInputElement>('retrieve-sources').checked=Boolean(state.retrieveSources);$<HTMLInputElement>('review-before-apply').checked=Boolean(state.reviewBeforeApply);
- $('chat-title').textContent=chat().title;
- $('chat-list').replaceChildren(...state.chats.filter(c=>c.workspaceId===work().id).map(c=>{const b=button(c.title,async()=>{if(!cancelNavigation())return;work().activeChatId=c.id;selected=[];render();await renderFolders();await persist();});b.className='chat-item'+(c.id===chat().id?' active':'');b.ondblclick=async()=>{const title=prompt('채팅 이름',c.title);if(title?.trim()){c.title=title.trim();render();await persist().catch(error);}};return b;}));
- renderModels();renderMessages();renderReferences();
+ $<HTMLInputElement>('ranked-search').checked=Boolean(state.rankedSearch);
+ $<HTMLInputElement>('pdf-ocr').checked=Boolean(state.pdfOcr);
+ $<HTMLInputElement>('document-tool-mode').checked=Boolean(state.documentToolMode);
+ $('window-edit-option').hidden=!state.documentToolMode;
+ $('chat-list').replaceChildren(...state.chats.filter(c=>c.workspaceId===work().id).map(c=>{
+  const b=button(c.title,async()=>{
+   if(c.workspaceId!==work().id||c.id===chat().id||!cancelNavigation())return;
+   resetReferenceSelection();
+   work().activeChatId=c.id;
+   renderActiveChat();
+   await renderFolders();
+   await persist();
+  });
+  b.className='chat-item';
+  b.dataset.chatId=c.id;
+  b.ondblclick=async()=>{
+   if(c.workspaceId!==work().id)return;
+   const title=prompt('채팅 이름',c.title)?.trim();
+   if(!title)return;
+   c.title=title;
+   b.textContent=title;
+   renderActiveChat();
+   await persist().catch(error);
+  };
+  return b;
+ }));
+ renderActiveChat();
  $('sidebar').style.setProperty('--chat-share',state.split+'%');$('sidebar-split').setAttribute('aria-valuenow',String(state.split));
  for(const tab of tabs){const visible=tab.workspaceId===work().id;tab.wrapper.hidden=!visible;tab.frame.hidden=!visible||tab!==activeTab;}
 }
+const messageActions={
+ button,
+ openSource:openReferenceLocation,
+ async undo(run:Run){
+  if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');
+  const tab=tabs.find(tab=>tab.id===run.documentId&&tab.workspaceId===run.workspaceId);
+  if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');
+  if(!run.receipt)return;
+  selectTab(tab);
+  await tab.api!.undoRequest(run.receipt);
+  run.undoneAt=Date.now();
+  renderMessages();
+  await persist();
+  await persistTab(tab);
+  status('이 요청의 변경을 되돌렸습니다.');
+ },
+ async saveMacro(run:Run){
+  if(!run.macroTemplate)return;
+  const name=prompt('반복 작업 이름');
+  if(!name?.trim())return;
+  const macro:CommandMacro={id:uid(),workspaceId:run.workspaceId,name:name.trim(),createdAt:Date.now(),template:structuredClone(run.macroTemplate)};
+  await macros.commands.append(macro);
+  status('이 업무의 반복 작업에 저장했습니다.');
+ },
+};
 function renderMessages(){
- const target=$('messages');target.replaceChildren();
- if(!chat().messages.length){const hint=document.createElement('div');hint.className='empty-chat';hint.textContent='자료를 연결하고 업무를 시작하세요.\nAI는 오른쪽의 열린 문서를 직접 편집합니다.';target.append(hint);}
- for(const m of chat().messages){
-  const card=document.createElement('article');card.className='message '+m.role;
-  const role=document.createElement('div');role.className='role';role.textContent=m.role==='user'?'나':'Jueony';
-  const text=document.createElement('div');text.textContent=m.text;card.append(role,text);
-  const run=state.runs.find(r=>r.id===m.runId&&r.workspaceId===work().id&&r.chatId===chat().id);
-  if(run&&m.role==='assistant'){
-   const meta=document.createElement('div');meta.className='run-meta';meta.textContent=runLabels[run.status]+(run.sources.length?' · 전달한 자료: '+run.sources.map(s=>s.name+' ('+s.characters+'자)').join(', '):' · 참고 파일 없음');card.append(meta);
-   if(run.sources.length){const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='자료 범위와 출처';detail.append(summary);for(const source of run.sources){const info=document.createElement('div');info.textContent=source.name+' · '+source.characters+'자 · '+(run.usedSourceIds?.includes(source.id)?'모델이 참조 표시':'모델에 전달')+'\n'+(source.limitation??'UTF-8 텍스트 전체');detail.append(info);}card.append(detail);}
-   if(run.retrieval){const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='자료 검색: '+run.retrieval.matchedChunkCount+'개 구간 · '+run.retrieval.sentCharacters+'자 전달';detail.append(summary);for(const hit of run.retrieval.hits){const line=document.createElement('div');line.textContent=hit.name+' · 추출문 '+hit.startLine+'–'+hit.endLine+'행';detail.append(line);}for(const warning of run.retrieval.warnings){const p=document.createElement('p');p.textContent=warning;detail.append(p);}card.append(detail);}
-   if(run.events?.length){const note=document.createElement('div');note.className='run-meta';note.textContent='검토 기록: '+run.events.map(e=>(phaseLabels[e.phase]??e.phase)+' '+e.call+'/'+e.maxCalls).join(' → ');card.append(note);}
-   if(run.receipt){const actions=document.createElement('div');actions.className='message-actions';actions.append(button('변경 확인',()=>{
-    const receipt=run.receipt!;$('diff-before').textContent=receipt.before;$('diff-after').textContent=receipt.after;
-    $('structure-diff').hidden=!receipt.formulaField && JSON.stringify(receipt.beforeStructure)===JSON.stringify(receipt.afterStructure);
-    $('structure-diff-text').textContent='변경 전\n'+describeStructure(receipt.beforeStructure)+'\n\n변경 후\n'+describeStructure(receipt.afterStructure);
-    if(receipt.formulaField){
-     const primary=receipt.formulaField;
-     const changes=[primary,...(primary.dependents??[])].map((f,i)=>`${i?'연관 계산식':'계산식'} · ${f.row+1}행 ${f.column+1}열\n변경 전 ${f.before.command??'일반 셀'} · 표시값 ${f.before.value}\n변경 후 ${f.after.command} · 표시값 ${f.after.value}\n\n`);
-     $('structure-diff-text').prepend(document.createTextNode(changes.join('')));
-    }
-    ($('change-dialog') as HTMLDialogElement).showModal();
-   }),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api!.undoRequest(run.receipt!);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));if(run.macroTemplate)actions.append(button('반복 작업으로 저장',async()=>{const name=prompt('반복 작업 이름');if(!name?.trim())return;const macro:CommandMacro={id:uid(),workspaceId:run.workspaceId,name:name.trim(),createdAt:Date.now(),template:structuredClone(run.macroTemplate!)};state.macros??=[];state.macros.push(macro);await persist();status('이 업무의 반복 작업에 저장했습니다.');}));card.append(actions);}
-  }
-  target.append(card);
- }
- const pending=running?.run.chatId===chat().id&&running.run.workspaceId===work().id;
- target.setAttribute('aria-busy',String(Boolean(pending)));
- if(pending){const card=document.createElement('article');card.className='message assistant pending';card.id='agent-progress';card.setAttribute('role','status');card.textContent=(running!.run.model?.modelId??'반복 작업')+' · '+runLabels[running!.run.status]+'…'+(running!.run.events?.length?' ('+running!.run.events.at(-1)!.call+'/3회)':'');target.append(card);}
- target.scrollTop=target.scrollHeight;
+ const current=chat();
+ const withinChat=(run:Run)=>run.workspaceId===current.workspaceId&&run.chatId===current.id;
+ const pending=running&&withinChat(running.run)?running.run:undefined;
+ renderChatMessages(current.messages,runHistory.list({workspaceId:current.workspaceId,chatId:current.id}),pending,messageActions);
 }
-function renderReferences(){
- const target=$('reference-summary');target.replaceChildren();
- const line=document.createElement('div');line.textContent=selected.length?'연결 자료: '+selected.map(s=>s.path).join(', '):'폴더에서 자료를 체크하거나 파일을 첨부하세요.';target.append(line);
- const workspaceId=work().id,chatId=chat().id;
- for(const item of temporary.list(workspaceId,chatId)){
-  const chip=button(item.file.name+' ×',()=>{temporary.remove(workspaceId,chatId,item.id);renderReferences();});
-  chip.className='attachment-chip';chip.title='임시 참고 첨부 제거: '+item.file.name;target.append(chip);
- }
-}
+const {renderSummary:renderReferences,renderFolders}=createReferencePanel({
+ scope:()=>({workspaceId:work().id,chatId:chat().id}),
+ folders:workspaceId=>state.folders.filter(folder=>folder.workspaceId===workspaceId),
+ selected:()=>selected,
+ attachments:({workspaceId,chatId})=>temporary.list(workspaceId,chatId),
+ removeAttachment({workspaceId,chatId},id){
+  temporary.remove(workspaceId,chatId,id);
+  cancelRunWithRevokedReference(workspaceId,chatId);
+  renderReferences();
+ },
+ choose,
+ async disconnect(folder){
+  if(!cancelNavigation())return;
+  cancelIndexRefresh();
+  const removed=await changeFolderLinks(folder.workspaceId,folders=>folders.filter(item=>item.id!==folder.id));
+  if(!removed)return;
+  selected=selected.filter(reference=>reference.rootId!==folder.id);
+  const cleared=state.rankedSearch
+   ?referenceIndex.clearIndex({workspaceId:folder.workspaceId}).then(()=>true,()=>false)
+   :Promise.resolve(true);
+  renderReferences();
+  await renderFolders();
+  status(await cleared
+   ?'폴더 연결을 해제했습니다. 원본은 그대로 있습니다.'
+   :'폴더 연결을 해제했습니다. 이전 검색 색인을 정리하지 못했습니다.');
+ },
+ openFile:openHandle,button,status,
+});
 function attachFiles(files:File[],workspaceId=work().id,chatId=chat().id){
  try{temporary.add(workspaceId,chatId,files);renderReferences();status('임시 참고 자료를 첨부했습니다. 이 채팅의 요청에 포함되며 앱을 새로고침하면 해제됩니다.');}catch(e){requestError(e);}
 }
-async function renderFolders(){
- const container=$('folder-tree');container.replaceChildren();const workspaceId=work().id;
- for(const folder of state.folders.filter(f=>f.workspaceId===workspaceId)){
-  const root=document.createElement('div');root.className='folder-root';container.append(root);
-  const row=document.createElement('div');row.className='folder-row';root.append(row);
-  const children=document.createElement('div');children.className='folder-children';
-  let expanded=false;
-  row.append(button('▸ '+folder.name,async()=>{if(!await permission(folder.handle,true))throw new Error('폴더 접근 권한이 없습니다. 다시 연결해 주세요.');expanded=!expanded;children.hidden=!expanded;if(expanded){children.replaceChildren();await entries(folder.handle,children,folder.name,folder.id,workspaceId);}}));
-  const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.title='폴더를 이번 요청 참고 자료로 지정';checkbox.checked=selected.some(r=>r.id===folder.id);checkbox.onchange=()=>choose(checkbox.checked,{id:folder.id,workspaceId,rootId:folder.id,path:folder.name,handle:folder.handle});row.prepend(checkbox);
-  row.append(button('해제',async()=>{if(!cancelNavigation())return;state.folders=state.folders.filter(f=>f.id!==folder.id);selected=selected.filter(r=>r.rootId!==folder.id);await persist();renderReferences();await renderFolders();status('폴더 연결을 해제했습니다. 원본은 그대로 있습니다.');}));
-  root.append(children);
-  if(!await permission(folder.handle)){const note=document.createElement('div');note.className='folder-warning';note.textContent='폴더 이름을 눌러 접근 권한을 다시 확인하세요.';root.append(note);}
+function choose(checked:boolean,reference:Reference){
+ if(reference.workspaceId!==work().id)return;
+ cancelIndexRefresh();
+ selected=selected.filter(s=>s.id!==reference.id);if(checked)selected.push(reference);
+ if(!checked){
+  const chatId=chat().id;
+  cancelRunWithRevokedReference(reference.workspaceId,chatId);
+  if(state.rankedSearch)void referenceIndex.clearIndex({workspaceId:reference.workspaceId,chatId}).catch(error);
  }
- if(!container.children.length){const p=document.createElement('p');p.className='hint';p.textContent='로컬 폴더를 연결해 자료를 탐색하세요.';container.append(p);}
+ renderReferences();
 }
-function choose(checked:boolean,reference:Reference){selected=selected.filter(s=>s.id!==reference.id);if(checked)selected.push(reference);renderReferences();}
-async function entries(dir:any,parent:HTMLElement,path:string,rootId:string,workspaceId:string){
- const list:[string,any][]=[];for await(const entry of dir.entries()){if(list.length>=1000)throw new Error('한 폴더의 표시는 1,000개로 제한됩니다. 하위 폴더를 연결해 주세요.');list.push(entry);}list.sort((a,b)=>Number(b[1].kind==='directory')-Number(a[1].kind==='directory')||a[0].localeCompare(b[0],'ko'));
- for(const [name,handle] of list){
-  const childPath=path+'/'+name,id=rootId+'/'+childPath,row=document.createElement('div');row.className='folder-row';parent.append(row);
-  const cb=document.createElement('input');cb.type='checkbox';cb.title='참고 자료 지정';cb.checked=selected.some(s=>s.id===id);cb.onchange=()=>choose(cb.checked,{id,workspaceId,rootId,path:childPath,handle});row.append(cb);
-  let expanded=false;const children=document.createElement('div');children.className='folder-children';children.hidden=true;
-  const label=button((handle.kind==='directory'?'▸ ':'')+name,async()=>{if(workspaceId!==work().id)return;if(handle.kind==='directory'){expanded=!expanded;children.hidden=!expanded;if(expanded){children.replaceChildren();await entries(handle,children,childPath,rootId,workspaceId);}}else if(/\.(hwp|hwpx)$/i.test(name)){await openHandle(handle);}else status('이 파일은 참고 자료로 체크할 수 있습니다. 문서 편집기는 HWP/HWPX만 엽니다.');});label.className='file-label';label.title=childPath;row.append(label);parent.append(children);
+function cancelRunWithRevokedReference(workspaceId:string,chatId:string){
+ if(running?.run.workspaceId===workspaceId&&running.run.chatId===chatId&&running.run.status!=='applying'){
+  running.controller.abort(new DOMException('요청 중 참고 자료가 해제되었습니다.','AbortError'));
  }
 }
+function resetReferenceSelection(){
+ cancelIndexRefresh();
+ if(state.rankedSearch&&selected.length)void referenceIndex.clearIndex({workspaceId:work().id,chatId:chat().id}).catch(error);
+ selected=[];
+ $<HTMLInputElement>('allow-window-edit').checked=false;
+}
+const referenceRefresh=createReferenceIndexRefresh(()=>{
+ const tab=activeTab;
+ if(!state?.rankedSearch||state.pdfOcr||!selected.length||!tab?.initialized||!tab.api||tab.api.busy()||document.hidden||running||restoring||closing||folderWrites||agentFilePending||nativeExitPending)return;
+ const api=tab.api,files=[...selected],folders=state.folders;
+ const scope={workspaceId:work().id,chatId:chat().id};
+ return {scope,readSources:(signal,cache)=>readWorkspaceReferences({scope,selected:files,folders,reader:api,skipUnavailable:true},signal,cache)};
+},referenceIndex);
+const cancelIndexRefresh=referenceRefresh.cancel;
+window.setInterval(referenceRefresh.refresh,90_000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelIndexRefresh();else void referenceRefresh.refresh();});
 function checkPendingConnection(tab:Tab){
  if(tab.pendingConnection&&tab.initialized&&tab.pendingIdentity!==tab.api!.documentIdentity()){tab.pendingConnection=undefined;tab.pendingIdentity=undefined;}
 }
@@ -212,14 +333,17 @@ async function persistCachedView(tab:Tab){
  if(nativeExitPending||tab.closed||!tab.initialized||!tab.api||!tab.cachedDocument||tab.pendingWrites)return;
  const view=tab.api.captureDocumentView();if(JSON.stringify(view)===JSON.stringify(tab.cachedDocument.view))return;
  const data={...tab.cachedDocument,view,viewUpdatedAt:viewStamp(tab)};tab.pendingWrites=(tab.pendingWrites??0)+1;
- tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
- try{await tab.persist;tab.cachedDocument=data;tab.persistError=false;}catch(e){tab.persistError=true;throw e;}finally{tab.pendingWrites!--;}
+ tab.persist=tab.persist.catch(()=>{}).then(async()=>{tab.cachedDocument=await store.saveDocument(data,tab.cachedDocument);});
+ try{await tab.persist;tab.persistError=false;}catch(e){tab.persistError=true;throw e;}finally{tab.pendingWrites!--;}
 }
-function selectTab(tab:Tab,authority?:symbol){if(agentFilePending&&authority!==agentFileAuthority)return;if(!session.canSelect(tab.id))return;if(activeTab?.initialized&&activeTab!==tab){activeTab.api!.suspendDocumentView();void persistTab(activeTab).catch(error);}if(!session.select(tab.id))return;activeTab=tab;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
+function selectTab(tab:Tab,authority?:symbol){if(agentFilePending&&authority!==agentFileAuthority)return;if(!session.canSelect(tab.id))return;alignmentMacros.cancelOnTabSwitch(tab);if(activeTab!==tab)$<HTMLInputElement>('allow-window-edit').checked=false;if(activeTab?.initialized&&activeTab!==tab){activeTab.api!.suspendDocumentView();void persistTab(activeTab).catch(error);}if(!session.select(tab.id))return;activeTab=tab;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
 async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=false,authority?:symbol){
  if(agentFilePending&&authority!==agentFileAuthority)throw Error('Agent 문서 탭 작업을 마친 뒤 새 문서를 여세요.');
  assertTabCapacity(tabs.filter(tab=>!tab.closed).length);
- if(saved)assertRecoveryRecord(saved,workspaceId,recoveryIntegrity);
+ if(saved){
+  assertRecoveryRecord(saved,workspaceId,recoveryIntegrity);
+  saved=await store.openDocumentCheckpoint({id:saved.id,workspaceId});
+ }
  const frame=document.createElement('iframe');const wrapper=document.createElement('div');wrapper.className='document-tab-wrap';
  const tab:Tab={id:saved?.id??uid(),workspaceId,frame,wrapper,button:button('문서 준비 중…',()=>{if(cancelNavigation())selectTab(tab);}),closed:false,initialized:false,pendingConnection:saved?.fileConnection,api:null,ready:Promise.resolve(null),persist:Promise.resolve()};
  tab.button.className='document-tab';tab.button.setAttribute('role','tab');
@@ -257,55 +381,78 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=fal
   status('문서를 복원하지 못했습니다. 기존 복구본은 보존합니다. '+tab.restoreError);throw e;
  }
 }
-async function persistTab(tab:Tab,reason:'explicit'|'automatic'|'native-exit'='explicit'):Promise<boolean>{
- if((nativeExitPending&&reason!=='native-exit')||tab.closed||!tab.api||!tab.initialized)return false;clearTimeout(tab.timer);
+function captureRecoveryRecord(tab:Tab):SavedDocument|undefined{
+ const api=tab.api!,snapshot=api.recovery();if(!snapshot)return;
+ checkPendingConnection(tab);
+ const handle=api.fileHandle(),fileConnection=snapshot.fileConnection??(!handle?tab.pendingConnection:undefined);
+ if(handle)tab.pendingConnection=undefined;
+ return {id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),viewUpdatedAt:viewStamp(tab),...snapshot,fileConnection,view:api.captureDocumentView()};
+}
+async function persistTab(tab:Tab,reason:'explicit'|'automatic'='explicit'):Promise<boolean>{
+ if(nativeExitPending||tab.closed||!tab.api||!tab.initialized)return false;clearTimeout(tab.timer);
  const captured={identity:tab.api.documentIdentity(),...tab.api.state()};
- if(reason!=='native-exit'&&captured.dirty&&tab.recovery&&!tab.recovery.enabled()){await persistCachedView(tab);return true;}
+ if(captured.dirty&&tab.recovery&&!tab.recovery.enabled()){await persistCachedView(tab);return true;}
  try{
-  const snapshot=tab.api!.recovery();if(!snapshot){if(reason==='explicit')tab.timer=window.setTimeout(()=>void persistTab(tab).catch(error),1500);return false;}
-  checkPendingConnection(tab);
-  const fileConnection=snapshot.fileConnection??(!tab.api!.fileHandle()?tab.pendingConnection:undefined);
-  if(tab.api!.fileHandle())tab.pendingConnection=undefined;
-  const data:SavedDocument={id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),viewUpdatedAt:viewStamp(tab),...snapshot,fileConnection,view:tab.api!.captureDocumentView()};
-  tab.pendingWrites=(tab.pendingWrites??0)+1;tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
-  try{await tab.persist;tab.cachedDocument=data;tab.recovery?.checkpointed(captured);tab.persistError=false;return true;}finally{tab.pendingWrites!--;}
+  const data=captureRecoveryRecord(tab);if(!data){if(reason==='explicit')tab.timer=window.setTimeout(()=>void persistTab(tab).catch(error),1500);return false;}
+  tab.pendingWrites=(tab.pendingWrites??0)+1;
+  tab.persist=tab.persist.catch(()=>{}).then(async()=>{tab.cachedDocument=await store.saveDocument(data,tab.cachedDocument);});
+  try{await tab.persist;tab.recovery?.checkpointed(captured);tab.persistError=false;return true;}finally{tab.pendingWrites!--;}
  }catch(e){
   if((e as any)?.code==='PASSWORD_RECOVERY_BLOCKED'){
-   if(reason==='native-exit')throw e;
-   tab.cachedDocument=undefined;viewClocks.delete(tab.id);
-   try{viewJournal.remove(tab.id,tab.workspaceId);}catch(journalError){viewJournalError=true;error(journalError);}
-   tab.pendingWrites=(tab.pendingWrites??0)+1;tab.persist=tab.persist.catch(()=>{}).then(()=>store.removeDocument(tab.id));
+   tab.pendingWrites=(tab.pendingWrites??0)+1;
+   tab.persist=tab.persist.catch(()=>{}).then(async()=>{
+    await store.removeDocumentIfUnchanged(tab.id,tab.workspaceId,tab.cachedDocument);
+    tab.cachedDocument=undefined;viewClocks.delete(tab.id);
+    try{viewJournal.remove(tab.id,tab.workspaceId);}catch(journalError){viewJournalError=true;error(journalError);}
+   });
    try{await tab.persist;tab.persistError=false;status((e as Error).message);return true;}catch(removeError){tab.persistError=true;throw removeError;}finally{tab.pendingWrites!--;}
   }
   tab.persistError=true;throw e;
  }
 }
-async function openHandle(handle:FileSystemFileHandle){
- if(!cancelNavigation())return;const workspaceId=work().id;if(!await permission(handle,true))throw new Error('파일 접근 권한이 없습니다.');
- if(work().id!==workspaceId)return;
- for(const tab of tabs.filter(t=>t.workspaceId===workspaceId&&t.api?.fileHandle())){if(await handle.isSameEntry(tab.api!.fileHandle()!)){selectTab(tab);return;}}
- const file=await handle.getFile();if(file.size>64*1024*1024)throw new Error('MVP 문서 열기는 64MB까지 지원합니다.');
- if(work().id!==workspaceId)return;const tab=await newTab(workspaceId,undefined,true);await tab.api!.open(new Uint8Array(await file.arrayBuffer()),file.name,handle);tab.handle=handle;await persistTab(tab);status('문서를 열었습니다.');
+const documentFileActions=createDocumentFileActions<Tab>({
+ currentWorkspace:()=>work().id,tabs:()=>tabs,activeTab:()=>activeTab,allowOpen:cancelNavigation,
+ allowSave:()=>running?.run.status!=='applying',permission:handle=>permission(handle,true),select:selectTab,
+ create:workspaceId=>newTab(workspaceId,undefined,true),persist:persistTab,status,
+});
+function openHandle(handle:FileSystemFileHandle){return documentFileActions.openBound(handle);}
+const navigateCitation=createCitationNavigation<Tab>({
+ isCurrent:scope=>work().id===scope.workspaceId&&chat().id===scope.chatId&&!running&&!closing&&!restoring&&!agentFilePending&&!nativeExitPending,
+ resolveOrigin:(id,scope)=>resolveReferenceOrigin(id,state.folders,scope,temporary.list(scope.workspaceId,scope.chatId)),
+ tabs:()=>tabs,select:selectTab,create:workspaceId=>newTab(workspaceId,undefined,true),remove:commitClosedTab,persist:persistTab,
+ showOfficeCitation:showReferenceCitation,status,reportError:error,
+});
+function openReferenceLocation(run:Run,source:Run['sources'][number],address:SourceAddress){
+ return navigateCitation({workspaceId:run.workspaceId,chatId:run.chatId},source,address);
 }
 async function closeTab(tab:Tab){
  if(closing||!cancelNavigation()||!tab.api||tab.api!.busy())return;if(!tab.initialized){status('복원 실패 문서의 기존 복구본을 보존합니다. 재실행 후 다시 확인해 주세요.');return;}closing=true;
  try {
+ const before=closeVersion(tab);
  if(tab.api!.state().dirty){
   selectTab(tab);const dialog=$<HTMLDialogElement>('close-document');$('close-document-name').textContent=tab.api!.state().name;dialog.returnValue='cancel';const choice=new Promise<string>(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue),{once:true}));dialog.showModal();const action=await choice;
-  if(action==='cancel'||!action)return;if(action==='save'){if(await tab.api!.save()!=='saved'||tab.api!.state().dirty)return;}else if(action!=='discard')return;
+  if(action==='cancel'||!action)return;
+  if(!sameCloseVersion(tab,before))throw Error('닫기 확인 중 문서가 바뀌었습니다. 다시 확인해 주세요.');
+  if(action==='save'){if(await tab.api!.save()!=='saved'||tab.api!.state().dirty)return;}else if(action!=='discard')return;
  }
  // Embedded frames have no private autosave owner. Deleting the workspace draft
  // is the discard commit: until that succeeds, keep the live dirty/undo state so
  // a failed IDB delete cannot turn unsaved work into an apparently saved tab.
- await commitClosedTab(tab);
+ await commitClosedTab(tab,undefined,closeVersion(tab));
  }finally{closing=false;}
 }
 function closeVersion(tab:Tab){return{api:tab.api,instance:tab.api!.documentInstance(),revision:tab.api!.revision(),identity:tab.api!.documentIdentity(),handle:tab.api!.fileHandle(),dirty:tab.api!.state().dirty,workspaceId:tab.workspaceId};}
+function sameCloseVersion(tab:Tab,expected:ReturnType<typeof closeVersion>):boolean{
+ const actual=closeVersion(tab);return (Object.keys(actual) as (keyof typeof actual)[]).every(key=>actual[key]===expected[key]);
+}
 async function commitClosedTab(tab:Tab,authority?:symbol,expected?:ReturnType<typeof closeVersion>){
- const assertOwned=()=>{if(tab.closed||!tabs.includes(tab)||!tab.api||!tab.initialized)throw Error('닫을 문서 탭의 소유 정보가 바뀌었습니다.');if(authority===agentFileAuthority){if(!agentFilePending||!expected||work().id!==expected.workspaceId||tab.workspaceId!==expected.workspaceId||tab.api!==expected.api||tab.api.documentInstance()!==expected.instance||tab.api.revision()!==expected.revision||tab.api.documentIdentity()!==expected.identity||tab.api.fileHandle()!==expected.handle||tab.api.state().dirty||tab.api.busy())throw Error('문서가 바뀌어 Agent가 닫지 않았습니다. 사용자 확인으로 닫아 주세요.');}};
+ const assertOwned=()=>{
+  if(tab.closed||!tabs.includes(tab)||!tab.api||!tab.initialized||tab.api.busy()||expected&&!sameCloseVersion(tab,expected))throw Error('닫을 문서 탭이 바뀌었습니다. 다시 확인해 주세요.');
+  if(authority===agentFileAuthority&&(!agentFilePending||!expected||work().id!==expected.workspaceId||expected.dirty))throw Error('문서가 바뀌어 Agent가 닫지 않았습니다. 사용자 확인으로 닫아 주세요.');
+ };
  assertOwned();clearTimeout(tab.timer);tab.closed=true;
  try{await tab.persist.catch(()=>{});tab.closed=false;assertOwned();tab.closed=true;
-  if(authority===agentFileAuthority){const record=(await store.documents(tab.workspaceId)).find(record=>record.id===tab.id);tab.closed=false;assertOwned();tab.closed=true;await store.removeDocumentIfUnchanged(tab.id,tab.workspaceId,record);}else await store.removeDocument(tab.id);
+  await store.removeDocumentIfUnchanged(tab.id,tab.workspaceId,tab.cachedDocument);
  }catch(error){tab.closed=false;refreshTab(tab);throw error;}
  tab.recovery?.dispose();tab.disposeTabCycle?.();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
  const next=tabs.find(t=>t.id===nextId);if(next)selectTab(next,authority);else await newTab(work().id,undefined,false,authority);
@@ -333,94 +480,161 @@ const agentFilePort=createAgentFilePort({read:()=>({workspaceId:state?.activeWor
   return result;
  },
 });
-async function switchWorkspace(id:string){
- if(restoring||closing||!cancelNavigation()){render();return;}restoring=true;
- try{if(activeTab?.initialized)activeTab.api!.suspendDocumentView();if(activeTab?.initialized&&!await persistTab(activeTab))throw new Error('문서 작업이 끝난 뒤 업무를 전환해 주세요.');state.activeWorkspaceId=id;selected=[];activeTab=undefined;render();
+const restoreWorkspace=createWorkspaceRecovery({
+ read:workspaceId=>store.documents(workspaceId),
+ order:(workspaceId,records)=>session.restore(workspaceId,records),
+ isOpen:id=>tabs.some(tab=>tab.id===id),
+ open:newTab,
+ onError(problem){recoveryWarning=true;error(problem);},
+});
+async function switchWorkspace(destination:string|(()=>string)){
+ if(restoring||closing||!cancelNavigation()){render();return;}
+ restoring=true;
+ const chooser=$<HTMLSelectElement>('workspace-select');
+ chooser.disabled=true;
+ const outgoing=activeTab;
+ try{
+  if(outgoing?.initialized){
+   outgoing.api!.suspendDocumentView();
+   try{
+    if(!await persistTab(outgoing))throw new Error('문서 작업이 끝난 뒤 업무를 전환해 주세요.');
+   }catch(problem){
+    render();
+    outgoing.frame.contentWindow?.dispatchEvent(new Event('resize'));
+    throw problem;
+   }
+  }
+  resetReferenceSelection();
+  const id=typeof destination==='string'?destination:destination();
+  state.activeWorkspaceId=id;
+  activeTab=undefined;
+  render();
+  const foldersReady=renderFolders().catch(error);
   const previousDocumentId=work().activeDocumentId;
-  if(!loaded.has(id)){const recovery=partitionRecoveryRecords(await store.documents(id),id,recoveryIntegrity);for(const issue of recovery.errors){recoveryWarning=true;error(issue);}const documents=session.restore(id,recovery.valid);for(const saved of documents)if(!tabs.some(t=>t.id===saved.id)){try{await newTab(id,saved);}catch(e){recoveryWarning=true;error(e);}}loaded.add(id);}
-  const tab=tabs.find(t=>t.id===session.preferred(id,previousDocumentId))??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
- }finally{restoring=false;}
+  await restoreWorkspace(id);
+  const tab=tabs.find(t=>t.id===session.preferred(id,previousDocumentId))??await newTab(id);
+  selectTab(tab);
+  render();
+  await foldersReady;
+  await persist();
+ }finally{restoring=false;chooser.disabled=false;}
 }
-function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 문서 요약 · 현재 업무 탭 · 기존 승인된 원본에 저장';}
+function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runStatusLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 문서 요약 · 현재 업무 탭 · 기존 승인된 원본에 저장';}
 async function send(){
  const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request)return;
  $('request-error').hidden=true;
  if(running)throw new Error('현재 요청이 진행 중입니다. 완료를 기다리거나 중지한 뒤 전송해 주세요.');
+ if(alignmentMacros.recording)throw new Error('편집 매크로 기록을 끝낸 뒤 AI 요청을 보내 주세요.');
  if(agentFilePending||closing||nativeExitPending)throw new Error('문서 작업을 마친 뒤 요청하세요.');
+ if(folderWrites)throw new Error('폴더 연결 정보를 저장한 뒤 다시 전송해 주세요.');
  if(restoring)throw new Error('문서를 준비하고 있습니다. 준비 완료 후 다시 전송해 주세요.');
+ cancelIndexRefresh();
  const model=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);if(!model)throw new Error('먼저 AI 연결을 등록해 주세요.');
+ const macroRequest=request.split('\n',1)[0];
+ const useSavedAlignment=manualMacroRequests.includes(macroRequest);
+ const useTools=Boolean(state.documentToolMode)&&!useSavedAlignment;
+ const allowToolEdits=useTools&&$<HTMLInputElement>('allow-window-edit').checked;
+ if(useTools&&!supportsDocumentTools(model))throw new Error(model.adapterId==='hyperclova'
+  ?'문서 조회 도구를 사용하려면 CLOVA Studio의 HCX-005 또는 HCX-007과 출력 토큰 1,024 이상을 설정하세요.'
+  :'문서 조회 도구를 지원하는 모델 연결을 선택하세요.');
  const original=activeTab;if(!original?.api||!original.initialized||original.workspaceId!==work().id)throw new Error('문서 준비를 기다려 주세요.');
+ const plannedChat=chat().id;
+ const alignment=useSavedAlignment?await alignmentMacros.agentPlan():undefined;
+ if(alignment&&(running||activeTab!==original||plannedChat!==chat().id||input.value.trim()!==request||
+    model.id!==$<HTMLSelectElement>('model-select').value))throw new Error('편집 기록을 확인하는 동안 문서나 요청이 바뀌었습니다.');
  const workspaceId=work().id,chatId=chat().id,run:Run={id:uid(),workspaceId,chatId,documentId:original.id,status:'preparing_context',model:{adapterId:model.adapterId,label:model.label,endpoint:model.endpoint,modelId:model.modelId,maxOutputTokens:model.maxOutputTokens},sources:[],createdAt:Date.now()};
- const controller=new AbortController();running={controller,run};state.runs.push(run);workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'user',text:request,runId:run.id});input.value='';renderMessages();updateRun();
+ $<HTMLInputElement>('allow-window-edit').checked=false;
+ const controller=new AbortController();runHistory.append(run);running={controller,run};workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'user',text:request,runId:run.id});input.value='';renderMessages();updateRun();
  try{
-  await persist();const snapshot:Snapshot={...original.api!.snapshot(),fileContext:agentFilePort.snapshot()};
-  const references=await readReferences([...selected],state.folders,workspaceId,bytes=>original.api!.readReference(bytes),controller.signal,async handle=>{
-   for(const tab of tabs.filter(t=>t.workspaceId===workspaceId&&t.api?.fileHandle()))if(await handle.isSameEntry(tab.api!.fileHandle()!)){const current:Snapshot=tab.api!.snapshot();return {text:current.plainText??current.nodes.map(n=>n.text).join('\n'),revision:current.revision};}
-   return undefined;
-  },{chatId,items:temporary.list(workspaceId,chatId)});
-  run.sources=references.map(({text,...source})=>source);
-  const retrieved=state.retrieveSources?await agent.contextWithRetrieval([state,workspaceId,chatId,snapshot,references,request],controller.signal):undefined;
-  const context=retrieved?.context??agent.context(state,workspaceId,chatId,snapshot,references,request);
-  run.sources=context.references.map(({text,...source})=>source);run.retrieval=retrieved?.retrieval;run.events=[];
-  const result=await agent.execute({runId:run.id,context,model,port:modelGateway,editor:original.api,filePort:agentFilePort,signal:controller.signal,
+  await persist();
+   const {context,snapshot,longDocument,alignmentPlan}=await prepareAgentContext({agent,editor:original.api,filePort:agentFilePort,state,run,request,
+    useTools,allowToolEdits,alignment:alignment?{...alignment,requestPrefix:macroRequest}:undefined,
+    readReferences:()=>readWorkspaceReferences({scope:{workspaceId,chatId},selected:[...selected],folders:state.folders,
+     reader:original.api!,openDocuments:()=>tabs,temporary:temporary.list(workspaceId,chatId),pdfOcr:Boolean(state.pdfOcr)},controller.signal),
+    retrievalMode:()=>state.retrieveSources?(state.rankedSearch?'bm25':'lexical'):undefined,signal:controller.signal});
+  const executeOptions:Parameters<typeof agent.execute>[0]={runId:run.id,context,model,port:modelGateway,editor:original.api,filePort:agentFilePort,signal:controller.signal,
+   reviewReferenceChanges,
    isCurrent:()=>work().id===workspaceId&&chat().id===chatId&&activeTab?.id===run.documentId,
    createDocument:async()=>{const tab=await newTab(workspaceId);run.documentId=tab.id;return tab.api!;},
-   onEvent:(event:any)=>{run.events!.push(event);if(run.events!.length>40)run.events!.shift();renderMessages();},
-   state:s=>{run.status=s;updateRun();renderMessages();void persist().catch(error);}},state.reviewBeforeApply?'bounded':'single');
+    onEvent:(event:AgentEvent)=>{run.events!.push(event);if(run.events!.length>40)run.events!.shift();renderMessages();},
+   state:s=>{run.status=s;updateRun();renderMessages();void persist().catch(error);}};
+   if(alignmentPlan)executeOptions.alignmentPlan=alignmentPlan;
+  const result=useTools?await agent.executeWithDocumentTools({...executeOptions,readOnly:allowToolEdits?undefined:true,
+    inspectLayout:()=>original.api!.documentFacades.query.inspectLayout(),longDocument})
+   :{...await agent.execute(executeOptions,state.reviewBeforeApply&&!alignment?'bounded':'single'),layout:undefined};
   run.status='completed';run.receipt=result.receipt;run.usedSourceIds=result.sourceIds;if(result.fileReceipt)run.documentId=result.fileReceipt.after.activeTabId;
   if(result.receipt&&result.generation)try{run.macroTemplate=automation.capture(result.generation,snapshot);}catch{/* Unsupported command groups are not offered as recordable macros. */}
-  workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.fileReceipt?result.fileReceipt.message:result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')});
+  const layout=result.layout;
+  const diagnostic=layout?'\n'+(layout.status==='unavailable'?'쪽 배치를 확인할 수 없습니다.':`쪽 배치 ${layout.checkedPages}쪽에서 확인할 항목 ${layout.count}건${layout.status==='partial'?' (일부 범위)':''}. 검토 메뉴에서 위치를 확인할 수 있습니다.`):'';
+   const reading=longDocument?'\n장문 조회는 요청에 필요한 본문 구간을 나눠 읽습니다.':'';
+  workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.fileReceipt?result.fileReceipt.message:result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')+reading+diagnostic});
   const tab=tabs.find(t=>t.id===run.documentId);
   try{if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');}catch(e){persistError=true;run.error='문서 변경은 적용됐지만 로컬 복구본 저장에 실패했습니다. 문서를 파일로 저장해 주세요.';workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});status(run.error);}
  }catch(e){
+  if(state.rankedSearch)void referenceIndex.clearIndex({workspaceId,chatId}).catch(error);
   const failure=classifyAgentFailure(readDocumentFailure(e),controller.signal.aborted);run.status=failure.status;run.error=failure.message;
   workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});requestError(run.error);
  }finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
 on('focus-mode',async()=>{state.focusMode=!state.focusMode;render();activeTab?.frame.contentWindow?.dispatchEvent(new Event('resize'));await persist();});
-for(const [id,key] of [['retrieve-sources','retrieveSources'],['review-before-apply','reviewBeforeApply']] as const)$(id).addEventListener('change',()=>{state[key]=$<HTMLInputElement>(id).checked;void persist().catch(error);});
+for(const [id,key] of [['retrieve-sources','retrieveSources'],['ranked-search','rankedSearch'],['review-before-apply','reviewBeforeApply'],['document-tool-mode','documentToolMode'],['pdf-ocr','pdfOcr']] as const)$(id).addEventListener('change',()=>{
+ const wasRanked=Boolean(state.rankedSearch);
+ state[key]=$<HTMLInputElement>(id).checked;
+ if(key==='pdfOcr'&&state.pdfOcr)cancelIndexRefresh();
+ if(key==='rankedSearch'&&state.rankedSearch)state.retrieveSources=true;
+ if(key==='retrieveSources'&&!state.retrieveSources)state.rankedSearch=false;
+ if(wasRanked&&!state.rankedSearch){
+  cancelIndexRefresh();
+  if(running?.run.status!=='applying')running?.controller.abort();
+  void Promise.all(state.workspaces.map(({id})=>referenceIndex.clearIndex({workspaceId:id}))).catch(error);
+ }
+ if(state[key]&&key==='documentToolMode')state.reviewBeforeApply=false;
+ if(state[key]&&key==='reviewBeforeApply')state.documentToolMode=false;
+ $<HTMLInputElement>('review-before-apply').checked=Boolean(state.reviewBeforeApply);
+ $<HTMLInputElement>('document-tool-mode').checked=Boolean(state.documentToolMode);
+ $('window-edit-option').hidden=!state.documentToolMode;
+ if(!state.documentToolMode)$<HTMLInputElement>('allow-window-edit').checked=false;
+ $<HTMLInputElement>('retrieve-sources').checked=Boolean(state.retrieveSources);
+ $<HTMLInputElement>('ranked-search').checked=Boolean(state.rankedSearch);
+ void persist().catch(error);
+});
 let pendingMacro:{template:CommandTemplate;name:string;workspaceId:string;chatId:string;tabId?:string;revision:string}|undefined;
 function showMacro(template:CommandTemplate,name:string){
  if(running)throw new Error('진행 중인 요청이 끝난 뒤 실행해 주세요.');
  if(!activeTab?.initialized||!activeTab.api)throw new Error('문서 준비가 끝난 뒤 실행해 주세요.');
- const base=activeTab.api.snapshot(),sections=automation.sections(template);
+ const base=activeTab.api.snapshot();
  pendingMacro={template:structuredClone(template),name,workspaceId:work().id,chatId:chat().id,tabId:activeTab.id,revision:base.revision};
- $('macro-parameters-title').textContent=name;$('macro-error').textContent='';$('macro-variables').replaceChildren();$('macro-sections').replaceChildren();
- for(const original of sections){
-  const label=document.createElement('label');label.textContent=`기록한 ${original+1}구역 → 대상 구역`;
-  const select=document.createElement('select');select.required=true;select.dataset.section=String(original);select.setAttribute('aria-label',label.textContent);
-  const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='적용할 구역을 직접 선택해 주세요';select.append(placeholder);
-  for(const section of base.structure?.sections??[]){const option=document.createElement('option');option.value=String(section.index);option.textContent=`${section.index+1}구역 · ${base.nodes.filter(n=>n.section===section.index).length}개 본문 문단`;select.append(option);}
-  label.append(select);$('macro-sections').append(label);
- }
- for(const variable of automation.variables(template)){const label=document.createElement('label');label.textContent=variable;const input=document.createElement('input');input.dataset.variable=variable;input.required=true;input.maxLength=4000;input.placeholder=variable==='붙임'?'없으면 없음으로 입력':variable;label.append(input);$('macro-variables').append(label);}
- $('macro-preview').textContent=automation.describe(template)+'\n\n'+(template.operations[0].kind==='create_document'?'새 문서를 만듭니다.':sections.length?'선택한 구역에 적용하며 본문은 해당 구역에서 원문을 대조합니다.':'현재 문서에서 원문이 일치하는 문단에 적용합니다.')+'\n문서가 바뀌면 설정창을 다시 열어 주세요. 변경 후 요청 되돌리기로 복원할 수 있습니다. 파일 저장은 별도로 실행하세요.';
- $<HTMLDialogElement>('macro-dialog').close();$<HTMLDialogElement>('macro-parameters').showModal();
+ showCommandMacroParameters(automation,template,name,base);
 }
 function renderMacros(){
- const list=$('macro-list');list.replaceChildren();
- for(const macro of (state.macros??[]).filter(m=>m.workspaceId===work().id)){
-  const row=document.createElement('div');row.className='macro-row';const name=document.createElement('strong');name.textContent=macro.name;row.append(name,button('실행',()=>showMacro(macro.template,macro.name)),button('이름',async()=>{const next=prompt('반복 작업 이름',macro.name);if(next?.trim()){macro.name=next.trim();await persist();renderMacros();}}),button('삭제',async()=>{state.macros=state.macros?.filter(m=>m.id!==macro.id);await persist();renderMacros();}));list.append(row);
- }
- if(!list.children.length)list.textContent='아직 저장한 반복 작업이 없습니다. 완료한 AI 변경에서 반복 작업으로 저장을 누르세요.';
+ alignmentMacros.render();
+ renderCommandMacros($('macro-list'),macros.commands.list(work().id),{
+  button,
+  run:macro=>showMacro(macro.template,macro.name),
+  async rename(macro){
+   const name=prompt('반복 작업 이름',macro.name)?.trim();
+   if(name){await macros.commands.rename(macro.workspaceId,macro.id,name);renderMacros();}
+  },
+  async remove(macro){await macros.commands.remove(macro.workspaceId,macro.id);renderMacros();},
+ });
 }
 on('macro-manager',()=>{renderMacros();$<HTMLDialogElement>('macro-dialog').showModal();});on('close-macros',()=>$<HTMLDialogElement>('macro-dialog').close());on('cancel-macro',()=>$<HTMLDialogElement>('macro-parameters').close());
 for(const [id,kind,label] of [['recipe-letter','official-letter','공문 초안'],['recipe-plan','plan','추진 계획'],['recipe-report','report','결과 보고']] as const)on(id,()=>showMacro(automation.draft(kind),label));
 $('macro-parameters-form').addEventListener('submit',e=>{e.preventDefault();void executeMacro().catch(e=>{$('macro-error').textContent=readDocumentFailure(e).message;});});
 async function executeMacro(){
- const pending=pendingMacro;if(!pending||running||restoring||closing)throw new Error('현재 작업을 마친 뒤 다시 실행해 주세요.');
+ const pending=pendingMacro;if(!pending||running||restoring||closing||agentFilePending||nativeExitPending)throw new Error('현재 작업을 마친 뒤 다시 실행해 주세요.');
  if(work().id!==pending.workspaceId||chat().id!==pending.chatId||activeTab?.id!==pending.tabId)throw new Error('업무나 문서가 바뀌었습니다. 반복 작업을 다시 선택해 주세요.');
  let tab=activeTab;if(!tab?.initialized)throw new Error('문서를 준비하고 있습니다.');
- const values:Record<string,string>=Object.create(null);for(const input of $('macro-variables').querySelectorAll<HTMLInputElement>('input'))values[input.dataset.variable!]=input.value;
- const sectionTargets:Record<string,number>=Object.create(null);
- for(const select of $('macro-sections').querySelectorAll<HTMLSelectElement>('select')){if(select.value==='')throw new Error('기록한 각 구역의 대상 구역을 직접 선택해 주세요.');sectionTargets[select.dataset.section!]=Number(select.value);}
- let base:Snapshot=tab.api!.snapshot();
+ const {values,sections,tables,shape}=readCommandMacroParameters();
+ const base:Snapshot=tab.api!.snapshot();
  if(base.revision!==pending.revision)throw new Error('반복 작업 설정 중 문서가 바뀌었습니다. 취소 후 작업을 다시 열어 주세요.');
- const generation=automation.prepare(pending.template,base,values,sectionTargets);
+ const generation=automation.prepare(pending.template,base,values,sections,tables,shape);
  await tab.api!.preflight(base,generation);
- if(activeTab!==tab||work().id!==pending.workspaceId||chat().id!==pending.chatId)throw new Error('문서가 바뀌었습니다. 다시 실행해 주세요.');
+ if(running||restoring||closing||agentFilePending||nativeExitPending||pendingMacro!==pending||!$<HTMLDialogElement>('macro-parameters').open)
+  throw new Error('반복 작업을 적용하기 전에 작업 상태가 바뀌었습니다. 다시 실행해 주세요.');
+ if(activeTab!==tab||work().id!==pending.workspaceId||chat().id!==pending.chatId||tab.api!.revision()!==base.revision)throw new Error('문서가 바뀌었습니다. 다시 실행해 주세요.');
  $('request-error').hidden=true;
- const run:Run={id:uid(),workspaceId:work().id,chatId:chat().id,documentId:tab.id,status:'applying',sources:[],createdAt:Date.now()};running={controller:new AbortController(),run};state.runs.push(run);
+ const run:Run={id:uid(),workspaceId:work().id,chatId:chat().id,documentId:tab.id,status:'applying',sources:[],createdAt:Date.now()};runHistory.append(run);running={controller:new AbortController(),run};
  workspace.appendMessage(run.workspaceId,run.chatId,{id:uid(),role:'user',text:'반복 작업: '+pending.name,runId:run.id});$<HTMLDialogElement>('macro-parameters').close();renderMessages();updateRun();
  try{
   run.receipt=await automation.apply({runId:run.id,base,proposal:generation,editor:tab.api!,createDocument:async()=>{tab=await newTab(run.workspaceId);run.documentId=tab.id;return tab.api!;}});run.status='completed';run.macroTemplate=pending.template;
@@ -431,16 +645,124 @@ async function executeMacro(){
 }
 installDocumentDefaultsPanel({status,error});
 window.addEventListener('keydown',e=>{if(agentFilePending){e.preventDefault();e.stopImmediatePropagation();return;}if(nativeExitPending){if(!document.getElementById('native-exit-confirm')?.contains(e.target as Node)){e.preventDefault();e.stopImmediatePropagation();}return;}if(e.isComposing||document.querySelector('dialog[open]'))return;if(!e.metaKey&&!e.shiftKey&&e.altKey&&((!e.ctrlKey&&e.code==='KeyN')||(e.ctrlKey&&e.code==='KeyT'))){e.preventDefault();if(!e.repeat)void documentWindows.execute(e.ctrlKey?'file:new-tab':'file:new-doc').catch(error);return;}if(e.key==='F6'&&e.altKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();if(document.activeElement===activeTab?.frame)$('request-input').focus();else activeTab?.api?.focusEditor();}if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&e.code==='KeyS'){e.preventDefault();$('save-document').click();}});
-on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;const w=workspace.addWorkspace(name);await switchWorkspace(w.id);});
-on('rename-workspace',async()=>{const name=prompt('업무 이름',work().name);if(name?.trim()){work().name=name.trim();render();await persist();}});
+on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;await switchWorkspace(()=>workspace.addWorkspace(name).id);});
+on('rename-workspace',async()=>{const name=prompt('업무 이름',work().name);if(name?.trim()){work().name=name.trim();render();if(activeTab?.initialized)refreshTab(activeTab);await persist();}});
 $('workspace-select').addEventListener('change',()=>void switchWorkspace($<HTMLSelectElement>('workspace-select').value).catch(error));
-on('add-chat',async()=>{if(!cancelNavigation())return;workspace.addChat(work().id,'새 채팅');selected=[];render();await renderFolders();await persist();});
-on('add-folder',async()=>{const picker=(window as any).showDirectoryPicker;if(!picker)throw new Error('폴더 연결은 Jueony 실행기의 Edge/Chrome 창에서 지원합니다.');const workspaceId=work().id;const handle=await picker({mode:'read'});if(work().id!==workspaceId)return;for(const f of state.folders.filter(f=>f.workspaceId===workspaceId))if(await handle.isSameEntry(f.handle)){status('이미 연결한 폴더입니다.');return;}state.folders.push({id:uid(),workspaceId,name:handle.name,handle});await persist();await renderFolders();status('폴더를 연결했습니다. 아직 자료를 분석하지 않았습니다.');});
-on('refresh-folders',renderFolders);
+on('add-chat',async()=>{if(!cancelNavigation())return;resetReferenceSelection();workspace.addChat(work().id,'새 채팅');render();await renderFolders();await persist();});
+on('add-folder',async()=>{
+ const picker=window as Window&{showDirectoryPicker?(options:{mode:'read'}):Promise<FileSystemDirectoryHandle>};
+ if(!picker.showDirectoryPicker)throw new Error('폴더 연결은 Jueony 실행기의 Edge/Chrome 창에서 지원합니다.');
+ const workspaceId=work().id;
+ const handle=await picker.showDirectoryPicker({mode:'read'});
+ const added=await changeFolderLinks(workspaceId,async folders=>{
+  for(const folder of folders){
+   if(folder.workspaceId===workspaceId&&await handle.isSameEntry(folder.handle)){
+    status('이미 연결한 폴더입니다.');
+    return folders;
+   }
+  }
+  return [...folders,{id:uid(),workspaceId,name:handle.name,handle}];
+ });
+ if(!added)return;
+ await renderFolders();
+ status('폴더를 연결했습니다. 아직 자료를 분석하지 않았습니다.');
+});
+on('refresh-folders',async()=>{await renderFolders();await referenceRefresh.refresh();});
 on('toggle-sidebar',async()=>{state.sidebarHidden=!state.sidebarHidden;$('app-shell').classList.toggle('sidebar-hidden',state.sidebarHidden);await persist();});
 on('new-document',async()=>{if(cancelNavigation())await newTab();});
-on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(picker){const [handle]=await picker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});await openHandle(handle);}else{const file=document.createElement('input');file.type='file';file.accept='.hwp,.hwpx';file.onchange=async()=>{const f=file.files?.[0];if(f&&cancelNavigation()){try{const tab=await newTab(work().id,undefined,true);await tab.api!.open(new Uint8Array(await f.arrayBuffer()),f.name);await persistTab(tab);}catch(e){error(e);}}};file.click();}});
-on('save-document',async()=>{if(running?.run.status==='applying')return;if(activeTab?.api&&activeTab.initialized){const tab=activeTab;const result=await tab.api!.save();await persistTab(tab);status(result==='saved'?'파일에 저장했습니다.':'저장을 완료하지 않았습니다.');}});
+function assertDocumentCopyOwner(owner:Tab,workspaceId:string){
+ if(activeTab!==owner||work().id!==workspaceId||closing||restoring||nativeExitPending||running||agentFilePending||owner.api?.busy()){
+  throw new Error('업무 또는 문서 상태가 바뀌었습니다. 사본 창을 다시 여세요.');
+ }
+}
+async function openUnboundDocumentCopy(workspaceId:string,name:string,bytes:Uint8Array,message:string){
+ const tab=await newTab(workspaceId,undefined,true);
+ try{await tab.api!.open(bytes,name,null,true);}
+ catch(loadError){if(tab.initialized)await commitClosedTab(tab);throw loadError;}
+ status(message);
+ await persistTab(tab).catch(error);
+}
+on('convert-office-copy',()=>{
+ if(!activeTab?.initialized||!activeTab.api?.createOfficeCopy||activeTab.api.busy()||!cancelNavigation())return;
+ const workspaceId=work().id, owner=activeTab;
+ showOfficeCopyDialog(async(name,blocks)=>{
+  assertDocumentCopyOwner(owner,workspaceId);
+  await openUnboundDocumentCopy(workspaceId,name,owner.api!.createOfficeCopy!(blocks),'변환한 사본을 열었습니다. 저장할 때 이름과 위치를 선택하세요.');
+ });
+});
+on('new-template-copy',()=>{
+ if(!activeTab?.initialized||!activeTab.api?.createWorkTemplateCopy||activeTab.api.busy()||!cancelNavigation())return;
+ const workspaceId=work().id,owner=activeTab;
+ showWorkTemplateCopyDialog(async(id,values)=>{
+  assertDocumentCopyOwner(owner,workspaceId);
+  const name=readWorkTemplate(id).name+' 사본.hwpx';
+  await openUnboundDocumentCopy(workspaceId,name,owner.api!.createWorkTemplateCopy!(id,values),'양식 사본을 열었습니다. 저장할 때 이름과 위치를 선택하세요.');
+ },async(id,values,notes,signal)=>{
+  assertDocumentCopyOwner(owner,workspaceId);
+  const conversation=chat();
+  const model=state.models.find(config=>config.id===conversation.modelId);
+  if(!model)throw new Error('현재 채팅에서 사용할 AI 연결을 선택하세요.');
+  const result=await suggestWorkTemplateDraft(modelGateway,model,id,values,notes,signal);
+  assertDocumentCopyOwner(owner,workspaceId);
+  if(conversation.id!==chat().id||model.id!==chat().modelId)throw new Error('채팅이나 선택한 모델이 바뀌었습니다.');
+  return result;
+ });
+});
+on('institution-template-copy',()=>{
+ const owner=activeTab,api=owner?.api;
+ if(!owner?.initialized||!api?.inspectInstitutionTemplate||!api.createInstitutionTemplateCopy||api.busy()||!cancelNavigation())return;
+ const workspaceId=work().id;
+ showInstitutionTemplateDialog({
+  inspect(bytes,name){assertDocumentCopyOwner(owner,workspaceId);return api.inspectInstitutionTemplate!(bytes,name);},
+  async open({file,bytes},values){
+   assertDocumentCopyOwner(owner,workspaceId);
+   const copy=api.createInstitutionTemplateCopy!(bytes,file.name,values);
+   const name=file.name.replace(/(\.hwpx?)$/iu,' 사본$1');
+   await openUnboundDocumentCopy(workspaceId,name,copy,'기관 양식 사본을 열었습니다. 저장할 때 이름과 위치를 선택하세요.');
+  },
+  async suggest(fields,notes,signal){
+   assertDocumentCopyOwner(owner,workspaceId);
+   const conversation=chat(),model=state.models.find(config=>config.id===conversation.modelId);
+   if(!model)throw new Error('현재 채팅에서 사용할 AI 연결을 선택하세요.');
+   const result=await suggestTemplateNarratives(modelGateway,model,'기관 업무 양식',fields,notes,signal);
+   assertDocumentCopyOwner(owner,workspaceId);
+   if(conversation.id!==chat().id||model.id!==chat().modelId)throw new Error('채팅이나 선택한 모델이 바뀌었습니다.');
+   return result;
+  },
+ });
+});
+on('institution-review-bundle',()=>{
+ const owner=activeTab,api=owner?.api;
+ if(!owner?.initialized||!api||api.busy()||!cancelNavigation())return;
+ const workspaceId=work().id;
+ $<HTMLDialogElement>('macro-dialog').close();
+ showInstitutionReviewDialog(async(files,notes,signal)=>{
+  assertDocumentCopyOwner(owner,workspaceId);
+  const revision=api.revision(),record=api.recovery();
+  if(!record)throw new Error('현재 문서의 검토 사본을 읽을 수 없습니다.');
+  const result=await createInstitutionReviewBundle(record,files,notes,signal);
+  assertDocumentCopyOwner(owner,workspaceId);
+  if(revision!==api.revision())throw new Error('묶음을 만드는 동안 문서가 바뀌었습니다. 다시 저장해 주세요.');
+  return result;
+ });
+});
+on('open-document',async()=>{
+ const workspaceId=work().id;
+ const pickerWindow=window as Window&{showOpenFilePicker?(options:{types:{description:string;accept:Record<string,string[]>}[]}):Promise<FileSystemFileHandle[]>};
+ if(pickerWindow.showOpenFilePicker){
+  const [handle]=await pickerWindow.showOpenFilePicker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});
+  if(handle)await documentFileActions.openBound(handle,workspaceId);
+  return;
+ }
+ const input=document.createElement('input');
+ input.type='file';input.accept='.hwp,.hwpx';
+ input.onchange=()=>{
+  const file=input.files?.[0];
+  if(file)void documentFileActions.openFile(file,workspaceId).catch(error);
+ };
+ input.click();
+});
+on('save-document',documentFileActions.saveActive);
 on('reconnect-document',async()=>{
  const tab=activeTab;if(!tab?.initialized)return;checkPendingConnection(tab);if(!tab.pendingConnection){refreshTab(tab);return;}
  const result=await tab.api!.restoreFileConnection(tab.pendingConnection,true);
@@ -449,7 +771,7 @@ on('reconnect-document',async()=>{
 });
 $('request-form').addEventListener('submit',e=>{e.preventDefault();void send().catch(requestError);});
 on('attach-reference',()=>{
- const workspaceId=work().id,chatId=chat().id,input=document.createElement('input');input.type='file';input.accept='.hwp,.hwpx,.txt,.md';input.multiple=true;
+ const workspaceId=work().id,chatId=chat().id,input=document.createElement('input');input.type='file';input.accept='.hwp,.hwpx,.txt,.md,.pdf,.docx,.xlsx';input.multiple=true;
  input.onchange=()=>attachFiles(Array.from(input.files??[]),workspaceId,chatId);input.click();
 });
 $('chat-panel').addEventListener('dragover',e=>{if(e.dataTransfer?.types.includes('Files')){e.preventDefault();e.dataTransfer.dropEffect='copy';}});
@@ -474,27 +796,17 @@ window.addEventListener('message',event=>{if(event.origin!==location.origin)retu
 function nativeExitSnapshot(){
  const documents=tabs.filter(tab=>!tab.closed);
  return {stamp:JSON.stringify({workspace:state?.activeWorkspaceId,documents:documents.map(tab=>({id:tab.id,workspaceId:tab.workspaceId,identity:tab.api?.documentIdentity(),instance:tab.api?.documentInstance(),name:tab.api?.state().name,revision:tab.api?.revision(),dirty:tab.api?.state().dirty}))}),
-  blocked:!state||agentFilePending||restoring||stateWrites>0||(closing&&!nativeExitPending)||Boolean(running)||documents.some(tab=>!tab.initialized||!tab.api||tab.api.busy()||(tab.pendingWrites??0)>0)||Boolean(document.querySelector('dialog[open]')),
+  blocked:!state||agentFilePending||restoring||stateWrites>0||folderWrites>0||(closing&&!nativeExitPending)||Boolean(running)||documents.some(tab=>!tab.initialized||!tab.api||tab.api.busy()||(tab.pendingWrites??0)>0)||Boolean(document.querySelector('dialog[open]')),
   needsConfirmation:documents.some(tab=>Boolean(tab.api?.state().dirty))};
 }
 let nativeExitMode:'checkpoint'|'discard'='checkpoint',nativeExitRollback:(()=>Promise<void>)|undefined;
 async function confirmNativeRecoveryExit():Promise<NativeExitConfirmation>{
  const before=nativeExitSnapshot(),original=JSON.parse(before.stamp),dirty=tabs.filter(tab=>!tab.closed&&tab.api?.state().dirty);
- const choice=await new Promise<string>(resolve=>{
-  const dialog=document.createElement('dialog');dialog.id='native-exit-confirm';dialog.className='jueony-page-dialog';
-  const title=document.createElement('h2');title.textContent='변경한 문서를 저장할까요?';
-  const message=document.createElement('p');message.textContent=dirty.map(tab=>tab.api!.state().name).join(', ')+' — 파일에 모두 저장하면 원본 파일(새 문서는 선택한 위치)에 저장합니다. 저장하지 않으면 해당 문서의 로컬 복구본도 폐기합니다. 복구본 보관은 원본 파일에 저장하지 않고 이 Windows 계정에 최신 내용을 보관합니다.';
-  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';cancel.onclick=()=>dialog.close('cancel');
-  const accept=document.createElement('button');accept.type='button';accept.textContent='복구본을 저장하고 종료';accept.onclick=()=>dialog.close('checkpoint');
-  const save=document.createElement('button');save.type='button';save.textContent='파일에 모두 저장하고 종료';save.dataset.exitChoice='save';save.onclick=()=>dialog.close('save');
-  const discard=document.createElement('button');discard.type='button';discard.textContent='저장하지 않고 종료';discard.dataset.exitChoice='discard';discard.onclick=()=>dialog.close('discard');
-  dialog.append(title,message,cancel,save,discard,accept);document.body.append(dialog);dialog.addEventListener('close',()=>{const result=dialog.returnValue;dialog.remove();resolve(result);},{once:true});dialog.showModal();cancel.focus();
- });
- if(!choice||choice==='cancel')return false;
+ const choice=await chooseNativeExit(dirty.map(tab=>tab.api!.state().name));
+ if(choice==='cancel')return false;
  if(nativeExitSnapshot().stamp!==before.stamp)throw Error('종료 확인 중 문서가 바뀌었습니다. 다시 확인해 주세요.');
  if(choice==='checkpoint')return true;
  if(choice==='discard'){nativeExitMode='discard';return{beforeStamp:before.stamp,approvedSnapshot:before,rollback:async()=>{await nativeExitRollback?.();nativeExitRollback=undefined;}};}
- if(choice!=='save')return false;
  const saved:string[]=[],apis=new Map(dirty.map(tab=>[tab,tab.api]));let expected=original;
  for(const tab of dirty){
   try{
@@ -510,27 +822,25 @@ async function confirmNativeRecoveryExit():Promise<NativeExitConfirmation>{
 async function commitNativeExitRecovery(){
  const discarded=nativeExitMode==='discard'?tabs.filter(tab=>!tab.closed&&tab.api?.state().dirty):[];
  const documents=tabs.filter(tab=>!tab.closed&&!discarded.includes(tab));
- if(nativeExitMode==='discard'){
-  const updates:SavedDocument[]=[];
-  for(const tab of documents){await tab.persist.catch(()=>{});if(tab.preferenceError)throw Error(tab.preferenceMessage??'문서 환경 설정을 확인해 주세요.');const snapshot=tab.api!.recovery();if(!snapshot)throw Error('문서 복구본을 준비하지 못했습니다.');const fileConnection=snapshot.fileConnection??(!tab.api!.fileHandle()?tab.pendingConnection:undefined);updates.push({id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),viewUpdatedAt:viewStamp(tab),...snapshot,fileConnection,view:tab.api!.captureDocumentView()});}
-  for(const tab of discarded)await tab.persist.catch(()=>{});
-  const changes=await store.commitExitRecovery(discarded.map(tab=>({id:tab.id,workspaceId:tab.workspaceId})),updates);
-  nativeExitRollback=()=>store.rollbackExitRecovery(changes);
-  await store.verifyExitRecovery(changes);
-  await persist();checkpointExitView();if(viewJournalError)throw Error('문서 보기 상태를 보관하지 못했습니다.');
-  return;
+ const updates:{document:SavedDocument;expected:SavedDocument|undefined}[]=[];
+ for(const tab of documents){
+  await tab.persist.catch(()=>{});
+  if(tab.preferenceError)throw Error(tab.preferenceMessage??'문서 환경 설정 저장을 확인해 주세요.');
+  const document=captureRecoveryRecord(tab);if(!document)throw Error('문서 복구본을 준비하지 못해 종료하지 않았습니다.');
+  updates.push({document,expected:tab.cachedDocument});
  }
- for(const tab of documents){await tab.persist.catch(()=>{});if(tab.preferenceError)throw new Error(tab.preferenceMessage??'문서 환경 설정 저장을 확인해 주세요.');if(!await persistTab(tab,'native-exit'))throw new Error('문서 복구본을 준비하지 못해 종료하지 않았습니다.');}
- // Read back committed records, including inactive and other-workspace documents.
- for(const workspaceId of new Set(documents.map(tab=>tab.workspaceId))){
-  const saved=await store.documents(workspaceId);
-  for(const tab of documents.filter(tab=>tab.workspaceId===workspaceId)){
-   const record=saved.find(value=>value.id===tab.id),expected=tab.cachedDocument;
-   assertRecoveryRecord(record,workspaceId,recoveryIntegrity);
-   if(!record.integrity)throw new Error('복구본 저장 확인용 무결성 정보가 없어 종료하지 않았습니다.');
-   if(!expected||!record||record.name!==expected.name||record.dirty!==expected.dirty||record.updatedAt!==expected.updatedAt||record.bytes.length!==expected.bytes.length||record.bytes.some((byte,index)=>byte!==expected.bytes[index]))throw new Error('복구본 저장 후 확인에 실패해 종료하지 않았습니다.');
+ for(const tab of discarded)await tab.persist.catch(()=>{});
+ const changes=await store.commitExitRecovery(discarded.map(tab=>({id:tab.id,workspaceId:tab.workspaceId,expected:tab.cachedDocument})),updates);
+ if(nativeExitMode==='discard'){
+  nativeExitRollback=()=>store.rollbackExitRecovery(changes);
+ }else{
+  for(const tab of documents){
+   tab.cachedDocument=changes.find(change=>change.id===tab.id)?.after;
+   tab.recovery?.checkpointed({identity:tab.api!.documentIdentity(),...tab.api!.state()});
+   tab.persistError=false;
   }
  }
+ await store.verifyExitRecovery(changes);
  await persist();checkpointExitView();if(viewJournalError)throw new Error('문서 보기 상태를 보관하지 못해 종료하지 않았습니다.');
 }
 if(nativeHost){
@@ -547,7 +857,7 @@ window.addEventListener('beforeunload',event=>{
  // The host owns the single exit prompt, including inactive and other-workspace tabs.
  // A failed editor read is protected rather than silently allowing a destructive exit.
  let protect=true;
- try{protect=shouldProtectExit({persistenceFailed:persistError||viewJournalError,pendingWrites:stateWrites,closing,running:Boolean(running),documents:tabs.filter(t=>!t.closed).map(t=>({dirty:Boolean(t.api?.state().dirty),persistenceFailed:Boolean(t.persistError),preferenceFailed:Boolean(t.preferenceError),pendingWrites:t.pendingWrites??0}))});}catch{}
+ try{protect=shouldProtectExit({persistenceFailed:persistError||viewJournalError,pendingWrites:stateWrites+folderWrites,closing,running:Boolean(running),documents:tabs.filter(t=>!t.closed).map(t=>({dirty:Boolean(t.api?.state().dirty),persistenceFailed:Boolean(t.persistError),preferenceFailed:Boolean(t.preferenceError),pendingWrites:t.pendingWrites??0}))});}catch{}
  if(protect){event.preventDefault();event.returnValue='';}
 });
 window.addEventListener('pagehide',checkpointExitView);

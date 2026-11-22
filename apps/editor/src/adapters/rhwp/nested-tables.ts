@@ -1,5 +1,7 @@
 import {readBodyTableMarkers} from './body-table-markers.ts';
 import {readNestedCellFields} from './nested-cell-fields.ts';
+import {sha256} from '@noble/hashes/sha2.js';
+import {bytesToHex} from '@noble/hashes/utils.js';
 import type {CellParagraphText, NestedTable, TableCellPathStep} from '../../modules/document/public/types.ts';
 
 type CellList = {isCell:boolean;listId:number;hostListId:number;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
@@ -10,7 +12,7 @@ const index = (value:number) => Number.isSafeInteger(value) && value >= 0;
 const check = (ok:boolean) => {if (!ok) throw Error('중첩 표 경로 또는 조회 한도를 확인해 주세요.');};
 
 /** Worksheet coordinates belong to a table. List IDs belong to a single native handle. */
-export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[]) {
+export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[], templates?:Record<string,string>) {
   const tables:NestedTable[] = [];
   const listIds = new Map<string,number[]>();
   const nested = controls.filter(c => c.ctrlId === 'tbl' && c.list !== 0);
@@ -99,16 +101,27 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
     }
     const tablePath=JSON.stringify([...host.path,{controlIndex:control.controlIndex,cellIndex:0,cellParaIndex:0}]);
     const axisEditable=canCheckAxis&&host.writable&&doc.canEditNestedTableAxis(host.section,host.paragraph,tablePath);
+    if(templates&&host.writable&&control.props?.Lock===0&&cells.length<=200&&cells.every(cell=>cell.editable&&cell.rowSpan===1&&cell.columnSpan===1)){
+      try{
+        const shapes=cells.map(cell=>{
+          const path=JSON.stringify([...host.path,{controlIndex:control.controlIndex,cellIndex:cell.index,cellParaIndex:0}]);
+          return [cell.row,cell.column,cell.text,json(doc.getCellPropertiesByPath(host.section,host.paragraph,path,cell.index)),
+            json(doc.getCellCharPropertiesAtByPath(host.section,host.paragraph,path,0)),json(doc.getParaShapeSet(ids[cell.index],0))];
+        });
+        const evidence=JSON.stringify([dimensions.rowCount,dimensions.colCount,control.props,shapes]);
+        templates[id]=bytesToHex(sha256(new TextEncoder().encode(evidence)));
+      }catch{/* The table stays readable and keeps its normal editing eligibility. */}
+    }
     tables.push({id,section:host.section,paragraph:host.paragraph,ancestors:host.path,control:control.controlIndex,rows:dimensions.rowCount,columns:dimensions.colCount,cells,
-      ...(axisEditable?{axisEditable:true}:{})});
+      ...(axisEditable?{axisEditable:true,...(typeof doc.reshapeNestedTableCells==='function'?{reshapeAvailable:true}:{})}:{})});
     listIds.set(id,ids);
   }
   return {tables,listIds};
 }
 
-export function readNestedTables(doc:any, controls:Control[], lists:CellList[]) {
+export function readNestedTables(doc:any, controls:Control[], lists:CellList[], templates?:Record<string,string>) {
   try {
-    const {tables}=inspectNestedTables(doc,controls,lists);
+    const {tables}=inspectNestedTables(doc,controls,lists,templates);
     return tables.length ? {nestedTables:tables} : {};
   } catch {
     return {nestedTableLimitation:'중첩 표의 전체 주소·내용을 확인할 수 없어 이번 요청에서 중첩 셀 편집을 사용할 수 없습니다.'};

@@ -1,0 +1,140 @@
+diff --git a/src/document_core/commands/page_number_position.rs b/src/document_core/commands/page_number_position.rs
+--- a/src/document_core/commands/page_number_position.rs
++++ b/src/document_core/commands/page_number_position.rs
+@@ -1,9 +1,7 @@
+ //! Root-body page-number-position mutation used by the Ctrl+N,P boundary.
+ //!
+-//! This deliberately supports the smallest durable shape: one section, one
+-//! top-level body paragraph, and no existing top-level `PageNumberPos` control.
+-//! Nested/special-story addressing and replacing ambiguous controls remain
+-//! fail-closed until their owner paths are part of the public command contract.
++//! Each section can own one unambiguous top-level `PageNumberPos` control.
++//! Nested and special-story controls remain outside this command.
+ 
+ use crate::document_core::DocumentCore;
+ use crate::error::HwpError;
+@@ -83,9 +81,6 @@
+         props_json: &str,
+     ) -> Result<String, HwpError> {
+         let page_number = parse_input(props_json)?;
+-        if self.document.sections.len() != 1 || section_idx != 0 {
+-            return Err(invalid("다구역 쪽 번호 매기기는 아직 지원하지 않습니다"));
+-        }
+         let section = self
+             .document
+             .sections
+@@ -105,8 +100,7 @@
+             .insert(0, Control::PageNumberPos(page_number.clone()));
+         paragraph.ctrl_data_records.insert(0, None);
+         section.raw_stream = None;
+-        self.recompose_section(section_idx);
+-        self.paginate_if_needed();
++        self.refresh_page_number_sections(section_idx);
+ 
+         Ok(serde_json::json!({
+             "ok": true,
+@@ -130,9 +124,6 @@
+     ) -> Result<String, HwpError> {
+         let expected = parse_input(expected_json)?;
+         let requested = parse_input(props_json)?;
+-        if self.document.sections.len() != 1 || section_idx != 0 {
+-            return Err(invalid("다구역 쪽 번호 매기기는 아직 지원하지 않습니다"));
+-        }
+         let (owner, previous) = self
+             .root_page_number_position(section_idx)?
+             .ok_or_else(|| invalid("기존 쪽 번호 위치를 찾지 못했습니다"))?;
+@@ -162,8 +153,7 @@
+         position.position = requested.position;
+         position.dash_char = requested.dash_char;
+         section.raw_stream = None;
+-        self.recompose_section(section_idx);
+-        self.paginate_if_needed();
++        self.refresh_page_number_sections(section_idx);
+ 
+         Ok(serde_json::json!({
+             "ok": true,
+@@ -175,6 +165,15 @@
+             "sideChar": requested.dash_char.to_string(),
+         })
+         .to_string())
++    }
++
++    fn refresh_page_number_sections(&mut self, first: usize) {
++        // Sections without their own position inherit the preceding section's
++        // rendered position. Their cached pagination must be refreshed as well.
++        for section in first..self.document.sections.len() {
++            self.recompose_section(section);
++        }
++        self.paginate_if_needed();
+     }
+ 
+     /// Reads only a unique top-level control. Ambiguous controls are errors.
+@@ -243,7 +242,7 @@
+     }
+ 
+     #[test]
+-    fn invalid_shape_multi_section_and_existing_control_leave_bytes_unchanged() {
++    fn invalid_shape_and_existing_control_leave_bytes_unchanged() {
+         for invalid_props in [
+             r#"{"format":8,"position":6,"sideChar":"-"}"#,
+             r#"{"format":0,"position":11,"sideChar":"-"}"#,
+@@ -271,18 +270,35 @@
+             duplicate.export_hwp_native().expect("duplicate after"),
+             duplicate_before
+         );
+-
+-        let mut multi = blank();
+-        let cloned = multi.document().sections[0].clone();
+-        multi.document_mut().sections.push(cloned);
+-        let multi_before = multi.export_hwp_native().expect("multi before");
+-        assert!(multi
+-            .insert_page_number_position_native(0, 0, PROPS)
+-            .is_err());
+-        assert_eq!(
+-            multi.export_hwp_native().expect("multi after"),
+-            multi_before
+-        );
++    }
++
++    #[test]
++    fn different_sections_keep_their_own_page_number_positions() {
++        const NEXT: &str = r#"{"format":0,"position":5,"sideChar":"."}"#;
++        let mut document = blank();
++        document
++            .insert_section_break_native(0, 0, 0)
++            .expect("split into two sections");
++        assert_eq!(document.document().sections.len(), 2);
++        document
++            .insert_page_number_position_native(0, 0, PROPS)
++            .expect("first section");
++        document
++            .insert_page_number_position_native(1, 0, NEXT)
++            .expect("second section");
++        let first = document.get_page_number_position_native(0).expect("first state");
++        let second = document.get_page_number_position_native(1).expect("second state");
++        assert_ne!(first, second);
++        document
++            .update_page_number_position_native(1, 0, NEXT, PROPS)
++            .expect("update second only");
++        assert_eq!(document.get_page_number_position_native(0).expect("first unchanged"), first);
++        let changed: serde_json::Value = serde_json::from_str(
++            &document.get_page_number_position_native(1).expect("changed second"),
++        ).expect("second JSON");
++        assert_eq!(changed["format"], 3);
++        assert_eq!(changed["position"], 6);
++        assert_eq!(changed["sectionIdx"], 1);
+     }
+ 
+     #[test]
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8774,7 +8774,7 @@
+     }
+ 
+     /// Root-body current-section page-number position insertion (Ctrl+N,P).
+-    /// Multi-section documents and existing controls are rejected by the core.
++    /// A section with an existing top-level control requires the update operation.
+     #[wasm_bindgen(js_name = insertPageNumberPosition)]
+     pub fn insert_page_number_position(
+         &mut self,

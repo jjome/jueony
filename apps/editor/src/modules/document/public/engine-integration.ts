@@ -42,6 +42,7 @@ export {rowHeightPlan} from '../domain/row-heights.ts';
 export {cellPaddingPlan} from '../domain/cell-padding.ts';
 
 export {tableMergePlan} from '../domain/table-merge.ts';
+export {nestedRowReshapePlan} from '../domain/nested-row-reshape.ts';
 
 export {tableSplitPlan,witnessedSplitPlan} from '../domain/table-split.ts';
 
@@ -52,3 +53,6 @@ export {agentTableFormulaTarget,agentFormulaInsertTarget} from '../domain/agent-
 export {tableSubdivisionPlan} from '../domain/table-subdivision.ts';
 
 export {validateAgentDocumentMetadata} from '../domain/agent-document-information.ts';
+export {agentStoredCharacterStyle} from '../domain/agent-stored-character-style.ts';
+export {shapeFillTarget} from '../domain/agent-shape-fill.ts';
+export type {ShapeFillSource,SetShapeFill} from '../domain/agent-shape-fill.ts';

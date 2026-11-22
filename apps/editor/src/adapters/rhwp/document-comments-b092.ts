@@ -1,7 +1,7 @@
 import {sha256} from '@noble/hashes/sha2.js';
 
 type JsonRecord = Record<string, unknown>;
-type CommentAction = 'create' | 'delete';
+type CommentAction = 'create' | 'delete' | 'update';
 type BlockReason =
   | 'api-unavailable'
   | 'invalid-context'
@@ -22,6 +22,7 @@ export interface CommentHostB092 {
   getCommentListV1(): unknown;
   insertCommentAtCursorV1(section: number, paragraph: number, offset: number, text: string, author: string): unknown;
   removeCommentV1(fieldId: number): unknown;
+  updateCommentTextV1?(fieldId: number, expected: string, text: string): unknown;
   saveSnapshot(): number;
   restoreSnapshot(token: number): unknown;
   discardSnapshot(token: number): void;
@@ -51,6 +52,7 @@ export interface DocumentCommentB092 {
   readonly start: number;
   readonly end: number;
   readonly pointComment: boolean;
+  readonly nested?: true;
 }
 
 export interface CommentPlanB092 {
@@ -135,6 +137,7 @@ function parseComment(value: unknown): DocumentCommentB092 | undefined {
     start: item.startCharIdx,
     end: item.endCharIdx,
     pointComment: item.pointComment,
+    ...(Array.isArray(location.path) && location.path.length ? {nested: true as const} : {}),
   };
 }
 
@@ -196,6 +199,20 @@ export function captureCreateCommentB092(
 export function captureDeleteCommentB092(
   host: Partial<CommentHostB092>, port: CommentContextB092, fieldId: number,
 ): CommentCaptureB092 {
+  return captureExistingComment(host, port, fieldId, 'delete');
+}
+
+export function captureUpdateCommentB092(
+  host: Partial<CommentHostB092>, port: CommentContextB092, fieldId: number, text: string,
+): CommentCaptureB092 {
+  if (typeof host.updateCommentTextV1 !== 'function') return {status: 'blocked', reason: 'api-unavailable'};
+  if (!validText(text)) return {status: 'blocked', reason: 'invalid-input'};
+  return captureExistingComment(host, port, fieldId, 'update', text);
+}
+
+function captureExistingComment(
+  host: Partial<CommentHostB092>, port: CommentContextB092, fieldId: number, action: 'delete' | 'update', text?: string,
+): CommentCaptureB092 {
   if (!hasApi(host)) return {status: 'blocked', reason: 'api-unavailable'};
   const unsafe = safeContext(port); if (unsafe) return {status: 'blocked', reason: unsafe};
   const observed = context(port); if (!observed) return {status: 'blocked', reason: 'invalid-context'};
@@ -203,11 +220,59 @@ export function captureDeleteCommentB092(
   const comments = readDocumentCommentsB092(host); if (!comments) return {status: 'blocked', reason: 'invalid-comment-list'};
   const target = comments.find(comment => comment.fieldId === fieldId);
   if (!target) return {status: 'blocked', reason: 'invalid-input'};
-  if (!target.pointComment) return {status: 'blocked', reason: 'unsupported-range-comment'};
+  if (!target.pointComment || target.nested) return {status: 'blocked', reason: 'unsupported-range-comment'};
   return {status: 'ready', comments, plan: {
-    version: 1, action: 'delete', documentIdentity: observed.identity, revision: observed.revision,
-    commentsFingerprint: digest(comments), fieldId,
+    version: 1, action, documentIdentity: observed.identity, revision: observed.revision,
+    commentsFingerprint: digest(comments), fieldId, ...(text !== undefined ? {text} : {}),
   }};
+}
+
+/** Call inside the editor's snapshot transaction so an exception rolls the document back. */
+export function executeCommentPlanInSnapshotB092(
+  host: Partial<CommentHostB092>, port: CommentContextB092, plan: CommentPlanB092,
+): {applied?: DocumentCommentB092; remaining: readonly DocumentCommentB092[]} {
+  if (!hasApi(host) || safeContext(port)) throw new Error('이 문서에서는 메모를 편집할 수 없습니다.');
+  const current = context(port);
+  const before = readDocumentCommentsB092(host);
+  if (!current || current.identity !== plan.documentIdentity || current.revision !== plan.revision
+      || !before || digest(before) !== plan.commentsFingerprint) throw new Error('문서나 메모가 바뀌었습니다. 목록을 다시 여세요.');
+
+  const target = before.find(comment => comment.fieldId === plan.fieldId);
+  let receipt: JsonRecord | undefined;
+  if (plan.action === 'create' && plan.point && plan.text !== undefined && plan.author !== undefined) {
+    receipt = accepted(host.insertCommentAtCursorV1(plan.point.section, plan.point.paragraph, plan.point.offset, plan.text, plan.author));
+  } else if (target?.pointComment && !target.nested && plan.action === 'delete') {
+    receipt = accepted(host.removeCommentV1(target.fieldId));
+  } else if (target?.pointComment && !target.nested && plan.action === 'update' && plan.text !== undefined) {
+    receipt = accepted(host.updateCommentTextV1?.(target.fieldId, target.text, plan.text));
+  }
+  if (!receipt || !integer(receipt.fieldId) || (plan.action !== 'create' && receipt.fieldId !== target?.fieldId)) {
+    throw new Error('메모 편집을 적용하지 못했습니다. 본문 한 지점의 한 줄 메모를 확인하세요.');
+  }
+  const after = readDocumentCommentsB092(host);
+  if (!after) throw new Error('편집 후 메모 목록을 읽을 수 없습니다.');
+  let applied: DocumentCommentB092 | undefined;
+  let unchanged: readonly DocumentCommentB092[] = before;
+  switch (plan.action) {
+    case 'create':
+      applied = after.find(comment => comment.fieldId === receipt?.fieldId);
+      if (!applied || applied.text !== plan.text || applied.author !== plan.author || !plan.point || applied.nested ||
+          applied.section !== plan.point.section || applied.paragraph !== plan.point.paragraph || applied.start !== plan.point.offset || !applied.pointComment) {
+        throw new Error('추가한 메모의 위치와 내용을 확인하지 못했습니다.');
+      }
+      break;
+    case 'update':
+      applied = after.find(comment => comment.fieldId === plan.fieldId);
+      if (!applied || digest(applied) !== digest({...target, text: plan.text})) throw new Error('메모의 내용이나 원래 위치가 달라졌습니다.');
+      unchanged = before.filter(comment => comment.fieldId !== plan.fieldId);
+      break;
+    case 'delete':
+      unchanged = before.filter(comment => comment.fieldId !== plan.fieldId);
+      break;
+  }
+  const remaining = applied ? after.filter(comment => comment.fieldId !== applied.fieldId) : after;
+  if (digest(remaining) !== digest(unchanged)) throw new Error('다른 메모가 함께 변경되었습니다.');
+  return {applied, remaining: after};
 }
 
 type SnapshotPair = {before: number; after: number};
@@ -279,21 +344,7 @@ export function applyCommentPlanB092(
   if (!integer(beforeToken)) return {status: 'blocked', reason: 'history-unavailable'};
   let afterToken: number | undefined;
   try {
-    let receipt: JsonRecord | undefined;
-    if (plan.action === 'create' && plan.point && plan.text !== undefined && plan.author !== undefined) {
-      receipt = accepted(host.insertCommentAtCursorV1(plan.point.section, plan.point.paragraph, plan.point.offset, plan.text, plan.author));
-    } else if (plan.action === 'delete' && plan.fieldId !== undefined) {
-      receipt = accepted(host.removeCommentV1(plan.fieldId));
-    }
-    if (!receipt || !integer(receipt.fieldId)) throw new Error('rejected');
-    const after = readDocumentCommentsB092(host); if (!after) throw new Error('verification');
-    let applied: DocumentCommentB092 | undefined;
-    if (plan.action === 'create') {
-      applied = after.find(comment => comment.fieldId === receipt?.fieldId);
-      if (!applied || applied.text !== plan.text || applied.author !== plan.author || !plan.point ||
-          applied.section !== plan.point.section || applied.paragraph !== plan.point.paragraph || applied.start !== plan.point.offset || !applied.pointComment ||
-          after.length !== before.length + 1) throw new Error('verification');
-    } else if (after.some(comment => comment.fieldId === plan.fieldId) || after.length !== before.length - 1) throw new Error('verification');
+    const {applied, remaining: after} = executeCommentPlanInSnapshotB092(host, port, plan);
     const afterContext = context(port);
     if (!afterContext || afterContext.identity !== plan.documentIdentity || afterContext.revision === plan.revision) throw new Error('verification');
     afterToken = host.saveSnapshot(); if (!integer(afterToken)) throw new Error('history');

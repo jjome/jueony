@@ -198,3 +198,15 @@ export function bootstrapPreferenceRuntimeN017(ports: PreferenceBootPortsN017): 
     rawStorageExposed: false,
   });
 }
+
+export function readStartupDocumentDefaults(origin:string,read:(key:string)=>string|null) {
+  const profileId='local-user';
+  const boot=bootstrapPreferenceRuntimeN017({scope:{origin,profileId},storage:{read(request){
+    if(request.scope.origin!==origin||request.scope.profileId!==profileId)return {status:'read-error'};
+    const value=read(request.key);
+    return value===null?{status:'missing'}:{status:'found',value};
+  }}});
+  const defaults=boot.preferences.read('jueony-document-defaults','user');
+  if(defaults.status!=='active')throw new Error('새 문서 기본값을 확인하지 못했습니다. 기존 설정은 보존했습니다.');
+  return defaults.value;
+}

@@ -31,6 +31,52 @@ test('지원하지 않는 작업의 설명만 있는 응답은 문서를 변경�
  const h=harness(),result=runOnce(h.options);h.release({message:'표 편집은 아직 지원하지 않습니다.',sourceIds:[],operations:[]});
  assert.equal((await result).receipt,undefined);assert.equal(h.counts().applies,0);
 });
+test('참고자료를 읽은 응답은 출처를 명시하지 않아도 승인한 정확한 변경만 적용한다',async()=>{
+ for(const mode of ['missing','cancel','stale','abort','approve']){
+  const h=harness();
+  const context={...h.options.context,references:[{id:'ref',name:'검수 자료.txt',text:'검수 내용',characters:5,sha256:'0'.repeat(64)}]};
+  let reviews=0;
+  const result=runOnce({...h.options,context,
+   ...(mode==='missing'?{}:{reviewReferenceChanges:async(review)=>{
+    reviews++;
+    assert.deepEqual(review.referenceNames,['검수 자료.txt']);
+    assert.deepEqual(review.operations,edit.operations);
+    assert.equal(h.counts().applies,0);
+    assert.doesNotMatch(JSON.stringify(review),/검수 내용/);
+    if(mode==='stale')h.setRevision();
+    if(mode==='abort')h.controller.abort();
+    return mode!=='cancel';
+   }}),
+  });
+  h.release(edit);
+  if(mode==='approve')assert.equal((await result).receipt?.operationCount,1);
+  else await assert.rejects(result);
+  assert.equal(reviews,mode==='missing'?0:1);
+  assert.equal(h.counts().applies,mode==='approve'?1:0);
+ }
+});
+test('표 편집 승인 화면에는 사본에서 먼저 검증한 결과를 전달하고 승인이 없으면 적용하지 않는다',async()=>{
+ const before={sections:[{index:0,page:{}}],paragraphs:[],tables:[],unsupportedControls:[]};
+ const after={...before,tables:[{id:'s0p1t0',section:0,paragraph:1,control:0,rows:1,columns:1,cells:[]}]};
+ const proposal={message:'표 편집 제안',sourceIds:[],operations:[{kind:'create_table',after:'s0p0',resultId:'newTable',rows:[['항목']]}]};
+ for(const mode of ['refuse','approve','invalid']){
+  const h=harness(),events:string[]=[];
+  const context={...h.options.context,document:{...base,structure:before},references:[{id:'ref',name:'검수 자료',text:'검수 원문',characters:5,sha256:'0'.repeat(64)}]};
+  const editor={...h.options.editor,preflight:async(_base:Snapshot,_proposal:unknown,includeStructure?:boolean)=>{
+   events.push('preflight');assert.equal(includeStructure,true);
+   if(mode==='invalid')throw Error('사본 검사 실패');return after;
+  }};
+  const result=runOnce({...h.options,context,editor,reviewReferenceChanges:async review=>{
+   events.push('review');assert.deepEqual(review.verifiedStructure,{before,after});assert.equal(h.counts().applies,0);
+   return mode==='approve';
+  }});
+  h.release(proposal);
+  if(mode==='approve')assert.equal((await result).receipt?.operationCount,1);
+  else await assert.rejects(result);
+  assert.deepEqual(events,mode==='invalid'?['preflight']:['preflight','review']);
+  assert.equal(h.counts().applies,mode==='approve'?1:0);
+ }
+});
 const txt={kind:'file',name:'자료.txt',queryPermission:async()=>'granted',getFile:async()=>new File(['disk'],'자료.txt')};
 const folder=(children:any[]=[])=>({kind:'directory',name:'root',queryPermission:async()=>'granted',async *entries(){for(const h of children)yield [h.name,h];}});
 test('참고 자료 중복 제거·다른 업무 차단·최신 열린 내용 우선',async()=>{

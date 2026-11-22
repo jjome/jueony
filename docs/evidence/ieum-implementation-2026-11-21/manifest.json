@@ -1,0 +1,225 @@
+{
+  "recordDate": "2026-11-21",
+  "jueony": {
+    "baselineCommit": "f550d472ccd9b5bb0199a2fd9bb4589192b0913c",
+    "changedPathsAndContentHashesSha256": "3c710d6dbcc61ce89400a62e51e11a9874dd51dc8160670b662df106e3b2621f",
+    "applicationBuildEvidenceSha256": "5fb65ff374870a72558d5f941cdd2f68d12aadff57e51a30bdcd4ec3ee9299c3",
+    "applicationSourceSha256": "34181d9c9333a169af617719732c36ae829077d9b03920b30b719c4790f3a854",
+    "npmLockSha256": "0acd47f14136b19a254a9b16499889c6cee6be63fc3f558abc23e2bf281b5c51",
+    "documentationEvidenceDirectoryExcludedFromChangeHash": "docs/evidence/ieum-implementation-2026-11-21"
+  },
+  "ieumOffice": {
+    "repository": "https://github.com/pblsketch/ieumoffice",
+    "commit": "8602a39410adb86037f3008588b64efc75b08c60",
+    "fullRepositoryDownloaded": false,
+    "files": [
+      {
+        "path": "apps/hwp/src/renderer/ai/hwp-skill.ts",
+        "sha256": "c73f0f5e3187ccaf6c4b47dc02d9ad5f723f915263890f6acec5d07a5e3c7ece",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "apps/hwp/src/renderer/MemoPanel.tsx",
+        "sha256": "d83eca1f112c88c34a3b471a0c80e0347bf75e5da5ed94baf00dbf41b7becbfa",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "apps/shell/src/main/file-index/store.ts",
+        "sha256": "a27b8b49d733a2170969c7efb38dbec857fe78418f7a51577475a5f9a9240384",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "apps/shell/src/main/file-index/tokenize.ts",
+        "sha256": "884f12090fc327d50b84cb47591ca9b2e5a78321aae6a8d336734ee252bda0a1",
+        "use": "CJK unigram and bigram design adapted"
+      },
+      {
+        "path": "LICENSE",
+        "sha256": "68e32334df324ef4fc79fad3a26487e5abac36055a484bb6c8d7ecf9d8350885",
+        "use": "Apache-2.0 license notice copied"
+      },
+      {
+        "path": "NOTICE",
+        "sha256": "5c3ffda90197edc8660ddc900b99d73ef592b15848dd00f40729047eaf6f234e",
+        "use": "Attribution notice copied"
+      },
+      {
+        "path": "packages/agent-core/src/loop.ts",
+        "sha256": "f41bce3c7c422b4d8a3abcd568191ac0abb6b133551dc03b7948e69a1202d2f9",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/ai-provider/src/local-models.ts",
+        "sha256": "9df1b4d56e125395502937d8ed40a07eea3993b8521d97dd76d8c56a5082756e",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/cli/src/op-catalog.ts",
+        "sha256": "a12fe0566fa0e5d3c6b33b54fbceaadcfae35150bd07fa1d581f0e4786b1687a",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/doc-rules/package.json",
+        "sha256": "bca21cb55092cc000904f119b832158f40da8d13cf07186516fd428afb03c798",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/doc-rules/src/audit.ts",
+        "sha256": "b33fb7376cc188e5b7d5f31a241b9423fc15ffa7cfc38f3ddeeb8acf1ba0a44a",
+        "use": "Two rule ideas connected to Jueony read contracts"
+      },
+      {
+        "path": "packages/doc-rules/src/fonts.ts",
+        "sha256": "c620faffeff3422373ff503e70291dc23dd451f9bc9847f0f26617ec5a39ee09",
+        "use": "Hangul-only family list adapted"
+      },
+      {
+        "path": "packages/doc-rules/src/profile.ts",
+        "sha256": "4607fb5473c326e990609d79ade4a59987a43451079b18d77a902acd3326c859",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/doc-rules/src/rules/administration-ko.ts",
+        "sha256": "00f8d2cdfdac7fe930cb7efff9d7fd038216697ada70b7d207739998885d3819",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/file-parse/package.json",
+        "sha256": "419947ba8ee85b239244bdd9d3b61848126bbd31bde21228b0882fa2983f0e24",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/print-layout/src/plan.ts",
+        "sha256": "7d950f339b7eb10e352835b80375aa871431e9514cda3b682e00886801b32ff4",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "packages/ui/src/AiChangesCard.tsx",
+        "sha256": "1330b42d9981051054a78d160f94c6ebc2db351e31924658d03cc2313cce927e",
+        "use": "Inspected for design or compatibility"
+      },
+      {
+        "path": "vendor/rhwp-core/patches/0055-nested-table-path-calls.patch",
+        "sha256": "ca679e85d5d0a563e830d18e9f89212e1bacaeb9bf706777bef2f7685ba36edb",
+        "use": "Inspected for design or compatibility"
+      }
+    ]
+  },
+  "rhwpEngine": {
+    "jsSha256": "e25c7dcaf3f06c6dca3267c818496fafa2e64163de08c11b803a32452107bd51",
+    "sourceId": "5979813cbfb10a78",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "5339aaa9bb7e0e6f9bf5e35d0c040f7307fbe52303a5b124ef4e972acf0c3599",
+    "builtAt": "2026-11-20T22:30:09.3035095Z",
+    "buildMode": "native-review-no-opt",
+    "optimized": false,
+    "patchCount": 215,
+    "patchManifestSha256": "372cf257e9ebef4410aa53781e7deb134128f3204d7bab75db3fc55333d5388c",
+    "paginationPatch": {
+      "name": "zzzzzzzzzzz-stored-formula-pagination.patch",
+      "sha256": "50685f8f4e078b6e580c5ad8fe1966f1dd67f80804c7d54c41d37ff12ec24977"
+    },
+    "ieum0055ApplyCheck": "Missing modules and changed Rust context in the pinned rhwp checkout"
+  },
+  "runtime": {
+    "os": "Windows",
+    "node": "24.22.3",
+    "npm": "11.6.2",
+    "rust": "1.93.1-x86_64-pc-windows-gnu",
+    "wasmBindgen": "0.2.127"
+  },
+  "addedRuntimeDependencies": {
+    "fflate": "0.8.3",
+    "pdfjs-dist": "6.5.438",
+    "pdfJsWorkerMapAndFontBytes": 3237708,
+    "pdfJsWorkerMapAndFontFiles": 186
+  },
+  "verification": {
+    "applicationBuildAndTypecheck": "pass",
+    "windowsLauncherHttpSmoke": "pass",
+    "windowsRebuildAutoEngineSelection": "pass",
+    "cliAndMcpDryRun": "pass",
+    "launcherSuite": {
+      "tests": 53,
+      "pass": 53,
+      "fail": 0,
+      "skipped": 0
+    },
+    "editorSuite": {
+      "tests": 2008,
+      "pass": 2007,
+      "fail": 0,
+      "skipped": 1
+    },
+    "browser": {
+      "audit": "HWPX controls and read-only location jump",
+      "layout": "explicit scope report",
+      "memo": "saved HWPX memo list and read-only location jump",
+      "agent": "two local mock calls, checked edit, bound file reopen, and visible request undo",
+      "office": [
+        "PDF text and DOCX body/table order delivered",
+        "Textless PDF and damaged DOCX displayed specific errors without a model call"
+      ],
+      "print": "five document pages in 2-up and 4-up preview; actual 4-up print markup generated a two-sheet Chromium PDF; source bytes unchanged",
+      "calls": [
+        "initial",
+        "tool-result"
+      ],
+      "errors": []
+    },
+    "rag": {
+      "physicalFileCount": 21,
+      "semanticDocumentCount": 16,
+      "contractChecks": {
+        "passed": 69,
+        "failed": 0
+      },
+      "metrics": {
+        "queryCount": 22,
+        "answerableCount": 18,
+        "unanswerableCount": 4,
+        "sourceRecallAt1": 0.2777777777777778,
+        "sourceRecallAt3": 0.8333333333333334,
+        "sourceRecallAt8": 1,
+        "sourcePrecisionAt1": 0.2777777777777778,
+        "sourcePrecisionAt3": 0.27777777777777773,
+        "sourcePrecisionAt8": 0.16732804232804233,
+        "meanReciprocalRank": 0.5666666666666668,
+        "answerSpanMacroRecall": 1,
+        "unanswerableFalsePositiveQueries": 3,
+        "queriesWithQualityIssues": 16,
+        "meanExtractionMilliseconds": 35.884695454545465,
+        "meanIndexMilliseconds": 0.3820181818182029,
+        "meanSearchMilliseconds": 0.5808318181817899,
+        "meanContextMilliseconds": 0.7265999999999725
+      },
+      "bm25": {
+        "sourceRecallAt1": 0.6666666666666666,
+        "sourceRecallAt8": 1,
+        "meanReciprocalRank": 0.8074074074074074,
+        "unanswerableFalsePositiveQueries": 1,
+        "meanSearchMilliseconds": 2.1403227272727205,
+        "passesAdoptionGate": true
+      },
+      "provenance": {
+        "wasmSha256": "5339aaa9bb7e0e6f9bf5e35d0c040f7307fbe52303a5b124ef4e972acf0c3599",
+        "engineJsSha256": "e25c7dcaf3f06c6dca3267c818496fafa2e64163de08c11b803a32452107bd51",
+        "manifestSha256": "45a29149ef3620674588e018868319df61caa4a9b202cb7922f3ecde01c94fb0",
+        "casesSha256": "2628da58dacb575977f5820dddf7ed090a06b1adb7a6bebb4894434098f85468",
+        "evaluationScriptSha256": "f4e95f6eb91a044939d6de99aa234431f9ae4dd0519a83278b076c7e7fdcfc9e"
+      }
+    },
+    "checklistUnitTests": 12,
+    "baselineNestedFormulaSuite": {
+      "tests": 15,
+      "pass": 13,
+      "fail": 2,
+      "skipped": 0
+    },
+    "limitations": [
+      "Independent Hancom layout and physical printer not checked",
+      "Model integration uses local mock provider",
+      "No institutional network deployment check"
+    ]
+  }
+}

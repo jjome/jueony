@@ -29,4 +29,47 @@ await scenario('later section indices shift without changing its different paper
 await scenario('source tables, lines, columns and page-hide originals refuse entire structural mutation',async()=>{for(const mode of ['table','lines','columns','hide']){const d=body();try{if(mode==='table')d.createTable(0,1,0,1,1);if(mode==='lines')edit(d,'hwpx',[line()]);if(mode==='columns')d.setColumnDef(0,2,0,1,1134);if(mode==='hide')d.setPageHide(0,1,true,false,false,false,false,false);const before=d.exportHwpx();assert.throws(()=>edit(d,'hwpx',[split()]));assert.deepEqual(d.exportHwpx(),before);}finally{d.free();}}});
 await scenario('missing original match and combined edits cannot change native text or section properties',async()=>{const d=body();try{const before=d.exportHwpx(),s=snap(d);assert.throws(()=>edit(d,'hwpx',[split(),{kind:'set_section_tabs',section:0,spacingPt:18}]),/단독/);s.nodes[0].text='원문 조작';assert.throws(()=>executeDocumentOperations(d,s,[split()]),/원문/);assert.deepEqual(d.exportHwpx(),before);}finally{d.free();}});
 await scenario('lying native split result fails instead of returning a successful edit',async()=>{const d=body();try{const before=d.exportHwpx(),original=d.insertSectionBreak;d.insertSectionBreak=()=>JSON.stringify({ok:true,sectionIdx:1});assert.throws(()=>executeDocumentOperations(d,snap(d),[split()]),/결과/);d.insertSectionBreak=original;assert.deepEqual(d.exportHwpx(),before);}finally{d.free();}});
+for(const format of ['hwp','hwpx'])await scenario(`${format}: one split configures only the new section and preserves earlier and later page settings`,async()=>{
+ const doc=body(format);
+ const encode=()=>doc[format==='hwp'?'exportHwp':'exportHwpx']();
+ const kinds=['both','even','odd'];
+ try{
+  doc.insertSectionBreak(0,2,0);
+  doc.setPageDef(1,JSON.stringify({width:41953,height:59528,marginTop:4100}));
+  for(const [index,kind] of kinds.entries()){
+   writePageBorderSettings(doc,0,kind,{...readPageBorderSettings(doc,0,kind),basis:'page',fillType:'solid',
+    fillColor:['#f2cf9f','#d8e7fd','#b8d0bf'][index],spacingTop:600+60*index,headerInside:false,footerInside:index===1});
+  }
+  const initial=snap(doc,format),initialBytes=encode(),token=doc.saveSnapshot();
+  const originalBorders=kinds.map(kind=>readPageBorderSettings(doc,0,kind));
+  const operation={...split('s0p1',0),newPageSetup:{landscape:true,marginTopMm:22},newPageBorder:{headerInside:true,footerInside:false}};
+  try{
+   assert.throws(()=>edit(doc,format,[{...operation,newPageSetup:{marginTopMm:300}}]),/본문 영역/);
+   assert.deepEqual(encode(),initialBytes);
+   edit(doc,format,[operation]);
+   const result=snap(doc,format);
+   assert.deepEqual(result.nodes.map(node=>[node.section,node.text]),[[0,'제목 😀'],[1,'첫 본문'],[2,'둘째 본문']]);
+   assert.deepEqual(result.structure.sections[0],initial.structure.sections[0]);
+   assert.deepEqual(result.structure.sections[2],{...initial.structure.sections[1],index:2});
+   assert.deepEqual(result.structure.sections[1].page,{...initial.structure.sections[0].page,landscape:true,marginTop:Math.round(22*7200/25.4)});
+   assert.deepEqual(kinds.map(kind=>readPageBorderSettings(doc,0,kind)),originalBorders);
+   for(const [index,kind] of kinds.entries()){
+    const {attr,borderFillId,...setting}=readPageBorderSettings(doc,1,kind);
+    const {attr:oldAttr,borderFillId:oldFill,...original}=originalBorders[index];
+    assert.equal(borderFillId,oldFill);
+    assert.equal(attr^oldAttr,2|(original.footerInside?4:0));
+    assert.deepEqual(setting,{...original,headerInside:true,footerInside:false});
+   }
+   const loaded=await saved(doc,format,'split-configured-new-section');
+   try{assert.deepEqual(snap(loaded,format).structure,result.structure);assert.deepEqual(snap(loaded,format).nodes,result.nodes);}
+   finally{loaded.free();}
+   doc.restoreSnapshot(token);
+   assert.deepEqual(encode(),initialBytes);
+   writePageBorderSettings(doc,0,'both',{...originalBorders[0],basis:'paper'});
+   const paperBytes=encode();
+   assert.throws(()=>edit(doc,format,[operation]),/쪽 기준/);
+   assert.deepEqual(encode(),paperBytes);
+  }finally{doc.discardSnapshot(token);}
+ }finally{doc.free();}
+});
 await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,engine:JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),note:'Agent connects existing native section splitter as isolated bounded body command. Unicode boundaries, source/remaining sections, inheritance, snapshots, guarded save and fresh reopened state; native Hancom deferred.'},null,2));if(failures.length)process.exitCode=1;

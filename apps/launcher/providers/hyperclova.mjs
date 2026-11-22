@@ -1,6 +1,7 @@
 import {randomUUID} from 'node:crypto';
 import {generationSchema, generationMessages} from './generation-contract.mjs';
 import {PARAGRAPH_SYSTEM,paragraphTool,normalizeParagraphEdits,parseParagraphToolArguments} from './paragraph-contract.mjs';
+import {documentToolMessages,parseDocumentToolTurn,probeDocumentTools} from './document-tool-contract.mjs';
 
 const fail=(code,message)=>{const error=new Error(message);error.code=code;error.safeMessage=message;throw error;};
 
@@ -17,11 +18,7 @@ export function createHyperCLOVA(config,key){
  const tokenLimit=config.modelId==='HCX-005'?4096:8192;
  const tokenMinimum=config.modelId==='HCX-005'?1024:128;
  if(!Number.isInteger(maxTokens)||maxTokens<tokenMinimum||maxTokens>tokenLimit)fail('configuration',`이 모델의 최대 출력 토큰은 ${tokenMinimum}~${tokenLimit} 사이의 정수로 입력해 주세요.`);
- return {async generate(input,signal){
-  const messages=generationMessages(input,config.modelId==='HCX-005'?PARAGRAPH_SYSTEM:undefined);
-  const body=config.modelId==='HCX-007'
-   ?{messages,maxCompletionTokens:maxTokens,thinking:{effort:'none'},responseFormat:{type:'json',schema:generationSchema(input.references.map(source=>source.id))}}
-   :{messages,maxTokens,includeAiFilters:true,tools:[paragraphTool(input.references.map(source=>source.id))],toolChoice:{type:'function',function:{name:'submit_document_edits'}}};
+ async function request(body,signal){
   let response;
   const combined=AbortSignal.any([signal,AbortSignal.timeout(90000)]);
   try{
@@ -49,16 +46,60 @@ export function createHyperCLOVA(config,key){
   let wire;try{wire=JSON.parse(Buffer.concat(parts).toString('utf8'));}catch{fail('invalid_response','CLOVA Studio가 올바른 JSON 응답을 반환하지 않았습니다.');}
   if(wire?.status?.code!=='20000')fail('provider','CLOVA Studio가 성공 상태를 반환하지 않았습니다. 키·권한·모델 설정을 확인해 주세요.');
   if(wire.result?.finishReason==='length')fail('incomplete','생성이 출력 토큰 한도에 도달했습니다. 문서를 변경하지 않았습니다. 요청 범위를 줄이거나 출력 토큰을 늘려 주세요.');
+  return wire.result;
+ }
+ const nativeTokenField=config.modelId==='HCX-005'?'maxTokens':'maxCompletionTokens';
+ async function documentTurn(input,signal,limit){
+  if(maxTokens<1024)fail('configuration','CLOVA Studio 문서 조회 도구에는 출력 토큰을 1,024 이상으로 설정해 주세요.');
+  const {messages,tools}=documentToolMessages(input);
+  const native=messages.map(message=>{
+   if(message.role==='tool')return {role:'tool',toolCallId:message.tool_call_id,content:message.content};
+   if(!message.tool_calls)return message;
+   const toolCalls=message.tool_calls.map(call=>{
+    let args;try{args=JSON.parse(call.function.arguments);}catch{}
+    if(!args||typeof args!=='object'||Array.isArray(args))fail('invalid_request','CLOVA Studio 조회 도구 인수가 올바른 객체가 아닙니다.');
+    return {...call,function:{name:call.function.name,arguments:args}};
+   });
+   return {role:'assistant',content:'',toolCalls};
+  });
+  const {message,finishReason}=await request({messages:native,tools,toolChoice:'auto',[nativeTokenField]:limit},signal)??{};
+  if(message?.role!=='assistant')fail('invalid_response','CLOVA Studio 조회 응답이 올바르지 않습니다.');
+  if(finishReason==='tool_calls'&&Array.isArray(message.toolCalls)&&message.toolCalls.length){
+   const ids=new Set();
+   const calls=message.toolCalls.map(call=>{
+    const args=call?.function?.arguments;
+    if(call?.type!=='function'||typeof call.id!=='string'||!/^[A-Za-z0-9_-]{1,160}$/u.test(call.id)||ids.has(call.id)||
+      !input.tools.includes(call.function?.name)||!args||typeof args!=='object'||Array.isArray(args)){
+     fail('invalid_response','CLOVA Studio가 제공하지 않은 조회 도구 또는 잘못된 인수를 반환했습니다.');
+    }
+    ids.add(call.id);
+    const argumentsJson=JSON.stringify(args);
+    if(argumentsJson.length>1000)fail('invalid_response','CLOVA Studio 조회 도구 인수의 크기가 한도를 넘었습니다.');
+    return {id:call.id,function:{name:call.function.name,arguments:argumentsJson}};
+   });
+   return parseDocumentToolTurn({tool_calls:calls});
+  }
+  if(finishReason!=='stop'||(Array.isArray(message.toolCalls)&&message.toolCalls.length))fail('invalid_response','CLOVA Studio 조회 응답이 정상 종료되지 않았습니다.');
+  return parseDocumentToolTurn({content:message.content});
+ }
+ return {async generate(input,signal){
+  const messages=generationMessages(input,config.modelId==='HCX-005'?PARAGRAPH_SYSTEM:undefined);
+  const body=config.modelId==='HCX-007'
+   ?{messages,maxCompletionTokens:maxTokens,thinking:{effort:'none'},responseFormat:{type:'json',schema:generationSchema(input.references.map(source=>source.id))}}
+   :{messages,maxTokens,includeAiFilters:true,tools:[paragraphTool(input.references.map(source=>source.id))],toolChoice:{type:'function',function:{name:'submit_document_edits'}}};
+  const result=await request(body,signal);
   if(config.modelId==='HCX-005'){
-   const calls=wire.result?.message?.toolCalls;
-   if(wire.result?.finishReason!=='tool_calls'||wire.result?.message?.role!=='assistant'||!Array.isArray(calls)||calls.length!==1||calls[0].type!=='function'||calls[0].function?.name!=='submit_document_edits')fail('invalid_response','CLOVA Studio가 정해진 편집안 도구를 반환하지 않았습니다. 문서를 변경하지 않았습니다.');
+   const calls=result?.message?.toolCalls;
+   if(result?.finishReason!=='tool_calls'||result?.message?.role!=='assistant'||!Array.isArray(calls)||calls.length!==1||calls[0].type!=='function'||calls[0].function?.name!=='submit_document_edits')fail('invalid_response','CLOVA Studio가 정해진 편집안 도구를 반환하지 않았습니다. 문서를 변경하지 않았습니다.');
    return normalizeParagraphEdits(parseParagraphToolArguments(calls[0].function.arguments),input.document);
   }
-  if(wire.result?.finishReason!=='stop'||wire.result?.message?.role!=='assistant')fail('invalid_response','CLOVA Studio 응답이 정상 종료되지 않았습니다. 문서를 변경하지 않았습니다.');
-  const content=wire.result.message.content;
+  if(result?.finishReason!=='stop'||result?.message?.role!=='assistant')fail('invalid_response','CLOVA Studio 응답이 정상 종료되지 않았습니다. 문서를 변경하지 않았습니다.');
+  const content=result.message.content;
   if(typeof content!=='string')fail('invalid_response','CLOVA Studio에서 텍스트 편집 JSON을 받지 못했습니다.');
-  let result;try{result=JSON.parse(content);}catch{fail('invalid_response','모델이 편집 JSON을 반환하지 않았습니다. 자동 재시도하지 않았습니다.');}
   // The editor validates every command, source ID and current document revision before applying.
-  return result;
- }};
+  try{return JSON.parse(content);}catch{fail('invalid_response','모델이 편집 JSON을 반환하지 않았습니다. 자동 재시도하지 않았습니다.');}
+ },
+ generateDocumentToolTurn(input,signal){return documentTurn(input,signal,maxTokens);},
+ testDocumentTools(_input,signal){return probeDocumentTools((input,activeSignal)=>documentTurn(input,activeSignal,1024),signal);},
+ };
 }

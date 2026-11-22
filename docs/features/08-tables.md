@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **41개**, 상위 범위 **24개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **43개**, 상위 범위 **24개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 24 |
-| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 17 · 미검증 7 |
-| Agent 연결 | 연결 28/33 · 부분 5 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
+| 구현 | 완료 38/43 · 부분 5 | 완료 0/24 · 부분 24 |
+| 검증 | 완료 3/43 · 부분 40 | 완료 0/24 · 부분 17 · 미검증 7 |
+| Agent 연결 | 연결 31/35 · 부분 4 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -21,7 +21,7 @@
 ## 먼저 할 일
 
 - **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 추가 감사에서 ClickHere half-open end caret 소유권과 복수 owner가 모호하고 nested cell의 line/cursor/paragraph/picture ByPath 증거 API 및 복합 개체 source↔run/cursor interleave 증거가 없음을 확인해 시험 변경을 모두 되돌렸다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 같은 owner·문단에서 정확히 한 plain scalar로 분리된 두 filled ClickHere는 ID·range·full path·value·marker controlIndex/raw position·stored position을 교차 검증한 뒤 일반/중첩 셀 분할에 보존한다. commit aa2ac0b3 기준 HWP/HWPX 재열기·exact undo/redo와 관련 회귀 44/44를 통과했다. 완전히 보이지 않는 0길이 이웃과 boundary-touch/실제 overlap은 engine inner owner 식별이 불가능해 mutation 전에 차단한다. object 혼합·caption field·실제 앱·한글 직접 비교는 남아 부분이다.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — Chrome에서 HWP·HWPX의 임의 셀 분할 55건을 검증했다. 중첩 표, 캡션, 분리된 누름틀 두 개, 여러 쪽에 이어지는 셀 및 서식 있는 문단 분배의 적용·저장·재열기·되돌리기를 확인했다. 보호·겹침 필드와 복합 개체, 독립 한글 비교가 남았다.
 - **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. Left/Right 중첩 캡션도 full path와 live·portable geometry를 재검증하며 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit e67ca6ee 기준 custom engine HWP/HWPX 저장·재열기·undo/redo 선별 검사는 18 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱·한글 직접 비교는 fail-closed로 남아 부분이다.
 
 ## 기능별 작업표
@@ -195,7 +195,7 @@
 | --- | --- | --- | --- | --- |
 | [G040](<08-tables.md#g040>) · 작업 | 단순 문자열→표·표→문자열 변환 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G041](<08-tables.md#g041>) · 작업 | 정수 자동 채우기 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [G042](<08-tables.md#g042>) · 작업 | 셀 높이/너비 수동 균등 경로 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
+| [G042](<08-tables.md#g042>) · 작업 | 셀 높이/너비 수동 균등 경로 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G043](<08-tables.md#g043>) · 작업 | 연속 여러 제목 행과 반복 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G044](<08-tables.md#g044>) · 작업 | 표·셀 보호 상태의 Native 재확인 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G045](<08-tables.md#g045>) · 작업 | HWPX 셀 안 여백 네 방향·기본값 복귀 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
@@ -213,6 +213,8 @@
 | [G050](<08-tables.md#g050>) · 작업 | HWPX 행 높이 mm 직접 지정 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G051](<08-tables.md#g051>) · 작업 | HWPX 한 쪽 평면 표 사각형 병합 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G052](<08-tables.md#g052>) · 작업 | 병합 중 다른 표의 같은 길이 텍스트 오염 거절 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
+| [G125](<08-tables.md#g125>) · 작업 | 쪽 배치와 표 셀 넘침 검사 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [G132](<08-tables.md#g132>) · 작업 | 중첩 표의 단일 행 셀 병합과 분할 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 
 ## 항목별 완료조건·근거
 
@@ -782,12 +784,12 @@
 <summary>G042 · 셀 높이/너비 수동 균등 경로</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 정규 평면 전체 밴드; 병합/부분/복합 원본 제외
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 완료 범위: 일반 평면 표의 전체 행에 걸친 열과 전체 열에 걸친 행의 균등 변경·직접 지정. 병합·보호·중첩 및 복합 원본은 제외한다.
+- 다음 작업: HWP와 HWPX의 AI 크기 변경을 연결했다. Chrome에서 열 너비 17건·행 높이 16건을 검증했다. HWP의 균등 변경·밀리미터 지정과 한 번 되돌리기, 다시 실행, 저장·재열기를 확인했다. 로컬 Qwen으로 HWP 한 표의 열 너비와 행 높이를 같게 했다. 보호·병합·혼합 서식과 내용 넘침은 거절한다. 운영 모델과 독립 한글 비교는 남았다.
+- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-equal-columns.mjs](<../../apps/editor/scripts/verify-equal-columns.mjs>) · [verify-row-heights.mjs](<../../apps/editor/scripts/verify-row-heights.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -958,10 +960,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 같은 owner·문단에서 정확히 한 plain scalar로 분리된 두 filled ClickHere는 ID·range·full path·value·marker controlIndex/raw position·stored position을 교차 검증한 뒤 일반/중첩 셀 분할에 보존한다. commit aa2ac0b3 기준 HWP/HWPX 재열기·exact undo/redo와 관련 회귀 44/44를 통과했다. 완전히 보이지 않는 0길이 이웃과 boundary-touch/실제 overlap은 engine inner owner 식별이 불가능해 mutation 전에 차단한다. object 혼합·caption field·실제 앱·한글 직접 비교는 남아 부분이다.
+- 다음 작업: Chrome에서 HWP·HWPX의 임의 셀 분할 55건을 검증했다. 중첩 표, 캡션, 분리된 누름틀 두 개, 여러 쪽에 이어지는 셀 및 서식 있는 문단 분배의 적용·저장·재열기·되돌리기를 확인했다. 보호·겹침 필드와 복합 개체, 독립 한글 비교가 남았다.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
-- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [verify-table-subdivision.mjs](<../../apps/editor/scripts/verify-table-subdivision.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;EMPTY_NEIGHBOR_FIELD_GUARD_2026_11_08;MULTI_CLICKHERE_SPLIT_2026_11_09`
 
 </details>
@@ -1142,6 +1144,34 @@
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - 근거: [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>)
 - 원래 기록: `SCOPED_TABLE_FIX_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g125">
+<summary>G125 · 쪽 배치와 표 셀 넘침 검사</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 편집기가 배치한 일반·중첩 표 글줄의 셀과 종이 경계, 다음 쪽 제목, 결과에서 문단과 셀로 이동.
+- 다음 작업: 종이와 셀의 위·아래·왼쪽·오른쪽 경계를 검사한다. Chrome의 HWP와 HWPX에서 종이 오른쪽 글줄을 찾고 셀로 이동했다. 로컬 Qwen이 읽기 전용 도구로 두 형식에서 같은 위치를 답했고 원본 바이트를 대조했다. 배치 자료에서 누락된 글줄과 독립 한글 인쇄 비교는 남았다.
+- UI 명령: `ext:jueony-layout-diagnostics`
+- Agent 명령: `inspect_layout`
+- 근거: [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
+
+</details>
+
+<details id="g132">
+<summary>G132 · 중첩 표의 단일 행 셀 병합과 분할</summary>
+
+- 종류: 실행 작업 · 우선순위: P2.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: HWP/HWPX 좁은 가로 범위의 기존 너비, 문단·글자·이웃 보존과 재열기·되돌림.
+- 다음 작업: 세로 병합과 필드·복합 셀, 한글 직접 비교가 남았다.
+- 근거: [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

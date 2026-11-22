@@ -1,4 +1,6 @@
+import type {SetShapeFill,ShapeFillSource} from '../domain/agent-shape-fill.ts';
 import type {DocumentMetadataValues} from '../domain/document-metadata-values.ts';
+import type {StoredCharacterStyleReference} from './character-style-reference.ts';
 export type CellCharacterFormat={start:number;end:number;bold?:boolean;italic?:boolean;color?:string;fontSizePt?:number};
 export type AgentCellParagraphOp={kind:"replace_cell_paragraph";target:string;row:number;column:number;paragraph:number;originalText:string;text:string;spanTexts?:string[];spanFormats?:CellCharacterFormat[]};
 export type CellParagraphText={index:number;text:string;formatSpans?:Array<{start:number;end:number}>;editableFrom?:number;formatOnlyRanges?:Array<{start:number;end:number}>;pictureTextRanges?:Array<{start:number;end:number}>};
@@ -23,6 +25,7 @@ export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:
 export type NestedTable = {
   id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
   axisEditable?:boolean;
+  reshapeAvailable?:boolean;
   cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'> & {paragraphs?:CellParagraphText[];fieldName?:string;clickHereFieldIds?:number[]}>;
 };
 export type TablePaginationMode='none'|'cell'|'row';
@@ -36,8 +39,13 @@ export type AgentTablePaginationSource={editable:boolean;mode?:TablePaginationMo
 export type Table = { cellZoneCount?:number; editable?:boolean; reason?:string; id: string; section: number; paragraph: number; control: number; headerRows?:number|null; pagination?:{mode:TablePaginationMode;repeatHeader:boolean}; rows: number; columns: number; cells: Cell[] };
 export type LineNumberRestart = 'page' | 'section' | 'continuous';
 export type AgentLineNumbers = {enabled:boolean;restart:LineNumberRestart|null;countBy:number;startNumber:number;distanceMm:number;editable:boolean};
-export type AgentPageBackground = {kind:'both'|'even'|'odd';fillType:string;color:string|null;applyPage:string;hideFill?:boolean;firstPageFill?:boolean;editable:boolean;reason?:string};
-export type AgentPageBackgroundOp = {kind:'set_page_background';section:number;pageKind:'both'|'even'|'odd';fillType:'none'|'solid';color:string};
+export type AgentPageBackground = {kind:'both'|'even'|'odd';fillType:string;color:string|null;applyPage:string;hideFill?:boolean;firstPageFill?:boolean;editable:boolean;reason?:string;
+  gradientEditable?:boolean; linearGradient?:{colors:[string,string];angle:number}};
+export type AgentPageBackgroundOp = {kind:'set_page_background';section:number;pageKind:'both'|'even'|'odd';color:string} &
+  ({fillType:'none'|'solid'}|{fillType:'gradient';endColor:string;angle:number});
+export type AgentPageBorderInclusion={editable:boolean;entries:{kind:'both'|'even'|'odd';headerInside:boolean;footerInside:boolean}[]};
+export type AgentPageBorderFlags = {headerInside?:boolean;footerInside?:boolean};
+export type AgentPageBorderInclusionOp = {kind:'set_page_border_inclusion';sections:number[]}&AgentPageBorderFlags;
 export type AgentMasterPage = {kind:'both'|'even'|'odd';text:string;textTruncated:boolean;xMm:number;yMm:number;fontSizePt:number;color:string;bold:boolean;italic:boolean;underline:string|null;editable:boolean;paragraphCount:number;controlCount:number};
 export type AgentMasterPages = {editable:boolean;pages:AgentMasterPage[];hiddenOnFirstPage?:boolean;reason?:string};
 export type AgentMasterPageOp = {kind:'set_master_page_text';section:number;pageKind:'both'|'even'|'odd';text:string;xMm:number;yMm:number;fontSizePt:number;color:string;bold:boolean} | {kind:'delete_master_page';section:number;pageKind:'both'|'even'|'odd'};
@@ -56,7 +64,7 @@ export type AgentHeaderFooterFormatOp = {kind:'format_header_footer';section:num
 export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'even';exists:boolean|null;editable:boolean;deletable?:boolean;creatable?:boolean;paragraphCount:number;text:string;textTruncated:boolean;hiddenOnFirstPage?:boolean;characters?:AgentHeaderFooterCharacters;paragraph?:AgentHeaderFooterParagraph;reason?:string};
 export type AgentHeaderFooterOp = {kind:'set_header_footer_text';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;text:string};
 export type AgentSectionMergeOp = {kind:'merge_sections';rightSection:number};
-export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number};
+export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number;newPageSetup?:Record<string,unknown>;newPageBorder?:AgentPageBorderFlags};
 export type AgentParagraphTabStop={positionMm:number;alignment:'left'|'right'|'center'|'decimal';leader:'none'|'solid'|'dash'|'dot'};
 export type AgentParagraphTabsOp={kind:'set_paragraph_tabs';target:string;stops:AgentParagraphTabStop[];autoLeft:boolean;autoRight:boolean};
 export type AgentParagraphDecorationOp={kind:'format_paragraph_decoration';target:string;properties:Record<string,unknown>};
@@ -73,7 +81,7 @@ export type AgentNumberingDefinitionSource={id:number;editable:boolean;startNumb
 export type AgentBasicBulletOp={kind:"set_basic_bullet";target:string;character:string};
 export type AgentParagraphListOp={kind:"set_paragraph_list";target:string;listKind:"none"|"number"|"bullet";definitionId:number;level:number};
 export type AgentListCatalog={numberings:{id:number;levelFormats:string[];startNumber:number}[];bullets:{id:number;char:string;rawCode:number}[]};
-export type Structure = { nestedTables?:NestedTable[]; nestedTableLimitation?:string; bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styleLinks?:{id:number;nextStyleId:number}[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
+export type Structure = { storedCharacterStyles?:Record<string,StoredCharacterStyleReference>; nestedTables?:NestedTable[]; nestedTableLimitation?:string; bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];pageBorderInclusion?:AgentPageBorderInclusion;masterPages?:AgentMasterPages }[]; styleLinks?:{id:number;nextStyleId:number}[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 export type AgentTableMergeOp={kind:"merge_table_cells";target:string;startRow:number;startColumn:number;rowCount:number;columnCount:number};
 export type AgentTableMergeSource={editable:boolean;fingerprint?:string;reason?:string};
@@ -86,13 +94,14 @@ export type AgentFileOp={kind:'list_document_tabs';contextStamp:string}|{kind:'n
 export type AgentFileReceipt={runId:string;kind:AgentFileOp['kind'];status:'completed';beforeStamp:string;after:AgentFileContext;operationCount:1;documentMutations:0;message:string;save?:{status:'saved';tabId:string;beforeRevision:string;afterRevision:string}};
 export type AgentDocumentInformation={metadata:{editable:boolean;values?:DocumentMetadataValues;fingerprint?:string;reason?:string};statistics?:Record<string,JsonValue>;reason?:string};
 export type AgentDocumentMetadataOp={kind:'set_document_metadata';originalFingerprint:string;values:DocumentMetadataValues};
-export type Snapshot = { tableFormulaFields?:AgentTableFormulaFields; fileContext?:AgentFileContext; documentInformation?:AgentDocumentInformation; cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type Snapshot = { currentSection?:number; shapeFillSources?:Record<string,ShapeFillSource>; nestedTableTemplateEvidence?:Record<string,string>; tableFormulaFields?:AgentTableFormulaFields; fileContext?:AgentFileContext; documentInformation?:AgentDocumentInformation; cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | SetShapeFill
   | AgentTableFormulaOp
   | AgentInsertTableFormulaOp
   | {kind:'fill_table_series';target:string;startRow:number;startColumn:number;endRow:number;endColumn:number;mode:'days'|'months'|'years'|'formula'|'calculated-value';axis?:'rows'|'columns'|null}
@@ -126,6 +135,7 @@ export type ControlOp =
   | AgentSectionSplitOp
   | AgentSectionOp
   | AgentPageBackgroundOp
+  | AgentPageBorderInclusionOp
   | AgentMasterPageOp
   | { kind:'apply_paragraph_style';target:string;styleId:number }
   | { kind:'set_columns';section:number;count:number;spacingMm:number }
@@ -138,8 +148,18 @@ export type ControlOp =
   | { kind: 'delete_table_row' | 'delete_table_column'; target: string; index: number }
   | { kind: 'set_page_setup'; section: number; properties: Record<string, unknown> };
 export type EditOp = BodyOp | ControlOp;
-export type Receipt = { formulaField?:(TableFormulaChange&{dependents?:TableFormulaChange[]}); metadata?:{before:DocumentMetadataValues;after:DocumentMetadataValues}; runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
+export type Receipt = { shapeFill?:{section:number;paragraph:number;control:number;before:string;after:string}; storedCharacterStyle?:{section:number;paragraph:number;start:number;count:number;name:string}; sectionSplit?:{sourceSection:number}; sectionRemoval?:{removedSection:number;reason:'merge'|'empty'}; formulaField?:(TableFormulaChange&{dependents?:TableFormulaChange[]}); metadata?:{before:DocumentMetadataValues;after:DocumentMetadataValues}; runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
 export function plainSnapshot(snapshot: Snapshot): string { return snapshot.nodes.map(node => node.text).join('\n'); }
+
+export function sectionChangeReceipt(operation:EditOp|undefined,nodes:Snapshot['nodes']):Pick<Receipt,'sectionSplit'|'sectionRemoval'>{
+ if(operation?.kind==='split_section'){
+  const source=nodes.find(node=>node.id===operation.target);
+  return source?{sectionSplit:{sourceSection:source.section}}:{};
+ }
+ if(operation?.kind==='merge_sections')return {sectionRemoval:{removedSection:operation.rightSection,reason:'merge'}};
+ if(operation?.kind==='remove_empty_section')return {sectionRemoval:{removedSection:operation.section,reason:'empty'}};
+ return {};
+}
 
 /** Metadata accompanying a batch proposed by a caller; no agent implementation types. */
 export type EditProposal = {message: string; operations: EditOp[]; sourceIds: string[]};

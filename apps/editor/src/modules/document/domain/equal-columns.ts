@@ -3,7 +3,7 @@ type Operation=Extract<ControlOp,{kind:'format_table_cells'}>;
 /** Full column bands have a durable rectangular representation. Remainders stay
  * in HWPUNIT, assigned from the first selected column; total width is unchanged. */
 function columnWidthsPlan(op:Operation,s:Snapshot,explicit:boolean):{table:Table;updates:{cellIdx:number;widthDelta:number}[]} {
- if(!/\.hwpx$/iu.test(s.name))throw new Error('AI 열 너비 균등 분배는 현재 HWPX 원본만 지원합니다.');
+ if(!/\.hwpx?$/iu.test(s.name))throw new Error('AI 열 너비 편집에는 HWP 또는 HWPX 문서가 필요합니다.');
  const table=s.structure?.tables.find(t=>t.id===op.target),source=s.equalColumnSources?.[op.target];
  if(!table||!/^s\d+p\d+t\d+$/u.test(op.target)||source?.editable!==true||!/^[a-f0-9]{64}$/u.test(source.fingerprint??''))throw new Error('조회된 균등 분배 가능 본문 단순 표가 필요합니다.');
  if((explicit ? typeof op.properties.columnWidthMm!=='number'||!Number.isFinite(op.properties.columnWidthMm)||op.properties.columnWidthMm<1||op.properties.columnWidthMm>500 : op.properties.equalizeColumns!==true)||Object.keys(op.properties).length!==1)throw new Error(explicit?'열 너비 지정은 columnWidthMm 숫자만 단독 서식으로 요청하세요.':'열 너비 균등 분배는 equalizeColumns:true만 단독 서식으로 요청하세요.');

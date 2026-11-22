@@ -25,6 +25,7 @@ export interface ScriptMacroRuntimeStateB142 extends ScriptMacroDocumentVersionB
 
 export interface RecordableScriptMacroCommandB142<Context> {
   readonly id: string;
+  readonly source?: SuccessfulScriptMacroCommandEventB142['source'];
   readonly recordable: true;
   readonly safety: {
     readonly deterministic: true;
@@ -37,7 +38,7 @@ export interface RecordableScriptMacroCommandB142<Context> {
 }
 
 export interface SuccessfulScriptMacroCommandEventB142 {
-  source: 'command-dispatcher';
+  source: 'command-dispatcher' | 'body-input';
   outcome: 'success';
   commandId: string;
   arguments: unknown;
@@ -189,6 +190,11 @@ export class ScriptMacroCommandCatalogB142<Context> {
     return normalizeScriptMacroArgumentsB142(command.validateArguments(value));
   }
 
+  acceptsRecordingSource(commandId: string, source: unknown): boolean {
+    const command = this.#commands.get(commandId);
+    return !!command && (command.source ?? 'command-dispatcher') === source;
+  }
+
   execute(context: Context, step: ScriptMacroStepB142): void {
     const command = this.#commands.get(step.commandId);
     if (!command) runtimeFail('UNREGISTERED_COMMAND', `등록되지 않은 스크립트 매크로 명령입니다: ${step.commandId}`);
@@ -227,10 +233,10 @@ export class ScriptMacroRecorderB142<Context> {
     try {
       if (!isRecord(eventValue)) runtimeFail('RECORDING_INVALIDATED', '명령 실행 이벤트 형식이 잘못되었습니다.');
       assertExactKeys(eventValue, ['source', 'outcome', 'commandId', 'arguments', 'before', 'after'], '명령 실행 이벤트');
-      if (eventValue.source !== 'command-dispatcher' || eventValue.outcome !== 'success') {
-        runtimeFail('RECORDING_INVALIDATED', '디스패처가 성공으로 확인한 명령만 기록할 수 있습니다.');
-      }
       assertScriptMacroCommandIdB142(eventValue.commandId);
+      if (eventValue.outcome !== 'success' || !this.#catalog.acceptsRecordingSource(eventValue.commandId, eventValue.source)) {
+        runtimeFail('RECORDING_INVALIDATED', '등록된 입력 경로에서 성공한 명령만 기록할 수 있습니다.');
+      }
       const before = assertRecordableState(eventValue.before);
       const after = assertRecordableState(eventValue.after);
       if (!sameVersion(session.current, before)) {

@@ -1,0 +1,86 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -1875,6 +1875,53 @@
+         return None;
+     }
+     Some(flow_y_before_vpos_snap + hwpunit_to_px(table.outer_margin_top as i32, dpi).max(0.0))
++}
++
++/// An edited native whole-table host can store its outer-box origin while the
++/// layout pen already points at the visible table top. Require both boundaries
++/// to agree with the current frame before suppressing the XML paint inset.
++fn reflowed_table_outer_top_consumed(
++    host: &Paragraph,
++    next: Option<&Paragraph>,
++    table: &crate::model::table::Table,
++    flow_y: f64,
++    col_area: &LayoutRect,
++    dpi: f64,
++) -> bool {
++    use crate::model::paragraph::{ColumnBreakType, LineSeg};
++    let ([Control::Table(_)], [row]) = (host.controls.as_slice(), host.line_segs.as_slice())
++    else {
++        return false;
++    };
++    let Some(next_row) = next
++        .filter(|next| next.controls.is_empty() && next.column_type == ColumnBreakType::None)
++        .and_then(|next| next.line_segs.first())
++    else {
++        return false;
++    };
++    let top = i64::from(table.outer_margin_top);
++    let height = i64::from(signed_hwpunit(table.common.height));
++    let pen = flow_y - col_area.y;
++    if row.tag != (LineSeg::TAG_SINGLE_SEGMENT_LINE | LineSeg::TAG_IMPLEMENTATION_PROPERTY)
++        || row.text_start != 0
++        || row.vertical_pos <= 0
++        || row.segment_width <= 0
++        || row.line_height <= 0
++        || row.line_height != row.text_height
++        || host.column_type != ColumnBreakType::None
++        || table.caption.is_some()
++        || signed_hwpunit(table.common.vertical_offset) != 0
++        || top == 0
++        || height <= 0
++        || !pen.is_finite()
++        || pen <= 0.0
++        || pen + hwpunit_to_px(height as i32, dpi) > col_area.height
++    {
++        return false;
++    }
++    let pen = i64::from(px_to_hwpunit(pen, dpi));
++    i64::from(row.vertical_pos) + top == pen
++        && i64::from(next_row.vertical_pos) == pen + height
+ }
+ 
+ fn para_line_spacing_px(para: &Paragraph, dpi: f64) -> f64 {
+@@ -12724,6 +12771,14 @@
+                             && !self.native_source_synthetic_context.get()
+                                 .is_some_and(|context| para.owns_native_source_synthetic_rows(context))
+                             && !current_origin_preinset
++                            && !reflowed_table_outer_top_consumed(
++                                para,
++                                paragraphs.get(para_index + 1),
++                                t,
++                                para_y_for_table,
++                                col_area,
++                                self.dpi,
++                            )
+                             && !(layout.column_areas.len()==1
+                                 && (crate::renderer::float_placement::plain_positive_offset_stack(paragraphs,para_index)
+                                     || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs,para_index)
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -3029,9 +3029,11 @@
+             if hwp3_origin {
+                 Self::push_hwp3_origin_marker(&mut doc);
+             }
+-            Self::materialize_hwp5_missing_linesegs_for_hwpx_export(&mut doc);
+             lower_markers(&mut doc);
+             self.authorize_completed_native_export(&mut doc);
++            // Missing-row placeholders are transport sentinels removed on load.
++            // Authorize the real frame before those sentinels enter its cells.
++            Self::materialize_hwp5_missing_linesegs_for_hwpx_export(&mut doc);
+             serialize(&doc)
+         } else if hwp3_origin
+             || document

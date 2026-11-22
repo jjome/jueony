@@ -6,7 +6,6 @@ import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer-core';
 import { build as viteBuild } from 'vite';
-import { patchInsertPlaceholderCommandsN019 } from '../scripts/integration/insert-placeholder-command-patches-n019.mjs';
 
 const app = resolve(import.meta.dirname, '..');
 const studio = resolve(app, '.build/studio');
@@ -61,7 +60,7 @@ async function removeWithRetry(path: string): Promise<void> {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try { await rm(path, { recursive: true, force: true }); return; }
     catch (error: any) {
-      if (!['EBUSY', 'EPERM'].includes(error?.code) || attempt === 4) throw error;
+      if (!['EBUSY', 'ENOTEMPTY', 'EPERM'].includes(error?.code) || attempt === 4) throw error;
       await new Promise(resolveDelay => setTimeout(resolveDelay, 100 * (attempt + 1)));
     }
   }
@@ -69,6 +68,8 @@ async function removeWithRetry(path: string): Promise<void> {
 
 test('N019 Studio surfaces and dispatcher keep unsupported insert placeholders disabled', { timeout: 60_000 }, async () => {
   await access(edge); await access(resolve(studio, 'src/command/commands/insert.ts'));
+  const builtInsert=await readFile(resolve(studio,'src/command/commands/insert.ts'),'utf8');
+  for(const command of commandIds)assert.ok(builtInsert.includes(`createInsertPlaceholderStudioCommandN019('${command}'`));
   const output = await mkdtemp(join(tmpdir(), 'jueony-n019-bundle-'));
   const profile = await mkdtemp(join(tmpdir(), 'jueony-n019-edge-'));
   const pageErrors: string[] = [], consoleErrors: string[] = [], externalRequests: string[] = [], missingResources: string[] = [];
@@ -79,11 +80,6 @@ test('N019 Studio surfaces and dispatcher keep unsupported insert placeholders d
     await writeFile(fixtureSource, fixture);
     await viteBuild({
       root: studio, configFile: false, logLevel: 'silent', resolve: { alias: { '@': resolve(studio, 'src') } },
-      plugins: [{
-        name: 'n019-command-seam', enforce: 'pre',
-        resolveId(source) { return source.endsWith('/jueony/shortcuts/insert-placeholder-capability-n019.ts') ? resolve(app, 'src/shortcuts/insert-placeholder-capability-n019.ts') : undefined; },
-        transform(code, id) { return /[\\/]src[\\/]command[\\/]commands[\\/]insert\.ts$/u.test(id) ? patchInsertPlaceholderCommandsN019(code) : undefined; },
-      }],
       build: { outDir: output, emptyOutDir: true, rollupOptions: { input: { n019: fixtureHtml } } },
     });
     const emitted = await readdir(output), builtHtml = emitted.find(value => value === `${fixtureName}.html`) ?? emitted.find(value => value === 'n019.html');

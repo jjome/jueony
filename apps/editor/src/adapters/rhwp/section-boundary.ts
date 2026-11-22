@@ -1,3 +1,18 @@
+/** Reflow new section rows with the same metrics the document writer uses. */
+export function mergeSectionBoundaryWithPortableMetrics(wasm: any, rightSection: number) {
+  const doc = wasm.borrowDocumentHandle?.() ?? wasm;
+  const merge = () => doc.mergeSectionBoundary(rightSection);
+  return typeof wasm.withPortableMetrics === 'function' ? wasm.withPortableMetrics(merge) : merge();
+}
+
+function movesBodyTable(doc: any, section: number): boolean {
+  let start = 0;
+  for (let index = 0; index < section; index++) start += doc.getParagraphCount(index);
+  const end = start + doc.getParagraphCount(section);
+  const controls: { list: number; para: number; ctrlId: string }[] = JSON.parse(doc.getControls());
+  return controls.some(control => control.list === 0 && control.ctrlId === 'tbl' && control.para > start && control.para < end);
+}
+
 /** Only body section edges reach this adapter; ordinary deletes keep Studio's commands. */
 export function mergeBodySectionBoundary(input: any, rightSection: number): void {
   const doc = input.wasm.borrowDocumentHandle();
@@ -10,7 +25,9 @@ export function mergeBodySectionBoundary(input: any, rightSection: number): void
     input.executeOperation({
       kind: 'snapshot', operationType: 'jueonySectionMerge',
       operation: (wasm: any) => {
-        const value = wasm.borrowDocumentHandle().mergeSectionBoundary(rightSection);
+        const current = wasm.borrowDocumentHandle();
+        const value = current.canvasMetricsActive?.() && movesBodyTable(current, rightSection)
+          ? mergeSectionBoundaryWithPortableMetrics(wasm, rightSection) : current.mergeSectionBoundary(rightSection);
         const result = typeof value === 'string' ? JSON.parse(value) : value;
         if (result?.ok !== true || !Number.isInteger(result.sectionIdx)
           || !Number.isInteger(result.paraIdx) || !Number.isInteger(result.charOffset))

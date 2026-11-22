@@ -32,7 +32,7 @@ const tabs: Record<string, Group[]> = {
     { label: '편집 용지', commands: ['file:page-setup', 'page:col-settings', 'page:break', 'page:section-break', 'page:section-settings'] },
     { label: '쪽 모양', commands: ['page:master-page', 'page:line-number-settings', 'page:copy-body-page', 'page:paste-body-page', 'page:delete-body-page', 'page:remove-empty-section', 'page:header-create', 'page:footer-create', 'page:new-page-num', 'page:hide-current'] },
   ],
-  review: [{ label: '문서 검토', commands: ['edit:compare-documents', 'edit:document-history'] }],
+  review: [{ label: '문서 검토', commands: ['edit:compare-documents', 'edit:document-history', 'ext:jueony-read-memos', 'ext:jueony-administrative-audit', 'ext:jueony-layout-diagnostics'] }],
   table: [
     { label: '표와 셀', commands: ['table:create', 'table:cell-props'] },
     { label: '셀 편집', commands: ['table:cell-merge', 'table:cell-split', 'table:insert-row-col', 'table:delete-row-col', 'table:cell-height-equal', 'table:cell-width-equal'] },

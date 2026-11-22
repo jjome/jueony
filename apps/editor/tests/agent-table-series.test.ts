@@ -38,11 +38,13 @@ for(const format of ['hwp','hwpx']) test(format+' nested stored formula fill shi
   const save=(d:any)=>format==='hwp'?d.exportHwp():d.exportHwpx();
   const d=new HwpDocument(save(blank));blank.free();
   try{
-    const [sibling,table]=readStructure(d).nestedTables!;
+    const [,table]=readStructure(d).nestedTables!;
     const root=[...table.ancestors,{controlIndex:table.control,cellIndex:0,cellParaIndex:0}];
     const seed=JSON.parse(d.insertTableFormulaFieldByPath(table.section,table.paragraph,JSON.stringify(root),'','=A2*2','%g'));
     assert.equal(seed.value,'4');
     const base={...snapshot(d,'계산.'+format),tableFormulaFields:readTableFormulaFields(d,true)};
+    // The seed can change which structural edits are safe. Take the sibling baseline at fill time.
+    const [sibling]=base.structure.nestedTables!;
     const op={...operation,target:table.id,endColumn:2,mode:'formula'} as const;
     const undo=d.saveSnapshot();
     executeDocumentOperations(d,base,validateEditOperations([op],base));

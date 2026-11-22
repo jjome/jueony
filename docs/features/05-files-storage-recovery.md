@@ -8,13 +8,13 @@
 
 ## 진행 요약
 
-실행 작업 **25개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **26개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **25/25** · 부분 0 | 완료 0/10 · 부분 10 |
-| 검증 | 완료 23/25 · 부분 2 | 완료 0/10 · 부분 10 |
-| Agent 연결 | 연결 🟢 **6/6** · 부분 0 · 해당 없음 19 | 연결 0/10 · 부분 5 · 미연결 5 |
+| 구현 | 완료 🟢 **26/26** · 부분 0 | 완료 0/10 · 부분 10 |
+| 검증 | 완료 23/26 · 부분 3 | 완료 0/10 · 부분 10 |
+| Agent 연결 | 연결 🟢 **6/6** · 부분 0 · 해당 없음 20 | 연결 0/10 · 부분 5 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -23,7 +23,8 @@
 ## 먼저 할 일
 
 - **검증** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 남은 검수는 실제 한글 합본 비교이며 N002와 분리한다. 기준 구현 커밋 f2e19c5b, 커밋 아카이브 증거140개 해시 일치.
-- **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
+- **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류. 구역을 합친 뒤 일반 표의 3.8픽셀 위치 차이를 보정했다. 새 문서와 저장된 HWP·HWPX를 두 형식으로 저장하고 표·셀·후속 문단 배치를 대조했다. Chrome에서 두 방향으로 변환해 다운로드하고 원본 바이트와 표·셀 좌표를 대조했다.
+- **검증** [G129](<05-files-storage-recovery.md#g129>) **Word·PDF의 HWPX 변환 사본** — 복합 Word 서식과 독립 한글 열기·출력 확인이 남았다.
 
 ## 기능별 작업표
 
@@ -38,6 +39,7 @@
 - [저장·호환성 · 독립 실행 작업 (2)](<#work-7>)
 - [HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존](<#work-8>)
 - [공개 형식 변환의 필드 보존 차이 4건](<#work-9>)
+- [파일 · 독립 실행 작업](<#work-10>)
 
 <a id="work-1"></a>
 
@@ -136,6 +138,14 @@
 | --- | --- | --- | --- | --- |
 | [N002](<05-files-storage-recovery.md#n002>) · 작업 | 공개 형식 변환의 필드 보존 차이 4건 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G092](<05-files-storage-recovery.md#g092>) · 작업 | HWP 글상자 알려진 세로 정렬과 raw list 비트 동기화 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+
+<a id="work-10"></a>
+
+### 파일 · 독립 실행 작업
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [G129](<05-files-storage-recovery.md#g129>) · 작업 | Word·PDF의 HWPX 변환 사본 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 
@@ -437,9 +447,9 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **PARTIAL**.
 - 완료 범위: 기록된 공개5문서10변환의4개 차이; common배치조회·영어단위·Lock·표셀메모 소유; 보존검사 유지
-- 다음 작업: 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
+- 다음 작업: 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류. 구역을 합친 뒤 일반 표의 3.8픽셀 위치 차이를 보정했다. 새 문서와 저장된 HWP·HWPX를 두 형식으로 저장하고 표·셀·후속 문단 배치를 대조했다. Chrome에서 두 방향으로 변환해 다운로드하고 원본 바이트와 표·셀 좌표를 대조했다.
 - 상위 항목: [B077](<10-headers-notes-fields.md#b077>) 필드
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [summary.json](<../evidence/format-conversion-2026-10-15/summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>) · [112-file-recovery-implementation.md](<../112-file-recovery-implementation.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [114-native-row-storage.md](<../114-native-row-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/native-rows92/README.md>) · [115-column-width-storage.md](<../115-column-width-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/columns93/README.md>) · [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/reflow94/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [summary.json](<../evidence/format-conversion-2026-10-15/summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>) · [112-file-recovery-implementation.md](<../112-file-recovery-implementation.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [114-native-row-storage.md](<../114-native-row-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/native-rows92/README.md>) · [115-column-width-storage.md](<../115-column-width-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/columns93/README.md>) · [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/reflow94/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `EXPLICIT_SCOPED_FIX;INDEPENDENT_HANCOM_GEOMETRY_FAILURES_FOUND_2026_10_17;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING;COMPUTED_PREFIX94_AUTOMATED_CLOSURE_PASS_NATIVE_PARITY_OPEN;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18`
 
 </details>
@@ -627,6 +637,19 @@
 - 상위 항목: [B011](<05-files-storage-recovery.md#b011>) 다른 이름 저장
 - 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [comparison.json](<../evidence/n046-hancom-2026-11-08/comparison.json>) · [editor-roundtrip.json](<../evidence/n046-hancom-2026-11-08/editor-roundtrip.json>)
 - 원래 기록: `PREEXISTING_UNRESOLVED_DIRECTION_MAPPING_EXPLICITLY_COUNTED_2026_10_24;VERIFIED_RUST_EDGE_AND_HANCOM_2026_11_08`
+
+</details>
+
+<details id="g129">
+<summary>G129 · Word·PDF의 HWPX 변환 사본</summary>
+
+- 종류: 실행 작업 · 우선순위: P2.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 손실 안내, DOCX 본문과 단순 표, PDF 텍스트와 선택 OCR, 별도 탭과 검증된 HWPX 출력.
+- 다음 작업: 복합 Word 서식과 독립 한글 열기·출력 확인이 남았다.
+- 근거: [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

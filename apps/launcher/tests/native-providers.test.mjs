@@ -15,7 +15,7 @@ function response(id,text,mode) {
 }
 before(async()=>{
  server=http.createServer(async(req,res)=>{
-  let raw='';for await(const part of req)raw+=part;const body=JSON.parse(raw);
+  req.setEncoding('utf8');let raw='';for await(const part of req)raw+=part;const body=JSON.parse(raw);
   const id=req.url.includes(':generateContent')?'gemini':req.url.endsWith('/messages')?'anthropic':'openai-responses';
   const data=JSON.parse(id==='gemini'?body.contents[0].parts[0].text:id==='anthropic'?body.messages[0].content:body.input[1].content),mode=data.instruction;
   calls.push({id,url:req.url,headers:req.headers,body,data});
@@ -77,6 +77,22 @@ test('strict projection makes optional format fields nullable; normalization pre
  const format=schema.properties.operations.items.anyOf.find(v=>v.properties.kind.enum[0]==='format_characters');
  assert.deepEqual(format.properties.properties.properties.bold.anyOf,[{type:'boolean'},{type:'null'}]);
  assert.deepEqual(parseGeneration(JSON.stringify({message:'제안',sourceIds:[],operations:[{kind:'format_characters',target:'s0p0',properties:{bold:false,italic:null,fontSizePt:0,unknown:null}}]}),true).operations[0].properties,{bold:false,fontSizePt:0,unknown:null});
+});
+test('strict provider normalization preserves sparse settings for an atomic section split',()=>{
+ const schema=nativeSchema([],true).properties.operations.items.anyOf;
+ const split=schema.find(variant=>variant.properties.kind.enum[0]==='split_section');
+ assert.equal(split.properties.newPageSetup.anyOf.at(-1).type,'null');
+ assert.equal(split.properties.newPageBorder.anyOf[0].properties.footerInside.anyOf.at(-1).type,'null');
+ const operations=[
+  {kind:'split_section',target:'s0p1',offset:0,newPageSetup:{landscape:true,marginTopMm:0,marginLeftMm:null,unknown:null},newPageBorder:{headerInside:false,footerInside:null}},
+  {kind:'split_section',target:'s0p0',offset:1,newPageSetup:null,newPageBorder:null},
+  {kind:'set_page_border_inclusion',sections:[0,2],headerInside:true,footerInside:null},
+ ];
+ assert.deepEqual(parseGeneration(JSON.stringify({message:'제안',sourceIds:[],operations}),true).operations,[
+  {kind:'split_section',target:'s0p1',offset:0,newPageSetup:{landscape:true,marginTopMm:0,unknown:null},newPageBorder:{headerInside:false}},
+  {kind:'split_section',target:'s0p0',offset:1},
+  {kind:'set_page_border_inclusion',sections:[0,2],headerInside:true},
+ ]);
 });
 test('Gemini rejects blocked prompts and models containing path components',async()=>{
  await assert.rejects(run('gemini','blocked'),e=>e.code==='refusal');

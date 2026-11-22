@@ -1,4 +1,5 @@
 import {readAgentDocumentInformation,preflightAgentDocumentMetadata,assertAgentDocumentMetadata} from './agent-document-information.ts';
+import {readShapeFillSources} from './agent-shape-fill.ts';
 import {configureDocumentHistoryScope} from '../browser/document-history-context.ts';
 import type {HistoryScope} from '../../modules/document-files/public/index.ts';
 import {readDocumentMetadata,DOCUMENT_METADATA_KEYS} from './document-metadata.ts';
@@ -26,52 +27,102 @@ import {captureFileConnection, restoreFileConnection} from '../files/file-connec
 import type {StoredFileConnection} from '../files/file-connection.ts';
 import { rememberFileSnapshot } from '../files/save-runtime.ts';
 import { collectTargetEvidence } from '../../../document-agent/controller';
+import type {CommandDispatcher} from '../../../command/dispatcher';
 import { assertRevision } from '../../modules/document/public/index.ts';
 import { createDocumentFacades } from '../../modules/document/public/index.ts';
 import { executeDocumentOperations } from './execute.ts';
-import { readStructure } from './structure.ts';
+import { nativeDocument, readStructure } from './structure.ts';
+import { readAdministrativeAuditProfile } from './administrative-audit.ts';
+import { inspectDocumentLayout } from './layout-diagnostics.ts';
+import { captureDeleteCommentB092, captureUpdateCommentB092, executeCommentPlanInSnapshotB092, readDocumentCommentsB092 } from './document-comments-b092.ts';
+import { showAdministrativeAudit } from '../browser/administrative-audit-dialog.ts';
+import { showDocumentMemos } from '../browser/document-memos-dialog.ts';
+import { createOfficeCopy } from './office-copy-native.ts';
+import { createWorkTemplateCopy } from './work-templates-native.ts';
+import {createInstitutionTemplateCopy,inspectInstitutionTemplate} from './institution-template-copy.ts';
+import type { WorkTemplateId, WorkTemplateValues } from '../../modules/document/public/work-templates.ts';
+import type { HwpReferenceAddress } from '../../modules/references/public/index.ts';
+import { readHwpReference, readHwpReferenceText } from './reference-locations.ts';
+import { bindManualEditObserver, createManualAlignmentMacro } from './manual-alignment-macro.ts';
+import {agentStoredCharacterStyle} from '../../modules/document/public/engine-integration.ts';
+import { DOCUMENT_CONTEXT_TEXT_LIMIT, DOCUMENT_TOOL_EDIT_TEXT_LIMIT, DOCUMENT_TOOL_PARAGRAPH_LIMIT, DOCUMENT_TOOL_READ_LENGTH, DOCUMENT_TOOL_SECTION_LIMIT,
+  type DocumentToolOutline, type DocumentToolWindow } from '../../modules/document/public/document-tool-reading.ts';
+import type { OfficeBlock } from '../files/office-copy.ts';
+import { showPrintImposition } from '../browser/print-imposition-dialog.ts';
+import { findHitPosition } from '../../editor-actions/basic-find.ts';
+import {inspectShortcutStoryContextN021} from '../../shortcuts/special-story-context-n021.ts';
 import {readTableFormulaFields} from './table-formula-fields.ts';
 import {insertedTableFormulaReceipt} from './insert-agent-table-formula.ts';
 import {tableFormulaReceipt} from './update-table-formula-field.ts';
 import {verifyPreservedExport} from './preservation.ts';
 import {planSaveTableFrames,applySaveTableFrames} from './save-table-frames.ts';
 import {readNativeFormattingState} from './formatting-toolbar.ts';
-import { plainSnapshot } from '../../modules/document/public/index.ts';
-import type { Snapshot, Receipt, EditProposal as Generation } from '../../modules/document/public/index.ts';
-type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;refreshMenus:()=>Promise<void>;};
+import { plainSnapshot,sectionChangeReceipt } from '../../modules/document/public/index.ts';
+import type { AuditAddress, Snapshot, Receipt, EditProposal as Generation } from '../../modules/document/public/index.ts';
+type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;dispatcher:Pick<CommandDispatcher,'dispatchWithResult'>;refreshMenus:()=>Promise<void>;};
 export function installAgentBridge(d:Deps){
  const api=(window as any).jueonyEditor;let applying=false,composing=false,damaged=false;
  const applied=new Map<string,Receipt>();
- const savedRequestRevisions=new Map<string,{before:string;after:string;command:any}>();
+ type SaveRebase={runId:string;before:string;after:string;command:object};
+ const savedRequestRevisions=new Map<string,SaveRebase>();
+ let pendingSaveRebase:SaveRebase|undefined;
+ d.eventBus.on('document-swapped',()=>{pendingSaveRebase=undefined;savedRequestRevisions.clear();applied.clear();});
  document.addEventListener('compositionstart',()=>composing=true,true);document.addEventListener('compositionend',()=>composing=false,true);
  const revision=()=>api.revision() as string;
- const textOf=(doc:any)=>{const value=JSON.parse(doc.getTextFileUnicode());return typeof value==='string'?value:typeof value.text==='string'?value.text:JSON.stringify(value);};
- function snapshot():Snapshot{
+ const reportCommands= [
+  {id:'ext:jueony-administrative-audit',label:'행정 문서 검사',mode:'administrative'},
+  {id:'ext:jueony-layout-diagnostics',label:'쪽 배치 검사',mode:'layout'},
+ ] as const;
+ const memoReview={id:'ext:jueony-read-memos',label:'문서 메모'};
+ const printImposition={id:'ext:jueony-print-imposition',label:'모아찍기 미리보기'};
+ function bodyEditEvidence(section:number,paragraph:number,length:number,localControls:{ctrlId:string}[]){
+  // Section and column definitions are metadata. The normal inline and mixed-format checks still apply.
+  const reader=localControls.length&&localControls.every(control=>control.ctrlId==='secd'||control.ctrlId==='cold')
+    ?Object.assign(Object.create(d.wasm),{getControlTextPositions:()=>[]}):d.wasm;
+  return collectTargetEvidence(reader,{kind:'body_paragraph',section,paragraph,charOffset:0,length});
+ }
+ function canUseToolEdit(){
+  const context=d.automation.getContext();
+  return /\.hwpx?$/iu.test(d.wasm.fileName)&&context.isEditable===true&&!context.isFormMode&&!d.wasm.requiresPasswordForSave;
+ }
+ function snapshot(editTarget?:string):Snapshot{
   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 다시 요청해 주세요.');
   d.input()?.flushDeferredPaginationIfNeeded('jueony-context');
-  const before=revision();const nodes:Snapshot['nodes']=[];const controls=d.wasm.getControls();let flatParagraph=0;
+  const before=revision();const nodes:Snapshot['nodes']=[];const controls=d.wasm.getControls();let flatParagraph=0,bodyLength=0;
   for(let section=0;section<d.wasm.getSectionCount();section++)for(let paragraph=0;paragraph<d.wasm.getParagraphCount(section);paragraph++){
-   const length=d.wasm.getParagraphLength(section,paragraph),text=d.wasm.getTextRange(section,paragraph,0,length);let editable=true,reason='';
-   try{
-    // Section/column definitions are document metadata, not editable inline objects.
-    // Only relax the inline-control guard when the entire document's controls
-    // are these two known metadata types. Field/mixed-format guards stay intact.
-    const localControls=controls.filter((c:any)=>c.list===0&&c.para===flatParagraph);
-    const reader=localControls.length&&localControls.every((c:any)=>c.ctrlId==='secd'||c.ctrlId==='cold')
-      ?Object.assign(Object.create(d.wasm),{getControlTextPositions:()=>[]}):d.wasm;
-    collectTargetEvidence(reader,{kind:'body_paragraph',section,paragraph,charOffset:0,length});}catch(e){editable=false;reason=e instanceof Error?e.message:'지원하지 않는 문단';}
-   nodes.push({id:`s${section}p${paragraph}`,section,paragraph,text,editable,...(!editable?{reason}:{})});
+   const id=`s${section}p${paragraph}`;
+   const length=d.wasm.getParagraphLength(section,paragraph),text=d.wasm.getTextRange(section,paragraph,0,length);
+   let editable=editTarget===undefined||editTarget===id,reason='';
+   if(editable){
+    try{bodyEditEvidence(section,paragraph,length,controls.filter((control:any)=>control.list===0&&control.para===flatParagraph));}
+    catch(error){editable=false;reason=error instanceof Error?error.message:'지원하지 않는 문단';}
+   }
+   bodyLength+=text.length+1;
+   if(editTarget!==undefined&&bodyLength>DOCUMENT_TOOL_EDIT_TEXT_LIMIT)throw new Error('저장 보존을 검사할 수 있는 장문 편집 범위를 넘었습니다.');
+   nodes.push({id,section,paragraph,text,editable,...(reason?{reason}:{})});
    flatParagraph++;
   }
-  const plainText=textOf(d.wasm.borrowDocumentHandle());assertRevision(before,revision());
-  if(plainText.length>120000)throw new Error('전체 문서 텍스트 한도 120,000자를 넘습니다.');
-  const structure=readStructure(d.wasm);assertRevision(before,revision());
+  if(editTarget!==undefined){
+   assertRevision(before,revision());
+   if(!nodes.some(node=>node.id===editTarget&&node.editable))throw new Error('조회한 문단의 편집 조건이 바뀌었습니다.');
+   return {revision:before,name:d.wasm.fileName,nodes,limitations:[]};
+  }
+  const plainText=readHwpReferenceText(d.wasm.borrowDocumentHandle());assertRevision(before,revision());
+  if(plainText.length>DOCUMENT_CONTEXT_TEXT_LIMIT)throw new Error('전체 문서 텍스트 한도 120,000자를 넘습니다. 조회 도구로 문단을 나눠 읽을 수 있습니다.');
+  const nestedTableTemplateEvidence:Record<string,string>=Object.create(null);
+  const shapeFillSources=readShapeFillSources(d.wasm.borrowDocumentHandle(),/\.hwpx?$/iu.test(d.wasm.fileName)&&
+    d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave);
+  const structure=readStructure(d.wasm,nestedTableTemplateEvidence);assertRevision(before,revision());
+  const input=d.input(),story=inspectShortcutStoryContextN021(input);
+  const sectionIndex=input?.getPosition?.()?.sectionIndex;
+  const currentSection=story.exact&&story.kind==='body'&&Number.isSafeInteger(sectionIndex)
+    &&structure.sections.some(section=>section.index===sectionIndex)?sectionIndex:undefined;
   const paragraphTabSources=readAgentParagraphTabSources(d.wasm,nodes),paragraphDecorationSources=readAgentParagraphDecorationSources(d.wasm,nodes);assertRevision(before,revision());
   const lists=readAgentParagraphLists(d.wasm,nodes),outlines=readAgentParagraphOutlineSources(d.wasm,nodes,lists.listCatalog);assertRevision(before,revision());
-  return {revision:before,name:d.wasm.fileName,tableFormulaFields:readTableFormulaFields(d.wasm,/\.hwpx?$/iu.test(d.wasm.fileName)&&d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave,structure.tables.some(t=>t.editable&&t.cells.some(c=>c.editable)) || !!structure.nestedTables?.some(t=>t.cells.some(c=>c.editable))),documentInformation:readAgentDocumentInformation(d.wasm,d.wasm.fileName,d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave),nodes,plainText,structure,cellParagraphSources:readCellParagraphSources(d.wasm,structure.tables,d.wasm.fileName),tableSubdivisionSources:readTableSubdivisionSources(d.wasm,structure.tables,d.wasm.fileName),tableStructureSources:readTableStructureSources(d.wasm,structure.tables,d.wasm.fileName),tableSplitSources:readTableSplitSources(d.wasm,structure.tables,d.wasm.fileName),tableMergeSources:readTableMergeSources(d.wasm,structure.tables,d.wasm.fileName),rowHeightSources:readRowHeightSources(d.wasm,structure.tables,d.wasm.fileName),equalColumnSources:readEqualColumnSources(d.wasm,structure.tables,d.wasm.fileName),cellPaddingSources:readCellPaddingSources(d.wasm,structure.tables,d.wasm.fileName),tablePaginationSources:readAgentTablePaginationSources(d.wasm,structure.tables),tableHeaderSources:readAgentTableHeaderSources(d.wasm,structure.tables),...lists,...outlines,...readAgentStyleCreationSources(d.wasm),...readAgentStyleRenameSources(d.wasm),...readAgentStyleNextSources(d.wasm),...(paragraphTabSources?{paragraphTabSources}:{}),...(paragraphDecorationSources?{paragraphDecorationSources}:{}),limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 보호 셀/표는 내용·서식·행/열 변경을 거절합니다. 본문 단순 표 쪽 나눔 none/cell/row(단독 요청, 맨 위 연속 제목 행 수 지정/해제·반복과 쪽 나눔 설정은 단독 요청 지원; 부분/흩어진 제목 원본은 보호), 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, HWPX 본문 단순 표 전체 행에 걸친 두 열 이상 너비 같게(단독 요청, 총너비 유지)·단일 단 구역의 전체 행 열 너비 mm 직접 지정(단독 요청, 본문 폭 이내; 행 높이 같게/직접 지정은 HWPX 한 쪽 단순 표의 전체 행·단독 요청 지원, 내용 최소 높이 초과 시 거절), HWPX 원본의 기존 본문 단순 표 셀 안 여백 네 방향 직접 지정/표 기본값 복귀(단독 요청), 일반 본문 구역 나누기·합치기·검증된 빈 본문 구역 삭제·기존 단순 머리말/꼬리말 텍스트·기본 글자 서식·정렬/백분율 줄 간격 수정·일반 문서의 새 정의 생성/기존 정의 삭제(각 단독 요청), 일반 본문 점 책갈피 추가·이름 변경·삭제(단독 요청), 저장 문단 스타일의 모양을 공유하는 새 이름 정의 생성(단독 요청, 본문 적용은 후속 요청)·기존 문단 스타일 이름/다음 문단 스타일 변경(필드 문서·바탕글/글자/잠금/비정규 원본 제외, 단독 요청), 저장된 구역 개요 모양의 본문 수준 지정·해제(다른 문단 전용 묶음), 새 기본 숫자 번호 3종·7수준·시작 값 생성(단독 요청), 조회된 기본 번호 모양 복제·지정 수준 시작 값·새 목록 적용(단독 요청, 원본 모양 보존 가능 시), 기본 문자 글머리표 8종 새 정의 생성·적용(단독 요청), 현재 문서에 저장된 문단 번호·글머리표 정의 적용/번호 7수준/해제(전용 묶음), 일반 본문 문단 기본 테두리/단색 배경·간격·연결/여백 무시, 일반 본문 문단별 사용자 탭 32개·양 끝 자동 탭(다른 문단 탭끼리 최대 30명령), 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 단색 쪽 배경·기본 텍스트 바탕쪽, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. HWPX 한 쪽 평면 본문 표의 동일 셀 속성 사각형 병합과 주변 격자가 확인된 병합 주 셀 하나의 기본 분할은 단독 요청 지원합니다. 기본 분할은 내용을 주 셀에 유지하고 새 셀은 비웁니다. 조회 가능한 HWPX 한 쪽 평면 표의 행 경계 나누기와 동일 속성의 다음 표 붙이기도 단독 요청 지원합니다. HWP·HWPX의 비보호 병합 주 셀에서는 쪽별 글줄을 대조한 문단과 누름틀 뒤 일반 텍스트를 교체할 수 있습니다. 병합 문단의 지정 글자 구간에는 굵게·기울임·색·크기를 적용할 수 있습니다. 중첩 표의 조회된 셀 문단은 서식 구간별로 교체할 수 있습니다. axisEditable인 내부 표는 지정한 행·열을 추가하거나 삭제할 수 있습니다. 병합 주 셀의 문단 교체와 합성 셀 영역이 없는 한 쪽 평면 표의 임의 행·열 분할은 단독 요청 지원합니다. 한 단의 원본 HWP5 본문 표 한 개도 바이너리 저장·재열기가 검증되면 분할할 수 있습니다. exactGrid가 확인되면 병합이 여러 개인 표에서도 조회된 셀을 새 격자선으로 나눌 수 있습니다. 해당 셀에 문단 서식이 조회되면 요청에 따라 새 셀에 순서대로 분배합니다. 셀 자체가 여러 쪽에 걸쳐도 원본 글줄과 쪽별 셀 범위가 확인되고 분할 후 각 쪽의 외형과 이웃 글줄이 보존되면 분할합니다. 병합 표에서 행·열 변경 뒤 살아남는 누름틀과 이름 셀은 필드 보존을 확인합니다. 조회된 표 계산식은 editable인 기존 필드의 원문·숫자 서식·계산 결과를 단독 요청으로 바꿀 수 있습니다. canInsert인 문서에서는 200칸 이하의 본문 표에서 주 셀의 시작 주소와 일반 텍스트 원문을 지정해 계산식 필드를 넣을 수 있습니다. 병합 범위를 참조하면 같은 주 셀을 범위당 한 번 계산합니다. canUseCellPaths인 경우 조회한 중첩 표 ID로 내부 표의 계산식을 지정할 수 있습니다. 같은 표에서 검증한 의존 계산식의 결과는 canRefreshDependents가 참일 때 함께 갱신합니다. 격자를 확인할 수 없는 병합 원본·axisEditable이 없는 중첩 표·합성 셀 영역의 구조 변경, 개체·기타 필드 편집은 미지원입니다.']} as Snapshot;
+  return {revision:before,name:d.wasm.fileName,...(currentSection===undefined?{}:{currentSection}),...(shapeFillSources?{shapeFillSources}:{}),...(Object.keys(nestedTableTemplateEvidence).length?{nestedTableTemplateEvidence}:{}),tableFormulaFields:readTableFormulaFields(d.wasm,/\.hwpx?$/iu.test(d.wasm.fileName)&&d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave,structure.tables.some(t=>t.editable&&t.cells.some(c=>c.editable)) || !!structure.nestedTables?.some(t=>t.cells.some(c=>c.editable))),documentInformation:readAgentDocumentInformation(d.wasm,d.wasm.fileName,d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave),nodes,plainText,structure,cellParagraphSources:readCellParagraphSources(d.wasm,structure.tables,d.wasm.fileName),tableSubdivisionSources:readTableSubdivisionSources(d.wasm,structure.tables,d.wasm.fileName),tableStructureSources:readTableStructureSources(d.wasm,structure.tables,d.wasm.fileName),tableSplitSources:readTableSplitSources(d.wasm,structure.tables,d.wasm.fileName),tableMergeSources:readTableMergeSources(d.wasm,structure.tables,d.wasm.fileName),rowHeightSources:readRowHeightSources(d.wasm,structure.tables,d.wasm.fileName),equalColumnSources:readEqualColumnSources(d.wasm,structure.tables,d.wasm.fileName),cellPaddingSources:readCellPaddingSources(d.wasm,structure.tables,d.wasm.fileName),tablePaginationSources:readAgentTablePaginationSources(d.wasm,structure.tables),tableHeaderSources:readAgentTableHeaderSources(d.wasm,structure.tables),...lists,...outlines,...readAgentStyleCreationSources(d.wasm),...readAgentStyleRenameSources(d.wasm),...readAgentStyleNextSources(d.wasm),...(paragraphTabSources?{paragraphTabSources}:{}),...(paragraphDecorationSources?{paragraphDecorationSources}:{}),limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 보호 셀/표는 내용·서식·행/열 변경을 거절합니다. 본문 단순 표 쪽 나눔 none/cell/row(단독 요청, 맨 위 연속 제목 행 수 지정/해제·반복과 쪽 나눔 설정은 단독 요청 지원; 부분/흩어진 제목 원본은 보호), 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, HWP·HWPX 본문 단순 표 전체 행에 걸친 두 열 이상 너비 같게(단독 요청, 총너비 유지)·단일 단 구역의 전체 행 열 너비 mm 직접 지정(단독 요청, 본문 폭 이내; 행 높이 같게/직접 지정은 HWP·HWPX 한 쪽 단순 표의 전체 행·단독 요청 지원, 내용 최소 높이 초과 시 거절), HWPX 원본의 기존 본문 단순 표 셀 안 여백 네 방향 직접 지정/표 기본값 복귀(단독 요청), 일반 본문 구역 나누기·합치기·검증된 빈 본문 구역 삭제·기존 단순 머리말/꼬리말 텍스트·기본 글자 서식·정렬/백분율 줄 간격 수정·일반 문서의 새 정의 생성/기존 정의 삭제(각 단독 요청), 일반 본문 점 책갈피 추가·이름 변경·삭제(단독 요청), 저장 문단 스타일의 모양을 공유하는 새 이름 정의 생성(단독 요청, 본문 적용은 후속 요청)·기존 문단 스타일 이름/다음 문단 스타일 변경(필드 문서·바탕글/글자/잠금/비정규 원본 제외, 단독 요청), 저장된 구역 개요 모양의 본문 수준 지정·해제(다른 문단 전용 묶음), 새 기본 숫자 번호 3종·7수준·시작 값 생성(단독 요청), 조회된 기본 번호 모양 복제·지정 수준 시작 값·새 목록 적용(단독 요청, 원본 모양 보존 가능 시), 기본 문자 글머리표 8종 새 정의 생성·적용(단독 요청), 현재 문서에 저장된 문단 번호·글머리표 정의 적용/번호 7수준/해제(전용 묶음), 일반 본문 문단 기본 테두리/단색 배경·간격·연결/여백 무시, 일반 본문 문단별 사용자 탭 32개·양 끝 자동 탭(다른 문단 탭끼리 최대 30명령), 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 텍스트 바탕쪽, HWP/HWPX의 조회한 일반 단색과 두 색 선형 쪽 배경, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. HWPX 한 쪽 평면 본문 표의 동일 셀 속성 사각형 병합과 주변 격자가 확인된 병합 주 셀 하나의 기본 분할은 단독 요청 지원합니다. 기본 분할은 내용을 주 셀에 유지하고 새 셀은 비웁니다. 조회 가능한 HWPX 한 쪽 평면 표의 행 경계 나누기와 동일 속성의 다음 표 붙이기도 단독 요청 지원합니다. HWP·HWPX의 비보호 병합 주 셀에서는 쪽별 글줄을 대조한 문단과 누름틀 뒤 일반 텍스트를 교체할 수 있습니다. 병합 문단의 지정 글자 구간에는 굵게·기울임·색·크기를 적용할 수 있습니다. 중첩 표의 조회된 셀 문단은 서식 구간별로 교체할 수 있습니다. axisEditable인 내부 표는 지정한 행·열을 추가하거나 삭제할 수 있습니다. 병합 주 셀의 문단 교체와 합성 셀 영역이 없는 한 쪽 평면 표의 임의 행·열 분할은 단독 요청 지원합니다. 한 단의 원본 HWP5 본문 표 한 개도 바이너리 저장·재열기가 검증되면 분할할 수 있습니다. exactGrid가 확인되면 병합이 여러 개인 표에서도 조회된 셀을 새 격자선으로 나눌 수 있습니다. 해당 셀에 문단 서식이 조회되면 요청에 따라 새 셀에 순서대로 분배합니다. 셀 자체가 여러 쪽에 걸쳐도 원본 글줄과 쪽별 셀 범위가 확인되고 분할 후 각 쪽의 외형과 이웃 글줄이 보존되면 분할합니다. 병합 표에서 행·열 변경 뒤 살아남는 누름틀과 이름 셀은 필드 보존을 확인합니다. 조회된 표 계산식은 editable인 기존 필드의 원문·숫자 서식·계산 결과를 단독 요청으로 바꿀 수 있습니다. canInsert인 문서에서는 200칸 이하의 본문 표에서 주 셀의 시작 주소와 일반 텍스트 원문을 지정해 계산식 필드를 넣을 수 있습니다. 병합 범위를 참조하면 같은 주 셀을 범위당 한 번 계산합니다. canUseCellPaths인 경우 조회한 중첩 표 ID로 내부 표의 계산식을 지정할 수 있습니다. 같은 표에서 검증한 의존 계산식의 결과는 canRefreshDependents가 참일 때 함께 갱신합니다. 격자를 확인할 수 없는 병합 원본·axisEditable이 없는 중첩 표·합성 셀 영역의 구조 변경 및 일반 개체·기타 필드 편집은 미지원입니다. 조회한 shapeFillSources의 본문 단순 도형은 단독 요청으로 단색 채우기를 바꿀 수 있습니다.']} as Snapshot;
  }
  const native = {
-  snapshot,
+  snapshot:()=>snapshot(),
   toolbarsVisible:()=>document.documentElement.dataset.toolboxBasic!=='hidden',
   formattingState:()=>readNativeFormattingState(d.wasm,d.input(),d.automation.getContext(),api),
   commands:()=>d.automation.listCommands(),
@@ -84,8 +135,15 @@ export function installAgentBridge(d:Deps){
    const pageMenu=model.find((menu:any)=>menu.menuId==='page');
    if(pageMenu&&!pageMenu.items.some((item:any)=>item.commandId==='page:header-footer-dialog'))pageMenu.items.unshift({label:'머리말/꼬리말',commandId:'page:header-footer-dialog',enabled:d.automation.isEnabled('page:header-footer-dialog')});
    if(pageMenu&&!pageMenu.items.some((item:any)=>item.commandId==='page:section-break'))pageMenu.items.push({label:'구역 나누기',commandId:'page:section-break',shortcut:'Alt+Shift+Enter',enabled:d.automation.isEnabled('page:section-break')});
+   if(pageMenu&&d.automation.listCommands().some((item:any)=>item.id==='page:page-number-dialog')){
+    pageMenu.items.push({label:'쪽 번호 매기기',commandId:'page:page-number-dialog',shortcut:'Ctrl+N,P',enabled:d.automation.isEnabled('page:page-number-dialog')});
+   }
    const fileMenu=model.find((menu:any)=>menu.menuId==='file');
    if(fileMenu&&!fileMenu.items.some((item:any)=>item.commandId==='file:document-info'))fileMenu.items.push({label:'문서 정보',commandId:'file:document-info',enabled:d.automation.isEnabled('file:document-info')});
+   if(fileMenu)fileMenu.items.push({...printImposition,commandId:printImposition.id,enabled:d.automation.isEnabled(printImposition.id)});
+   let review=model.find((menu:any)=>menu.menuId==='review');
+   if(!review){review={menuId:'review',label:'검토',items:[]};model.push(review);}
+   for(const {id,label} of reportCommands)review.items.push({label,commandId:id,enabled:d.automation.isEnabled(id)});
    return model;
   },
   focusEditor:()=>d.input()?.focus(),
@@ -109,7 +167,10 @@ export function installAgentBridge(d:Deps){
     const absorbedIntoPrevious=Boolean(previous&&input.history.absorbSaveFrameSnapshot(previous,current,d.wasm));
     if(absorbedIntoPrevious&&previous.type.startsWith('snapshot:jueony:')){
      const runId=previous.type.slice('snapshot:jueony:'.length),receipt=applied.get(runId);
-     if(receipt?.afterRevision===beforeRevision)savedRequestRevisions.set(runId,{before:beforeRevision,after:revision(),command:previous});
+     const prior=pendingSaveRebase?.command===previous?pendingSaveRebase:savedRequestRevisions.get(runId);
+     if(receipt&&(receipt.afterRevision===beforeRevision||(prior&&prior.command===previous&&prior.after===beforeRevision))){
+      pendingSaveRebase={runId,before:receipt.afterRevision,after:revision(),command:previous};
+     }
     }
     return {changedTables:plans.length,beforeRevision,afterRevision:revision(),absorbedIntoPrevious};
    }catch(error){
@@ -119,13 +180,19 @@ export function installAgentBridge(d:Deps){
     throw error;
    }finally{applying=false;root.inert=inert;overlay.remove();}
   },
+  acknowledgeVerifiedSave(expected:unknown,sha256?:string){
+   const pending=pendingSaveRebase;
+   if(!pending||pending.after!==expected||pending.after!==revision()||
+      d.input()?.history.peekUndoTop()!==pending.command||!sha256||!/^[a-f0-9]{64}$/u.test(sha256))return;
+   savedRequestRevisions.set(pending.runId,pending);pendingSaveRebase=undefined;
+  },
   executeCommand(id:string,params?:Record<string,unknown>){
    if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 실행해 주세요.');
    d.input()?.focus();
    if(id==='file:open-recent'&&typeof params?.id!=='string')return {ok:false,message:'최근 문서 식별자가 없습니다. 파일 메뉴를 다시 열어 주세요.'};
    return d.automation.execute(id,params,{allowDialog:true});
   },
-  async preflight(base:Snapshot,generation:Generation){
+  async preflight(base:Snapshot,generation:Generation,includeStructure=false){
    if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('문서 작업이 끝난 뒤 다시 요청해 주세요.');
    assertRevision(base.revision,revision());
    const validated=generation;
@@ -133,6 +200,7 @@ export function installAgentBridge(d:Deps){
    const {HwpDocument}=d.wasm.getWasmModuleExports();
    const creating=validated.operations[0]?.kind==='create_document';
    let copy=creating?HwpDocument.createEmpty():new HwpDocument(recoveryBytes(d.wasm,d.wasm.fileName));
+   let preview:Snapshot['structure'];
    try{
     if(creating){
      copy.createBlankDocument();
@@ -158,10 +226,12 @@ export function installAgentBridge(d:Deps){
      verifyPreservedExport(copy,bytes,d.wasm.fileName.toLowerCase().endsWith('.hwpx')?'hwpx':'hwp',loss,bytes=>new HwpDocument(bytes));
      // The preservation verifier compares resolved semantics, including text/runs/tables.
      // Raw reader JSON differs for HWPX metadata control ordering and cached storage IDs.
+     if(includeStructure&&!creating)preview=readStructure(copy);
     }
     finally{artifact.free();}
    }finally{copy.free();}
    assertRevision(base.revision,revision());
+   return preview;
   },
   documentIdentity:()=>String(d.wasm.documentGeneration)+':'+d.wasm.fileName,
   documentInstance:()=>String(d.wasm.documentGeneration),
@@ -197,7 +267,86 @@ export function installAgentBridge(d:Deps){
    return result;
   },
   recovery(){if(applying||composing||api.busy())return null;d.input()?.flushDeferredPaginationIfNeeded('jueony-recovery');return {name:d.wasm.fileName,dirty:d.documentState.isDirty(),fileConnection:captureFileConnection(d.wasm.currentFileHandle),bytes:recoveryBytes(d.wasm,d.wasm.fileName)};},
-  async readReference(bytes:Uint8Array){await d.ready;const {HwpDocument}=d.wasm.getWasmModuleExports();const doc=new HwpDocument(bytes);try{return textOf(doc);}finally{doc.free();}},
+  async readReference(bytes:Uint8Array){await d.ready;const {HwpDocument}=d.wasm.getWasmModuleExports();const doc=new HwpDocument(bytes);try{return readHwpReferenceText(doc);}finally{doc.free();}},
+  async readReferenceDetails(bytes:Uint8Array){
+   await d.ready;
+   const {HwpDocument}=d.wasm.getWasmModuleExports(),doc=new HwpDocument(bytes);
+   try{return readHwpReference(doc);}finally{doc.free();}
+  },
+  readOpenReference(){
+   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 참고 위치를 확인해 주세요.');
+   const before=revision(),result=readHwpReference(nativeDocument(d.wasm));
+   assertRevision(before,revision());
+   return {...result,revision:before};
+  },
+  inspectDocumentToolOutline():DocumentToolOutline|undefined {
+   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 조회해 주세요.');
+   const stamp=revision(),doc=nativeDocument(d.wasm),sections=doc.getSectionCount();
+   if(sections>DOCUMENT_TOOL_SECTION_LIMIT)throw new Error('문서 조회는 100개 구역까지 지원합니다.');
+   const sectionParagraphs=Array.from({length:sections},(_,section)=>Number(doc.getParagraphCount(section)));
+   const paragraphs=sectionParagraphs.reduce((total,count)=>total+count,0);
+   if(paragraphs>DOCUMENT_TOOL_PARAGRAPH_LIMIT)throw new Error('문서 조회는 본문 50,000문단까지 지원합니다.');
+   const long=paragraphs>1_000||readHwpReferenceText(doc).length>DOCUMENT_CONTEXT_TEXT_LIMIT;
+   assertRevision(stamp,revision());
+   return long?{name:d.wasm.fileName,revision:stamp,sectionParagraphs}:undefined;
+  },
+  readDocumentToolWindow(expected:string,section:number,paragraph:number,start:number,count:number,allowEdit=false):DocumentToolWindow {
+   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 조회해 주세요.');
+   assertRevision(expected,revision());
+   const doc=nativeDocument(d.wasm);
+   if(![section,paragraph,start,count].every(value=>Number.isSafeInteger(value)&&value>=0)||
+      !count||count>DOCUMENT_TOOL_READ_LENGTH||section>=doc.getSectionCount()||paragraph>=doc.getParagraphCount(section)){
+    throw new Error('조회할 문단 또는 범위를 확인할 수 없습니다.');
+   }
+   const length=doc.getParagraphLength(section,paragraph);
+   if(start>length||start===length&&length!==0)throw new RangeError('조회할 문단 범위가 원문을 벗어났습니다.');
+   const end=Math.min(length,start+count),text=doc.getTextRange(section,paragraph,start,end-start);
+   let editable=false;
+   if(allowEdit&&canUseToolEdit()&&length<=DOCUMENT_TOOL_READ_LENGTH){
+    let flatParagraph=paragraph;
+    for(let index=0;index<section;index++)flatParagraph+=doc.getParagraphCount(index);
+    try{bodyEditEvidence(section,paragraph,length,d.wasm.getControls().filter((control:any)=>control.list===0&&control.para===flatParagraph));editable=true;}
+    catch{/* Leave protected or structurally ambiguous paragraphs read-only. */}
+   }
+   assertRevision(expected,revision());
+   return {id:`s${section}p${paragraph}`,text,editable,length,start,end,...(end<length?{nextOffset:end}:{})};
+  },
+  captureDocumentToolEditBase(expected:string,target:string):Snapshot {
+   assertRevision(expected,revision());
+   if(!canUseToolEdit()||!/^s\d{1,3}p\d{1,6}$/u.test(target))throw new Error('현재 장문에서는 본문을 편집할 수 없습니다.');
+   const base=snapshot(target);
+   assertRevision(expected,base.revision);
+   return base;
+  },
+  jumpToReference(address:HwpReferenceAddress,expectedRevision:string){
+   assertRevision(expectedRevision,revision());
+   const {section,paragraph,offset,cell,ancestors}=address;
+   const path=cell ? [...(ancestors??[]),cell].map(({controlIndex,cellIndex,cellParagraph})=>({controlIndex,cellIndex,cellParaIndex:cellParagraph})) : undefined;
+   navigateToReportFinding({section,paragraph,offset,path});
+  },
+  startAlignmentMacro(){if(!alignmentTarget())throw new Error('선택이 없는 일반 본문에서 기록을 시작해 주세요.');alignmentMacro.start();},
+  finishAlignmentMacro(name:string){return alignmentMacro.stop(name);},
+  cancelAlignmentMacro(){alignmentMacro.cancel();},
+  bindImportedAlignmentMacro(macro:ReturnType<typeof alignmentMacro.stop>){
+   if(!alignmentTarget())throw new Error('선택이 없는 일반 본문에서 정렬 기록을 가져오세요.');
+   const base=snapshot();
+   const bound={...macro,recordedFrom:{...macro.recordedFrom,documentIdentity:api.documentIdentity()}};
+   alignmentMacro.prepare(bound,base);
+   return bound;
+  },
+  prepareAlignmentMacro(macro:ReturnType<typeof alignmentMacro.stop>){
+   if(!alignmentTarget())throw new Error('선택이 없는 일반 본문에서 정렬 기록을 사용하세요.');
+   return alignmentMacro.prepare(macro,snapshot());
+  },
+  async replayAlignmentMacro(macro:unknown){
+   if(!alignmentTarget())throw new Error('선택이 없는 일반 본문에서 재생해 주세요.');
+   const base=snapshot();
+   return api.apply('alignment-'+crypto.randomUUID(),base,alignmentMacro.prepare(macro,base));
+  },
+  createOfficeCopy(blocks:OfficeBlock[]){return createOfficeCopy(d.wasm.getWasmModuleExports().HwpDocument,blocks);},
+  createWorkTemplateCopy(id:WorkTemplateId,values:WorkTemplateValues){return createWorkTemplateCopy(d.wasm.getWasmModuleExports().HwpDocument,id,values);},
+  inspectInstitutionTemplate(bytes:Uint8Array,name:string){return inspectInstitutionTemplate(d.wasm.getWasmModuleExports().HwpDocument,bytes,name);},
+  createInstitutionTemplateCopy(bytes:Uint8Array,name:string,values:WorkTemplateValues){return createInstitutionTemplateCopy(d.wasm.getWasmModuleExports().HwpDocument,bytes,name,values);},
   async apply(runId:string,base:Snapshot,generation:Generation):Promise<Receipt>{
    if(applied.has(runId))throw new Error('이미 적용한 요청입니다.');
    if(applying||damaged||composing||(api.busy()||api.hostMutationLocked()))throw new Error('문서 작업 또는 한글 조합 중입니다.');
@@ -226,11 +375,37 @@ export function installAgentBridge(d:Deps){
      if(validated.operations[0]?.kind==='insert_table_formula_field' && JSON.stringify(formulaField)!==JSON.stringify(insertedTableFormulaReceipt(d.wasm,base,validated.operations[0])))throw Error('조판 후 삽입한 계산식이 달라졌습니다.');
      if(validated.operations[0]?.kind==='update_table_formula_field' && JSON.stringify(formulaField)!==JSON.stringify(tableFormulaReceipt(d.wasm,base,validated.operations[0])))
       throw Error('조판 후 계산식 원문 또는 연관 셀의 결과가 달라졌습니다.');
-     afterStructure=readStructure(d.wasm);for(const op of validated.operations){assertAxisTitleResult(d.wasm,base,op);if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op,copyMetrics);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
+     if(base.structure)afterStructure=readStructure(d.wasm);
+     for(const op of validated.operations){
+      assertAxisTitleResult(d.wasm,base,op);
+      if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);
+      if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);
+      if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op,copyMetrics);
+      if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);
+      if(op.kind==='split_table_cell'||op.kind==='merge_table_cells'){
+       const nested=base.structure?.nestedTables?.some(item=>item.id===op.target);
+       if(!nested){
+        if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);
+        else assertTableMergeResult(d.wasm,base,op);
+       }
+      }
+      if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);
+     }
+    });
     const afterRevision=revision();applying=false;
     // snapshot requires the busy gate to be removed; read the body directly while still gated.
     const after:string[]=[];for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)after.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));
-    const receipt={...(formulaField?{formulaField}:{}),runId,beforeRevision:base.revision,afterRevision,before,after:after.join('\n'),beforeStructure:base.structure,afterStructure,operationCount:validated.operations.length,...(validated.operations[0].kind==='set_document_metadata'?{metadata:{before:base.documentInformation!.metadata.values!,after:validated.operations[0].values}}:{})};applied.set(runId,receipt);return receipt;
+    const first=validated.operations[0];
+    let storedCharacterStyle:Receipt['storedCharacterStyle'];
+    if(first.kind==='format_characters'&&Object.hasOwn(first.properties,'storedStyle')){
+     const {node,reference,start,count}=agentStoredCharacterStyle(first.target,first.properties,base);
+     const name=afterStructure?.styles?.find(style=>style.id===reference.styleId)?.name??String(reference.styleId);
+     storedCharacterStyle={section:node.section,paragraph:node.paragraph,start,count,name};
+    }
+    const shape=first.kind==='set_shape_fill'?base.shapeFillSources?.[first.target]:undefined;
+    const shapeFill=shape&&first.kind==='set_shape_fill'?{section:shape.section,paragraph:shape.paragraph,control:shape.control,before:shape.color,after:first.color.toLowerCase()}:undefined;
+     const receipt:Receipt={...(formulaField?{formulaField}:{}),...(storedCharacterStyle?{storedCharacterStyle}:{}),...(shapeFill?{shapeFill}:{}),
+      ...sectionChangeReceipt(first,base.nodes),runId,beforeRevision:base.revision,afterRevision,before,after:after.join('\n'),beforeStructure:base.structure,afterStructure,operationCount:validated.operations.length,...(first.kind==='set_document_metadata'?{metadata:{before:base.documentInformation!.metadata.values!,after:first.values}}:{})};applied.set(runId,receipt);return receipt;
    }catch(error){
     const e=error instanceof Error?error:new Error(typeof error==='string'?error:'문서 적용 실패');
     const body:string[]=[];try{for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)body.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));}catch{}
@@ -246,14 +421,18 @@ export function installAgentBridge(d:Deps){
    assertRevision(expected,revision());
    if(input?.history?.peekUndoTop()?.type!=='snapshot:jueony:'+receipt.runId)throw new Error('요청 이후 편집 이력이 달라져 이 요청만 되돌릴 수 없습니다.');
    const result=d.automation.execute('edit:undo');if(!result.ok)throw new Error('되돌리기 실패');
-   await d.render();const restored=snapshot();if(plainSnapshot(restored)!==receipt.before||receipt.beforeStructure&&JSON.stringify(restored.structure)!==JSON.stringify(receipt.beforeStructure))throw new Error('되돌림 결과를 확인하지 못했습니다.');
+   await d.render();
+   const restored=receipt.beforeStructure?snapshot():undefined;
+   const body:string[]=[];
+   if(!restored)for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)body.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));
+   if((restored?plainSnapshot(restored):body.join('\n'))!==receipt.before||receipt.beforeStructure&&JSON.stringify(restored?.structure)!==JSON.stringify(receipt.beforeStructure))throw new Error('되돌림 결과를 확인하지 못했습니다.');
    if(owned?.metadata){const metadata=readDocumentMetadata(d.wasm);if(!metadata.values||!DOCUMENT_METADATA_KEYS.every(k=>metadata.values![k]===owned.metadata!.before[k]))throw Error('요청 되돌림의 문서 요약을 확인하지 못했습니다.');}
    if(owned?.formulaField){
     for(const target of [owned.formulaField,...(owned.formulaField.dependents??[])]){
-     const field=restored.tableFormulaFields?.fields.find(f=>f.tableId===target.tableId&&f.row===target.row&&f.column===target.column&&f.fieldId===target.fieldId);
+     const field=restored?.tableFormulaFields?.fields.find(f=>f.tableId===target.tableId&&f.row===target.row&&f.column===target.column&&f.fieldId===target.fieldId);
      if(target.before.command===null){
-      const table=restored.structure?.tables.find(t=>t.id===target.tableId) ??
-        restored.structure?.nestedTables?.find(t=>t.id===target.tableId);
+      const table=restored?.structure?.tables.find(t=>t.id===target.tableId) ??
+        restored?.structure?.nestedTables?.find(t=>t.id===target.tableId);
       const cell=table?.cells.find(c=>c.row===target.row&&c.column===target.column);
       if(field || !cell?.editable || cell.text!==target.before.value)throw Error('되돌린 일반 셀의 원문이 다릅니다.');
       continue;
@@ -262,9 +441,163 @@ export function installAgentBridge(d:Deps){
     }
    }
    savedRequestRevisions.delete(receipt.runId);
+   if(pendingSaveRebase?.runId===receipt.runId)pendingSaveRebase=undefined;
    // Keep the request ID consumed after undo; replay must use a new run ID.
   },
  };
- const facades=createDocumentFacades({readSnapshot:native.snapshot,preflight:native.preflight,apply:native.apply,undoRequest:native.undoRequest});
+ const facades=createDocumentFacades({
+  readSnapshot:native.snapshot,preflight:native.preflight,apply:native.apply,undoRequest:native.undoRequest,
+  readAdministrativeAuditProfile: options => {
+   if (applying || damaged || composing || !d.automation.getContext().hasDocument) throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 다시 검사하세요.');
+   return readAdministrativeAuditProfile(nativeDocument(d.wasm), options);
+  },
+  inspectLayout: () => {
+   if (applying || damaged || composing || !d.automation.getContext().hasDocument) throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 다시 검사하세요.');
+   d.input()?.flushDeferredPaginationIfNeeded('jueony-layout-diagnostics');
+   return inspectDocumentLayout(nativeDocument(d.wasm));
+  },
+ });
+ function navigateToReportFinding(address:AuditAddress){
+   const input=d.input();
+   if(!input||applying||damaged||composing||input.cursor.isInHeaderFooter?.()||input.cursor.isInFootnote?.()||input.cursor.isInTextBox?.()) {
+    throw new Error('특수 영역 편집을 마친 뒤 다시 이동하세요.');
+   }
+   const position=findHitPosition({sec:address.section,para:address.paragraph,charOffset:address.offset,length:1,
+    ...(address.path?{cellPath:[...address.path]}:{})});
+   if(!position)throw new Error('검사 위치를 확인할 수 없습니다.');
+   input.cursor.exitCellSelectionMode?.();
+   input.cursor.exitTableObjectSelection?.();
+   input.cursor.exitPictureObjectSelection?.();
+   input.cursor.clearSelection();
+   input.cursor.moveTo(position);
+   input.updateCaret();
+ }
+ function alignmentTarget(bodyEdit=false){
+   const input=d.input(),cursor=input?.cursor,position=input?.getCursorPosition();
+   if(!position||!cursor||position.parentParaIndex!==undefined||position.cellPath?.length||
+      cursor.isInHeaderFooter?.()||cursor.isInFootnote?.()||cursor.isInTextBox?.()||
+      cursor.isInCellSelectionMode?.()||cursor.isInTableObjectSelection?.()||cursor.isInPictureObjectSelection?.())return undefined;
+   const {sectionIndex:section,paragraphIndex:paragraph}=position;
+   const selection=cursor.getSelectionOrdered?.();
+   if(selection&&(!bodyEdit||[selection.start,selection.end].some(point=>point.sectionIndex!==section
+     ||point.paragraphIndex!==paragraph||point.parentParaIndex!==undefined||point.cellPath?.length)))return undefined;
+   const doc=nativeDocument(d.wasm),length=doc.getParagraphLength(section,paragraph);
+   if(length>4000)return undefined;
+   let format:string|undefined,adjacent:string|undefined;
+   if(bodyEdit){
+    let flat=paragraph;
+    for(let index=0;index<section;index++)flat+=doc.getParagraphCount(index);
+    try{
+     const controls:{list:number;para:number;ctrlId:string}[]=d.wasm.getControls();
+     const evidence=bodyEditEvidence(section,paragraph,length,controls.filter(control=>control.list===0&&control.para===flat));
+     format=evidence.formatSha256;adjacent=evidence.adjacentContextSha256;
+    }catch{return undefined;}
+   }
+   const {alignment}=JSON.parse(doc.getParaPropertiesAt(section,paragraph));
+   return {section,paragraph,alignment,text:doc.getTextRange(section,paragraph,0,length),format,adjacent,
+    sectionCount:doc.getSectionCount(),paragraphCount:doc.getParagraphCount(section)};
+ }
+ const alignmentMacro=createManualAlignmentMacro(()=>{
+   const context=d.automation.getContext();
+   const frame=window.frameElement as HTMLElement|null;
+   return {documentIdentity:api.documentIdentity(),revision:revision(),active:context.hasDocument===true&&!frame?.hidden,
+     editable:context.isEditable===true&&!context.isFormMode&&!d.wasm.requiresPasswordForSave,
+     busy:applying||damaged||api.busy()||api.hostMutationLocked(),composing,hasSelection:Boolean(d.input()?.cursor.getSelection?.())};
+ },alignmentTarget,message=>{
+  if(window.parent!==window)window.parent.postMessage({type:'jueony:manual-macro-invalid',message},location.origin);
+ });
+ bindManualEditObserver(d.wasm,alignmentMacro);
+ const dispatch=d.dispatcher.dispatchWithResult.bind(d.dispatcher);
+ d.dispatcher.dispatchWithResult=(id,params)=>alignmentMacro.dispatch(id,()=>dispatch(id,params));
+ for(const {id,label,mode} of reportCommands)d.automation.registerCommand({
+  id,label,opensDialog:true,
+  canExecute:(context:any)=>context.hasDocument&&!applying&&!damaged&&!composing,
+  execute:()=>showAdministrativeAudit(facades.query,()=>`${api.documentIdentity()}:${revision()}`,navigateToReportFinding,mode),
+ });
+ const memoContext={
+  documentIdentity:()=>api.documentIdentity() as string,
+  revision,
+  story:()=>{
+   const input=d.input(),cursor=input?.cursor;
+   return cursor&&!cursor.isInHeaderFooter?.()&&!cursor.isInFootnote?.()&&!cursor.isInTextBox?.()&&!input.getCursorPosition()?.cellPath?.length?'body':'special';
+  },
+  editable:()=>d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode,
+  protected:()=>Boolean(d.wasm.requiresPasswordForSave)||!(/\.hwpx?$/iu.test(d.wasm.fileName)),
+ };
+ const canEditMemo=()=>memoContext.story()==='body'&&memoContext.editable()&&!memoContext.protected()&&!api.hostMutationLocked();
+ d.automation.registerCommand({
+  ...memoReview,opensDialog:true,canExecute:(context:any)=>context.hasDocument&&!applying&&!damaged&&!composing,
+  execute:()=>showDocumentMemos({
+   identity:memoContext.documentIdentity,revision,canEdit:canEditMemo,
+   canUpdate:()=>typeof nativeDocument(d.wasm).updateCommentTextV1==='function',
+   read:()=>{
+    const comments=readDocumentCommentsB092(nativeDocument(d.wasm));
+    if(!comments)throw new Error('이 문서의 메모를 읽을 수 없습니다.');
+    return comments;
+   },
+   moveTo:memo=>navigateToReportFinding({section:memo.section,paragraph:memo.paragraph,offset:memo.start}),
+   apply:(dialog,memo,change)=>{
+    const input=d.input(), host=nativeDocument(d.wasm), currentRevision=revision();
+    const checkCurrent=()=>{
+     if(!input||applying||damaged||composing||api.busy(dialog)||!canEditMemo()||d.input()!==input||nativeDocument(d.wasm)!==host||revision()!==currentRevision) {
+      throw new Error('문서나 편집 상태가 바뀌었습니다. 메모 창을 다시 여세요.');
+     }
+    };
+    checkCurrent();
+    const capture=change.action==='update'?captureUpdateCommentB092(host,memoContext,memo.fieldId,change.text):captureDeleteCommentB092(host,memoContext,memo.fieldId);
+    if(capture.status!=='ready'||JSON.stringify(capture.comments.find(item=>item.fieldId===memo.fieldId))!==JSON.stringify(memo)) {
+     throw new Error('현재 메모를 편집할 수 없습니다. 메모 목록과 문서 상태를 확인하세요.');
+    }
+    const {HwpDocument}=d.wasm.getWasmModuleExports();
+    const reopen=(bytes:Uint8Array)=>new HwpDocument(bytes);
+    const beforeText=readHwpReferenceText(host);
+    const copy=reopen(recoveryBytes(d.wasm,d.wasm.fileName));
+    let expected: string;
+    try{
+     expected=JSON.stringify(executeCommentPlanInSnapshotB092(copy,memoContext,capture.plan).remaining);
+     const format=/\.hwpx$/iu.test(d.wasm.fileName)?'hwpx':'hwp';
+     const artifact=format==='hwpx'?copy.exportHwpxWithReport():copy.exportHwpWithReport();
+     try{
+      const bytes=artifact.takeBytes();
+      verifyPreservedExport(copy,bytes,format,artifact.contentLoss(),reopen);
+      const reloaded=reopen(bytes);
+      try{
+       if(readHwpReferenceText(reloaded)!==beforeText||JSON.stringify(readDocumentCommentsB092(reloaded))!==expected)throw new Error('저장본에서 본문과 메모를 확인하지 못했습니다.');
+      }finally{reloaded.free();}
+     }finally{artifact.free();}
+    }finally{copy.free();}
+    checkCurrent();
+    const cursor=input.getCursorPosition();
+    const selection=input.cursor.getSelection?.();
+    input.executeOperation({kind:'snapshot',operationType:'editDocumentMemo',
+     selectionBefore:selection?{start:selection.anchor,end:selection.focus,blockPhase:input.cursor.blockSelectionPhase()}:null,
+     operation:(wasm:any)=>{
+      checkCurrent();
+      const actual=executeCommentPlanInSnapshotB092(nativeDocument(wasm),memoContext,capture.plan).remaining;
+      if(JSON.stringify(actual)!==expected||readHwpReferenceText(host)!==beforeText)throw new Error('실제 메모 편집 결과를 확인하지 못했습니다.');
+      return cursor;
+     },
+    });
+    if(JSON.stringify(readDocumentCommentsB092(host))!==expected)throw new Error('메모를 적용하지 못했습니다.');
+   },
+  }),
+ });
+ d.automation.registerCommand({
+  ...printImposition,opensDialog:true,canExecute:(context:any)=>context.hasDocument&&!applying&&!damaged&&!composing,
+  execute:()=>showPrintImposition(()=>{
+   d.input()?.flushDeferredPaginationIfNeeded('jueony-print-imposition');
+   return d.wasm.withPortableMetrics(()=>{
+    const count=d.wasm.pageCount;
+    if(!Number.isSafeInteger(count)||count<1||count>60)throw new Error('모아찍기는 1~60쪽 문서를 지원합니다.');
+    let bytes=0;
+    return Array.from({length:count},(_,page)=>{
+     const svg=d.wasm.renderPageSvgWithProfile(page,'print');
+     bytes+=svg.length;
+     if(bytes>24_000_000)throw new Error('모아찍기 미리보기가 24MB를 넘습니다.');
+     return {svg,...d.wasm.getPageInfo(page)};
+    });
+   });
+  },()=>`${api.documentIdentity()}:${revision()}`),
+ });
  Object.assign(api,native,{documentFacades:facades,preflight:facades.edit.preflight,apply:facades.edit.apply,undoRequest:facades.edit.undoRequest});
 }

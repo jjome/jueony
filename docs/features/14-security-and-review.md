@@ -6,19 +6,21 @@
 
 ## 진행 요약
 
-실행 작업 **0개**, 상위 범위 **11개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **1개**, 상위 범위 **11개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 9 · 미구현 2 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 9 · 미검증 2 |
-| Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
+| 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/11 · 부분 9 · 미구현 2 |
+| 검증 | 완료 0/1 · 부분 1 | 완료 0/11 · 부분 9 · 미검증 2 |
+| Agent 연결 | 해당 없음 1 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
 상위 범위는 세 축 완료 **0/11개**다. 세부 작업 완료 수와 분리해서 읽는다.
 
-이 영역은 상위 기능의 점검 기록만 있다. 상세 실행 작업을 추가하고 완료조건을 확정해야 한다.
+## 먼저 할 일
+
+- **검증** [G128](<14-security-and-review.md#g128>) **본문 점 메모 조회·수정·삭제** — 범위·표 셀 메모와 독립 한글 대조가 남았다.
 
 ## 기능별 작업표
 
@@ -28,6 +30,7 @@
 - [보안 · 상위 기능 점검](<#work-2>)
 - [검토 · 상위 기능 점검](<#work-3>)
 - [도구 · 상위 기능 점검](<#work-4>)
+- [검토 · 독립 실행 작업](<#work-5>)
 
 <a id="work-1"></a>
 
@@ -68,6 +71,14 @@
 | --- | --- | --- | --- | --- |
 | [B146](<14-security-and-review.md#b146>) · 범위 | 개인 정보 변환 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
+<a id="work-5"></a>
+
+### 검토 · 독립 실행 작업
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [G128](<14-security-and-review.md#g128>) · 작업 | 본문 점 메모 조회·수정·삭제 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+
 ## 항목별 완료조건·근거
 
 각 항목은 펼쳐서 읽는다. 상태와 근거는 CSV에서 관리한다.
@@ -78,10 +89,10 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 본문 단일 지점 메모만 실제 rhwp MEMO 필드로 생성·조회·삭제한다.
-- 다음 작업: commit 5c71c6d3 기준 본문 단일 지점 메모의 보호·story·revision·목록 fingerprint 검사와 snapshot undo/redo를 구현했다. fresh Rust/WASM 선별 검사 3/3에서 HWP/HWPX 재열기 후 본문·앵커·작성자·내용·memoIndex 보존과 삭제 후 본문 보존을 확인했다. 기존 Studio insert:comment stub·범위 메모·표/글상자·여러 문단·모양/표시 UI·한글 비교는 남아 부분이다.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-comments-b092.ts](<../../apps/editor/src/adapters/rhwp/document-comments-b092.ts>) · [document-comments-b092.test.ts](<../../apps/editor/tests/document-comments-b092.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch>)
-- 원래 기록: `PARTIAL;BODY_POINT_MEMO_HWP_HWPX_REOPEN_PASS_2026_11_09;STUDIO_UI_WIRING_PENDING`
+- 완료 범위: 한글 2024 상위 항목. Jueony에는 실제 rhwp MEMO 필드의 본문 단일 지점 생성 코어와 목록·위치 이동·한 줄 수정·삭제 UI가 있다.
+- 다음 작업: HWP/HWPX 메모 내용·앵커·작성자 보존과 Chrome 수정·저장·재열기·삭제·되돌리기를 확인했다. 범위, 표·글상자, 여러 문단, 메모 모양과 독립 한글 비교는 남았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-comments-b092.ts](<../../apps/editor/src/adapters/rhwp/document-comments-b092.ts>) · [document-comments-b092.test.ts](<../../apps/editor/tests/document-comments-b092.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [manifest.json](<../evidence/ieum-followup-2026-11-21/manifest.json>)
+- 원래 기록: `PARTIAL;BODY_POINT_MEMO_HWP_HWPX_REOPEN_PASS_2026_11_09;STUDIO_UI_WIRING_PENDING;SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 
@@ -197,10 +208,10 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. B092와 같은 메모 계열이며 현재 본문 단일 지점 삽입 코어만 지원한다.
-- 다음 작업: commit 5c71c6d3 기준 실제 MEMO 필드 삽입·조회·삭제·undo/redo와 HWP/HWPX 재열기 보존을 선별 검사 3/3으로 확인했다. 메모 모양·표시·범위 메모·특수 story와 기존 Studio insert:comment UI 연결은 구현하지 않았으므로 완료가 아니다.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-comments-b092.ts](<../../apps/editor/src/adapters/rhwp/document-comments-b092.ts>) · [document-comments-b092.test.ts](<../../apps/editor/tests/document-comments-b092.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch>)
-- 원래 기록: `PARTIAL;BODY_POINT_MEMO_CORE_PASS_2026_11_09;SHAPE_DISPLAY_UI_PENDING`
+- 완료 범위: 한글 2024 상위 항목. Jueony에는 B092 본문 점 메모 목록·이동과 한 줄 수정·삭제 UI가 있다.
+- 다음 작업: 원본 저장 전에 메모를 비롯한 문서 보존을 확인한다. 범위·특수 영역 메모, 메모 모양과 쪽 옆 표시, 한글 비교는 남았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-comments-b092.ts](<../../apps/editor/src/adapters/rhwp/document-comments-b092.ts>) · [document-comments-b092.test.ts](<../../apps/editor/tests/document-comments-b092.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-b092-memo-comment-editing.patch>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [manifest.json](<../evidence/ieum-followup-2026-11-21/manifest.json>)
+- 원래 기록: `PARTIAL;BODY_POINT_MEMO_CORE_PASS_2026_11_09;SHAPE_DISPLAY_UI_PENDING;SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 
@@ -214,6 +225,20 @@
 - 다음 작업: dbdb307f 선택 검사 4/4 및 실제 HWP/HWPX 재열기·정확한 undo/redo·stale/실패 바이트 불변 통과. 문서 전체 찾기·바로 바꾸기 UI와 사용자 패턴은 남음.
 - 근거: [personal-info-conversion-b146.ts](<../../apps/editor/src/adapters/rhwp/personal-info-conversion-b146.ts>) · [personal-info-conversion-b146.test.ts](<../../apps/editor/tests/personal-info-conversion-b146.test.ts>)
 - 원래 기록: `PARTIAL;PASS;SAFE_SELECTED_PERSONAL_INFO_MASKING_2026_11_09`
+
+</details>
+
+<details id="g128">
+<summary>G128 · 본문 점 메모 조회·수정·삭제</summary>
+
+- 종류: 실행 작업 · 우선순위: P2.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 본문 점 메모를 찾아 이동하고 한 줄 내용을 수정 또는 삭제한 뒤 되돌린다. 재열기에서 앵커와 작성자 보존 검사.
+- 다음 작업: 범위·표 셀 메모와 독립 한글 대조가 남았다.
+- UI 명령: `ext:jueony-read-memos`
+- 근거: [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

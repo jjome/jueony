@@ -98,7 +98,7 @@ apps/editor/scripts/integration/
 ## 남은 이관
 
 1. `shell.ts`에는 자료 트리 렌더링, 메시지·실행 기록, 문서 열기/닫기/복구의 일부 조정이 남아 있다. 현재 facade 호출을 유지하며 UI controller와 Session/RunRepository 경계로 더 옮긴다.
-2. 저장 adapter는 기존 v1 aggregate를 하나의 writer로 다룬다. workspace/실행/매크로/폴더별 repository와 부분 갱신 계약은 아직 전부 도입하지 않았다. 여러 프로세스의 동시 쓰기 병합을 새로 지원하는 것은 아니다.
+2. 저장 어댑터는 기존 v1 업무 상태를 한 쓰기 순서에서 보존한다. 실행 기록과 반복 작업은 현재 업무 범위를 확인하는 저장 계약을 사용한다. 업무·폴더·환경 영역별 부분 갱신 계약과 여러 프로세스의 동시 쓰기 병합이 남아 있다.
 3. Document에는 query/edit/interaction 계약이 적용됐다. 전체 lifecycle·selection·save receipt를 목표 계약의 `documentId/epoch` 형태로 바꾸는 작업은 남아 있다. 현재는 기존 document generation/revision/탭 scope 검사를 보존한다.
 4. iframe 연결은 typed adapter로 옮겼지만 같은 origin의 직접 연결이다. `contentWindow` 크기/포커스 이벤트, Studio bootstrap 패치, 일부 native adapter의 `any`는 남아 있다. 외부 MCP 및 독립 프로세스 transport는 별도 작업이다.
 5. 자료 파일 읽기는 파일 adapter, 검색은 References 모듈로 분리했다. 자료 등록/추출의 전체 Metadata/Parser/Repository Port 통합은 다음 단계다.

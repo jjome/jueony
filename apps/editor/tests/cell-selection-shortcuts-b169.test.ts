@@ -164,8 +164,8 @@ test('capability inspection requires every real CursorState method used by the c
 test('upstream Studio exposes the exact cursor APIs and currently routes F5 through its keyboard handler', async () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const root = resolve(here, '../../..');
-  const cursor = await readFile(resolve(root, 'upstream/rhwp/rhwp-studio/src/engine/cursor.ts'), 'utf8');
-  const keyboard = await readFile(resolve(root, 'upstream/rhwp/rhwp-studio/src/engine/input-handler-keyboard.ts'), 'utf8');
+  const cursor = await readFile(resolve(root, 'upstream/rhwp-source/rhwp-studio/src/engine/cursor.ts'), 'utf8');
+  const keyboard = await readFile(resolve(root, 'upstream/rhwp-source/rhwp-studio/src/engine/input-handler-keyboard.ts'), 'utf8');
   for (const method of [
     'enterCellSelectionMode', 'advanceCellSelectionPhase', 'getCellSelectionPhase',
     'captureCellSelection', 'restoreCellSelection', 'exitCellSelectionMode',

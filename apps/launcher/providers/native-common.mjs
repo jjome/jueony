@@ -43,6 +43,18 @@ export function nativeSchema(referenceIds, strict=false) {
  return project(generationSchema(referenceIds));
 }
 
+function removeOptionalNulls(value,shape){
+ if(Array.isArray(value)&&shape.items){
+  for(const item of value)removeOptionalNulls(item,shape.items);
+ }else if(value&&typeof value==='object'&&!Array.isArray(value)&&shape.properties){
+  for(const [name,child] of Object.entries(shape.properties)){
+   if(!Object.hasOwn(value,name))continue;
+   if(value[name]===null&&!shape.required?.includes(name))delete value[name];
+   else removeOptionalNulls(value[name],child);
+  }
+ }
+}
+
 export function parseGeneration(text, strict=false) {
  let result;
  try{if(typeof text!=='string')throw new Error();result=JSON.parse(text);}catch{fail('invalid_response','모델이 올바른 편집 JSON을 반환하지 않았습니다. 문서를 변경하지 않았습니다.');}
@@ -50,16 +62,8 @@ export function parseGeneration(text, strict=false) {
  if(strict) {
   const variants=generationSchema().properties.operations.items.anyOf;
   for(const op of result.operations) {
-   if(op?.kind==='set_table_cell'&&op.paragraph===null)delete op.paragraph;
-   if((op?.kind==='set_table_cell'||op?.kind==='replace_cell_paragraph')&&op.spanTexts===null)delete op.spanTexts;
-   if(op?.kind==='replace_cell_paragraph'){
-    if(op.spanFormats===null)delete op.spanFormats;
-    if(Array.isArray(op.spanFormats))for(const span of op.spanFormats){
-     if(span&&typeof span==='object')for(const name of ['bold','italic','color','fontSizePt'])if(span[name]===null)delete span[name];
-    }
-   }
-   const allowed=variants.find(v=>v.properties.kind.enum[0]===op?.kind)?.properties.properties?.properties;
-   if(allowed&&op.properties&&typeof op.properties==='object')for(const name of Object.keys(allowed))if(op.properties[name]===null)delete op.properties[name];
+   const shape=variants.find(variant=>variant.properties.kind.enum[0]===op?.kind);
+   if(shape)removeOptionalNulls(op,shape);
   }
  }
  return result;

@@ -210,6 +210,7 @@ rhwp 엔진의 MIT, 패키지 전이 의존성, 글꼴과 외부 자산의 원�
 
 ## 연결 문서
 
+- [적용 결과와 로컬 검증](145-ieumoffice-implementation.md) · [후속 구현과 확인 범위](146-ieumoffice-followup.md)
 - [제품 요구사항](01-product-requirements.md)과 [기능별 진행 현황](jueony-progress.md)
 - [모듈 경계와 facade 계약](31-facade-contracts.md)
 - [파일 저장과 표 편집 검수](file-table-verification-2026-11-08.md)

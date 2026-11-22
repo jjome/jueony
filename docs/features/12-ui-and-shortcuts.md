@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 29 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 15 · 미검증 15 |
+| 검증 | 완료 5/11 · 부분 6 | 완료 0/30 · 부분 15 · 미검증 15 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 reachability·fail-closed capability gate에 더해 실제 생성한 Studio UI에서 미지원 자리표시 명령이 메뉴·문맥 메뉴 disabled·리본/빠른 메뉴 미노출·dispatcher disabled로 유지되고 UI dispatch·execute·native write·성공 이벤트가 모두 0임을 Edge로 확인했다. 891ac4d0 기준 Edge 1/1과 HWP/HWPX 불변 회귀 5/5를 통과했다. 실제 native API·durable model·undo/HWP·HWPX adapter와 dirty build.mjs를 건드리지 않는 정식 build hook·한글 비교는 남아 부분이다.
+- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 문단 띠와 삽입 메모 자리표시 명령의 비활성 조건을 정식 빌드에 적용했다. Chrome 메뉴·문맥 메뉴·명령 처리기의 비활성과 변경 0건을 확인했다. 한글 전체 메뉴 비교와 지원 기능 확대가 남았다.
 - **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
-- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 7df5d8fb·454073eb·cd4ef484 기준 HWP/HWPX 저장·재열기·undo/redo·실패 bytes 불변 Rust 3/3, adapter·대화상자·실제 tracked Studio seam 10/10, 전체 엔진 패치 연쇄 적용, strict TypeScript·경계 diagnostics 0을 통과했다. dirty build.mjs를 건드리지 않아 정식 build hook 호출은 아직 미연결이며 기존 컨트롤 교체·다구역/특수 story·매크로·한글 비교도 남아 부분이다.
+- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — Chrome의 Ctrl+N,P로 HWP·HWPX의 쪽 번호를 원래 문단에서 바꿨다. 세 구역 문서에서 2구역 번호 위치를 바꾸면 1구역은 유지되고 설정이 없는 3구역은 새 위치를 이어받았다. 저장·재열기와 같은 커서 위치에서 한 번 되돌린 바이트를 확인했다. 특수 영역·독립 한글 비교가 남았다.
 
 ## 기능별 작업표
 
@@ -127,7 +127,7 @@
 | --- | --- | --- | --- | --- |
 | [G012](<12-ui-and-shortcuts.md#g012>) · 작업 | 앱과 편집기의 중복 메뉴 통합 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G013](<12-ui-and-shortcuts.md#g013>) · 작업 | 채팅·문서 사이 가변 너비 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G014](<12-ui-and-shortcuts.md#g014>) · 작업 | 채팅 목록·폴더 트리 사이 가변 높이 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G014](<12-ui-and-shortcuts.md#g014>) · 작업 | 채팅 목록·폴더 트리 사이 가변 높이 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G015](<12-ui-and-shortcuts.md#g015>) · 작업 | 문서 집중 보기·패널 복원 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G016](<12-ui-and-shortcuts.md#g016>) · 작업 | 문서 탭 순환과 활성 탭 소유 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G017](<12-ui-and-shortcuts.md#g017>) · 작업 | 채팅 Enter 전송·Shift+Enter 줄바꿈 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
@@ -581,12 +581,12 @@
 <summary>G014 · 채팅 목록·폴더 트리 사이 가변 높이</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
-- 완료 범위: 업무 화면 분할 조절; OS 조합 검증 별도
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 업무 화면 분할 조절; Chrome에서 키보드·마우스 조절과 재열기 확인; OS 조합 검증 별도
+- 다음 작업: 관련 변경 시 키보드·마우스 및 높이 복원 회귀 검사
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `CHROME_SIDEBAR_POINTER_KEYBOARD_AND_RELOAD_PASS_2026_11_22`
 
 </details>
 
@@ -649,9 +649,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 하위 dialog/표·개체·특수 영역·disabled 조건까지
-- 다음 작업: 정적 reachability·fail-closed capability gate에 더해 실제 생성한 Studio UI에서 미지원 자리표시 명령이 메뉴·문맥 메뉴 disabled·리본/빠른 메뉴 미노출·dispatcher disabled로 유지되고 UI dispatch·execute·native write·성공 이벤트가 모두 0임을 Edge로 확인했다. 891ac4d0 기준 Edge 1/1과 HWP/HWPX 불변 회귀 5/5를 통과했다. 실제 native API·durable model·undo/HWP·HWPX adapter와 dirty build.mjs를 건드리지 않는 정식 build hook·한글 비교는 남아 부분이다.
+- 다음 작업: 문단 띠와 삽입 메모 자리표시 명령의 비활성 조건을 정식 빌드에 적용했다. Chrome 메뉴·문맥 메뉴·명령 처리기의 비활성과 변경 0건을 확인했다. 한글 전체 메뉴 비교와 지원 기능 확대가 남았다.
 - 상위 항목: [B054](<12-ui-and-shortcuts.md#b054>) 기본 도구 상자
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [insert-placeholder-capability-n019.ts](<../../apps/editor/src/shortcuts/insert-placeholder-capability-n019.ts>) · [insert-placeholder-command-patches-n019.mjs](<../../apps/editor/scripts/integration/insert-placeholder-command-patches-n019.mjs>) · [insert-placeholder-capability-n019.test.ts](<../../apps/editor/tests/insert-placeholder-capability-n019.test.ts>) · [insert-placeholder-studio-browser-n019.test.ts](<../../apps/editor/tests/insert-placeholder-studio-browser-n019.test.ts>)
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [insert-placeholder-capability-n019.ts](<../../apps/editor/src/shortcuts/insert-placeholder-capability-n019.ts>) · [insert-placeholder-command-patches-n019.mjs](<../../apps/editor/scripts/integration/insert-placeholder-command-patches-n019.mjs>) · [insert-placeholder-capability-n019.test.ts](<../../apps/editor/tests/insert-placeholder-capability-n019.test.ts>) · [insert-placeholder-studio-browser-n019.test.ts](<../../apps/editor/tests/insert-placeholder-studio-browser-n019.test.ts>) · [147-checklist-completion.md](<../147-checklist-completion.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08;INSERT_PLACEHOLDER_CAPABILITY_GATE_2026_11_09;INSERT_PLACEHOLDER_ACTUAL_UI_DISABLED_2026_11_09`
 
 </details>
@@ -676,11 +676,12 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한컴 기본 매핑과 exact story 경계에 단일 구역 최상위 본문의 PageNumberPos Rust/WASM·snapshot adapter·Ctrl+N,P 대화상자와 pinned Studio exact-seam 등록을 연결하고 특수 story/다구역/기존 control/IME/stale owner는 snapshot 전에 fail-closed
-- 다음 작업: 7df5d8fb·454073eb·cd4ef484 기준 HWP/HWPX 저장·재열기·undo/redo·실패 bytes 불변 Rust 3/3, adapter·대화상자·실제 tracked Studio seam 10/10, 전체 엔진 패치 연쇄 적용, strict TypeScript·경계 diagnostics 0을 통과했다. dirty build.mjs를 건드리지 않아 정식 build hook 호출은 아직 미연결이며 기존 컨트롤 교체·다구역/특수 story·매크로·한글 비교도 남아 부분이다.
+- 완료 범위: 단일 구역의 최상위 본문에서 쪽 번호를 만들거나 변경하고, 쪽 메뉴와 Ctrl+N,P로 같은 대화상자를 연다. 특수 영역, 다구역, 모호한 컨트롤과 입력 조합 중에는 적용을 거절한다.
+- 다음 작업: Chrome의 Ctrl+N,P로 HWP·HWPX의 쪽 번호를 원래 문단에서 바꿨다. 세 구역 문서에서 2구역 번호 위치를 바꾸면 1구역은 유지되고 설정이 없는 3구역은 새 위치를 이어받았다. 저장·재열기와 같은 커서 위치에서 한 번 되돌린 바이트를 확인했다. 특수 영역·독립 한글 비교가 남았다.
 - 상위 항목: [B169](<08-tables.md#b169>) 첫 셀·셀 블록
-- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [page-number-position-n021.ts](<../../apps/editor/src/adapters/rhwp/page-number-position-n021.ts>) · [page-number-position-dialog-n021.ts](<../../apps/editor/src/adapters/browser/page-number-position-dialog-n021.ts>) · [page-number-position-n021-patches.mjs](<../../apps/editor/scripts/integration/page-number-position-n021-patches.mjs>) · [page-number-position-n021.test.ts](<../../apps/editor/tests/page-number-position-n021.test.ts>) · [page-number-position-n021-studio-patches.test.ts](<../../apps/editor/tests/page-number-position-n021-studio-patches.test.ts>) · [zzzzzzzzzzzzzzzzzzz-page-number-position.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzz-page-number-position.patch>) · [verify-document-engine-package.mjs](<../../scripts/verify-document-engine-package.mjs>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09;SPECIAL_STORY_SAFE_GLOBALS_2026_11_09;PAGE_NUMBER_POSITION_ENGINE_2026_11_09;PAGE_NUMBER_POSITION_DIALOG_2026_11_09`
+- UI 명령: `page:page-number-dialog`
+- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [page-number-position-n021.ts](<../../apps/editor/src/adapters/rhwp/page-number-position-n021.ts>) · [page-number-position-dialog-n021.ts](<../../apps/editor/src/adapters/browser/page-number-position-dialog-n021.ts>) · [page-number-position-n021-patches.mjs](<../../apps/editor/scripts/integration/page-number-position-n021-patches.mjs>) · [page-number-position-n021.test.ts](<../../apps/editor/tests/page-number-position-n021.test.ts>) · [page-number-position-n021-studio-patches.test.ts](<../../apps/editor/tests/page-number-position-n021-studio-patches.test.ts>) · [zzzzzzzzzzzzzzzzzzz-page-number-position.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzz-page-number-position.patch>) · [verify-document-engine-package.mjs](<../../scripts/verify-document-engine-package.mjs>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-session-expansion.mjs](<../../apps/editor/scripts/verify-session-expansion.mjs>) · [zzzzzzzzzzzzzzzzzzzzz-page-number-position-update.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzz-page-number-position-update.patch>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09;SPECIAL_STORY_SAFE_GLOBALS_2026_11_09;PAGE_NUMBER_POSITION_ENGINE_2026_11_09;PAGE_NUMBER_POSITION_DIALOG_2026_11_09;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -691,10 +692,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: visualViewport CSS 좌표의 DOM 경계 clamp·상단 flip·resize/scroll 재배치·devicePixelRatio 이중 적용 방지와 다중 browser surface에서 활성 문서 identity·instance·geometry sequence가 정확히 일치하는 evidence 기반 popup 배치
-- 다음 작업: commit 833239ac 기준 다중 surface·음수 CSS 좌표·활성 문서 owner·geometry sequence를 검증하고 native/device-pixel 좌표 추측을 차단했다. 신규+기존 선별 7/7과 strict adapter TypeScript·경계 검사를 통과했다. 기존 Edge 6 scenarios 증거는 유지하며 이번 headless 재실행은 격리 프로필 사용 중이라 시작 전에 차단됐다. 실제 Windows OS DPI·다중 모니터·native 좌표·한글 비교는 남아 부분이다.
+- 다음 작업: Chrome에서 DPR·좁은 화면·뷰포트 배율 등 6건을 다시 검증했다. 화면·콘솔·외부·누락 리소스 오류가 모두 0이었다. Windows OS 배율·다중 모니터와 독립 한글은 별도다.
 - 상위 항목: [B061](<12-ui-and-shortcuts.md#b061>) 문서 탭·상황선·눈금자
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [viewport-placement-browser-n023.html](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.html>) · [viewport-placement-browser-n023.ts](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.ts>) · [verify-viewport-placement-browser-n023.mjs](<../../apps/editor/scripts/verify-viewport-placement-browser-n023.mjs>) · [viewport-placement-n023-evidence.ts](<../../apps/editor/src/adapters/browser/viewport-placement-n023-evidence.ts>) · [viewport-placement-n023-evidence.test.ts](<../../apps/editor/tests/viewport-placement-n023-evidence.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;VISUAL_VIEWPORT_MENU_PLACEMENT_2026_11_09;EDGE_VIEWPORT_PLACEMENT_2026_11_09;MULTI_SURFACE_CSS_EVIDENCE_2026_11_09;NATIVE_DPI_COORDINATES_BLOCKED_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [viewport-placement-browser-n023.html](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.html>) · [viewport-placement-browser-n023.ts](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.ts>) · [verify-viewport-placement-browser-n023.mjs](<../../apps/editor/scripts/verify-viewport-placement-browser-n023.mjs>) · [viewport-placement-n023-evidence.ts](<../../apps/editor/src/adapters/browser/viewport-placement-n023-evidence.ts>) · [viewport-placement-n023-evidence.test.ts](<../../apps/editor/tests/viewport-placement-n023-evidence.test.ts>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-viewport-placement-browser-n023.mjs](<../../apps/editor/scripts/verify-viewport-placement-browser-n023.mjs>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;VISUAL_VIEWPORT_MENU_PLACEMENT_2026_11_09;EDGE_VIEWPORT_PLACEMENT_2026_11_09;MULTI_SURFACE_CSS_EVIDENCE_2026_11_09;NATIVE_DPI_COORDINATES_BLOCKED_2026_11_09;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 

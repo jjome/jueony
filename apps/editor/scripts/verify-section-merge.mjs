@@ -249,6 +249,35 @@ await run('later table moves with contents and properties; snapshot restores its
   } finally { doc.free(); }
 });
 
+await run('moving a whole table keeps the same frame for HWP and HWPX input', async () => {
+  const observations = [];
+  for (const prefix of [[], ['앞 문단'], ['앞 문단', '둘째 문단']]) {
+    const source = blank([...prefix, 'LEFT', 'RIGHT', 'TABLE', 'END']);
+    try {
+      const table = parse(source.createTable(0, prefix.length + 2, 0, 2, 2));
+      source.insertTextInCell(0, table.paraIdx, table.controlIdx, 0, 0, 0, '업무\t표 😀');
+      source.insertSectionBreak(0, prefix.length + 1, 0);
+      source.setSectionDef(0, JSON.stringify({ defaultTabSpacing: 4000 }));
+      source.setSectionDef(1, JSON.stringify({ defaultTabSpacing: 12000 }));
+      await roundtrip(source, `merge-table-original-${prefix.length}`);
+      const layouts = {};
+      for (const format of ['hwp', 'hwpx']) {
+        const doc = new HwpDocument(await readFile(join(out, `merge-table-original-${prefix.length}.${format}`)));
+        try {
+          joinBoundary(doc, 1);
+          const published = parse(doc.getPageControlLayout(0)).controls;
+          assert.equal(published.length, 1);
+          layouts[format] = published[0];
+          await roundtrip(doc, `merge-table-${prefix.length}-from-${format}`);
+        } finally { doc.free(); }
+      }
+      assert.deepEqual(layouts.hwp, layouts.hwpx);
+      observations.push({ precedingParagraphs: prefix.length, tableY: layouts.hwp.y });
+    } finally { source.free(); }
+  }
+  return observations;
+});
+
 await writeFile(join(out, 'engine-result.json'), JSON.stringify({
   build, results, failures, documents, nativeHancom: 'NOT_RUN',
   unverified: ['RangeTag-only boundary rejection has no public creation API and is not synthesized by these diagnostics.', 'Right-section additional ColumnDef controls require a separate imported fixture.'],

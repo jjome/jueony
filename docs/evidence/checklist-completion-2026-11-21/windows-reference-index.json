@@ -1,0 +1,87 @@
+{
+  "build": {
+    "customSourceSha256": "d3161b532e36140234ad3ff187327b9ac7f912bef843e439fa233f2e626673d2",
+    "engineWasmSha256": "5c0f97d1e606f730c85b7dd007feccb505c8a02ffa2b8b2df0e55feff17f87c0"
+  },
+  "verified": [
+    "the real persistent FTS index reused unchanged files and omitted an unselected fourth folder",
+    "moving away a directly selected Windows file removed only that file from the index",
+    "the Windows ACL denial removed that folder and retained the other approved folder",
+    "same-length same-timestamp Windows file replacement was detected by content hash",
+    "creating and deleting a child of a selected directory updated only that child",
+    "restored Windows permission reindexed its file and launcher restart preserved the correctly scoped SQLite rows",
+    "the chat received the new approved content and no unselected evidence"
+  ],
+  "requests": [
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 3,
+      "deleted": 0
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 0,
+      "deleted": 0
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 0,
+      "deleted": 1
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 0,
+      "deleted": 1
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 1,
+      "deleted": 1
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 1,
+      "deleted": 0
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 1,
+      "deleted": 0
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 0,
+      "deleted": 1
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 0,
+      "deleted": 0
+    }
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "chat": {
+    "updatedApprovedReference": true,
+    "oldAndUnselectedOmitted": true,
+    "provider": "local deterministic fixture"
+  }
+}

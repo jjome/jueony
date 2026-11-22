@@ -1,5 +1,13 @@
 export type WorkTemplateId = 'official-letter' | 'work-plan' | 'meeting-result' | 'work-report';
 export type WorkTemplate = { id: WorkTemplateId; name: string; description: string; paragraphs: { text: string; style: 'title' | 'heading' | 'body' }[]; table?: string[][] };
+export type WorkTemplateValues = Readonly<Record<string, string>>;
+const requiredFields: Record<WorkTemplateId, readonly string[]> = {
+  'official-letter':['기관명','공문 제목'],
+  'work-plan':['업무명','시작일','종료일'],
+  'meeting-result':['회의명','날짜 및 시간'],
+  'work-report':['업무명','날짜'],
+};
+const placeholder = /\[([^\[\]]+)\]/gu;
 export const workTemplates: readonly WorkTemplate[] = [
   { id: 'official-letter', name: '공문 초안', description: '수신·제목·본문·붙임이 있는 작성용 초안', paragraphs: [
     { text: '[기관명]', style: 'title' }, { text: '수신  [수신 기관 또는 부서]', style: 'body' }, { text: '(경유)  [경유 부서]', style: 'body' }, { text: '제목  [공문 제목]', style: 'heading' },
@@ -12,4 +20,27 @@ export const workTemplates: readonly WorkTemplate[] = [
   { id: 'work-report', name: '업무 보고서', description: '보고 요지·현황·문제점·검토 의견·향후 계획', paragraphs: [
     { text: '[업무명] 보고', style: 'title' }, { text: '보고일: [날짜] / 작성: [부서 및 담당자]', style: 'body' }, { text: '1. 보고 요지', style: 'heading' }, { text: '[핵심 내용과 필요한 결정을 간단히 작성하세요.]', style: 'body' }, { text: '2. 추진 현황', style: 'heading' }, { text: '[확인된 사실과 진행 상황을 작성하세요.]', style: 'body' }, { text: '3. 문제점 및 검토 의견', style: 'heading' }, { text: '[문제점, 원인, 대안과 근거를 작성하세요.]', style: 'body' }, { text: '4. 향후 계획', style: 'heading' }, { text: '[추진 일정과 담당 부서를 작성하세요.]', style: 'body' } ] },
 ];
-export function readWorkTemplate(id: unknown): WorkTemplate { const value = workTemplates.find(template => template.id === id); if (!value) throw new Error('지원하는 업무 양식을 선택하세요.'); return structuredClone(value); }
+export function workTemplateFields(template: WorkTemplate): {name:string; required:boolean}[] {
+  const lines = [...template.paragraphs.map(item => item.text), ...(template.table ?? []).flat()];
+  const names = new Set(lines.flatMap(line => [...line.matchAll(placeholder)].map(match => match[1])));
+  return [...names].map(name => ({name,required:requiredFields[template.id].includes(name)}));
+}
+
+export function readWorkTemplate(id: unknown, values?: WorkTemplateValues, preview = false): WorkTemplate {
+  const source = workTemplates.find(template => template.id === id);
+  if (!source) throw new Error('지원하는 업무 양식을 선택하세요.');
+  const template = structuredClone(source);
+  if (!values) return template;
+  const fields = workTemplateFields(template);
+  const known = new Map(fields.map(field=>[field.name,field]));
+  for (const [name,value] of Object.entries(values)) {
+    if (!known.has(name) || typeof value !== 'string' || value.length > 180 || /\p{Cc}/u.test(value)) throw new Error('양식 입력값은 항목당 180자 이하의 한 줄이어야 합니다.');
+  }
+  const get = (name: string) => Object.hasOwn(values,name) ? values[name].trim() : '';
+  const missing = fields.filter(field=>field.required&&!get(field.name)).map(field=>field.name);
+  if (!preview && missing.length) throw new Error(`필수 입력을 확인하세요. ${missing.join(', ')}`);
+  const populate = (line: string) => line.replace(placeholder,(match,name)=>get(name)||match);
+  template.paragraphs = template.paragraphs.map(item=>({...item,text:populate(item.text)}));
+  if (template.table) template.table=template.table.map(row=>row.map(populate));
+  return template;
+}

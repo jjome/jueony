@@ -12,7 +12,7 @@
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **23/23** · 부분 0 | 완료 0/18 · 부분 18 |
 | 검증 | 완료 0/23 · 부분 23 | 완료 0/18 · 부분 12 · 미검증 6 |
-| Agent 연결 | 연결 12/17 · 부분 5 · 해당 없음 6 | 연결 0/18 · 부분 8 · 미연결 10 |
+| Agent 연결 | 연결 🟢 **17/17** · 부분 0 · 해당 없음 6 | 연결 0/18 · 부분 8 · 미연결 10 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **Agent 연결** [G053](<09-pages-and-sections.md#g053>) **수동 쪽 테두리의 적용 범위/포함 정책** — 정의한 범위 회귀 유지; 한글 비교 대기
-- **Agent 연결** [G054](<09-pages-and-sections.md#g054>) **단색/두 색 쪽 그러데이션 배경** — 정의한 범위 회귀 유지; 한글 비교 대기
-- **Agent 연결** [G056](<09-pages-and-sections.md#g056>) **구역 용지·방향·여백 범위 설정** — 정의한 범위 회귀 유지; 한글 비교 대기
+- **검증** [A026](<09-pages-and-sections.md#a026>) **검증된 일반 본문 구역 합치기** — Chrome의 HWP·HWPX 채팅과 엔진 검사에서 일반 평면 표의 이동, 앞 구역 기본 탭 적용, 저장·재열기와 한 번 되돌리기를 확인했다. 독립 한글과 운영 모델 검증은 남았다.
+- **검증** [A027](<09-pages-and-sections.md#a027>) **검증된 빈 본문 구역 삭제** — 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- **검증** [A028](<09-pages-and-sections.md#a028>) **일반 본문 구역 나누기** — HWP·HWPX에서 구역 나누기와 새 구역만의 용지·여백·테두리 포함을 한 요청으로 적용한다. 앞뒤 구역의 보존, 저장·재열기·되돌리기와 용지 단계 실패 시 복원을 검증했다. 실제 로컬 Qwen이 가로 용지·22mm 위 여백·머리말 포함을 적용하고 한 번 되돌렸다. 복합 원본, 독립 한글 비교와 운영 모델 평가가 남았다.
 
 ## 기능별 작업표
 
@@ -146,12 +146,12 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [G053](<09-pages-and-sections.md#g053>) · 작업 | 수동 쪽 테두리의 적용 범위/포함 정책 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
-| [G054](<09-pages-and-sections.md#g054>) · 작업 | 단색/두 색 쪽 그러데이션 배경 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
+| [G053](<09-pages-and-sections.md#g053>) · 작업 | 수동 쪽 테두리의 적용 범위/포함 정책 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [G054](<09-pages-and-sections.md#g054>) · 작업 | 단색/두 색 쪽 그러데이션 배경 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G055](<09-pages-and-sections.md#g055>) · 작업 | 로컬 그림 쪽 배경과 안전한 자산 저장 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [G056](<09-pages-and-sections.md#g056>) · 작업 | 구역 용지·방향·여백 범위 설정 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
-| [G057](<09-pages-and-sections.md#g057>) · 작업 | 기본 텍스트 바탕쪽 수동 편집 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
-| [G058](<09-pages-and-sections.md#g058>) · 작업 | HWPX 기본 본문 줄 번호 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
+| [G056](<09-pages-and-sections.md#g056>) · 작업 | 구역 용지·방향·여백 범위 설정 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [G057](<09-pages-and-sections.md#g057>) · 작업 | 기본 텍스트 바탕쪽 수동 편집 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [G058](<09-pages-and-sections.md#g058>) · 작업 | HWPX 기본 본문 줄 번호 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G059](<09-pages-and-sections.md#g059>) · 작업 | 완전한 본문 쪽 삭제 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G060](<09-pages-and-sections.md#g060>) · 작업 | 기본 본문 쪽 복사·붙이기 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
@@ -425,11 +425,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
-- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 완료 범위: 한 단 본문 두 구역의 경계를 합친다. 뒤 구역 첫 문단 아래에 독립된 한 쪽 평면 표 한 개를 함께 옮길 수 있다. 보호·병합·필드·캡션·여러 쪽에 걸친 표는 제외한다.
+- 다음 작업: Chrome의 HWP·HWPX 채팅과 엔진 검사에서 일반 평면 표의 이동, 앞 구역 기본 탭 적용, 저장·재열기와 한 번 되돌리기를 확인했다. 독립 한글과 운영 모델 검증은 남았다.
 - 상위 항목: [B125](<09-pages-and-sections.md#b125>) 구역 나누기
 - Agent 명령: `merge_sections`
-- 근거: [67-agent-section-merge.md](<../67-agent-section-merge.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 근거: [67-agent-section-merge.md](<../67-agent-section-merge.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `CURRENT_46_KIND_CONTRACT`
 
 </details>
@@ -456,10 +456,10 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
-- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 다음 작업: HWP·HWPX에서 구역 나누기와 새 구역만의 용지·여백·테두리 포함을 한 요청으로 적용한다. 앞뒤 구역의 보존, 저장·재열기·되돌리기와 용지 단계 실패 시 복원을 검증했다. 실제 로컬 Qwen이 가로 용지·22mm 위 여백·머리말 포함을 적용하고 한 번 되돌렸다. 복합 원본, 독립 한글 비교와 운영 모델 평가가 남았다.
 - 상위 항목: [B125](<09-pages-and-sections.md#b125>) 구역 나누기
 - Agent 명령: `split_section`
-- 근거: [65-agent-section-split.md](<../65-agent-section-split.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 근거: [65-agent-section-split.md](<../65-agent-section-split.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-agent-split-engine.mjs](<../../apps/editor/scripts/verify-agent-split-engine.mjs>) · [verify-agent-split.mjs](<../../apps/editor/scripts/verify-agent-split.mjs>) · [verify-local-model.mjs](<../../apps/editor/scripts/verify-local-model.mjs>)
 - 원래 기록: `CURRENT_46_KIND_CONTRACT`
 
 </details>
@@ -588,12 +588,12 @@
 <summary>G053 · 수동 쪽 테두리의 적용 범위/포함 정책</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 현재 지원 단순 구역 범위; 복합 원본 제외
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [49-page-border-inclusion-and-scope.md](<../49-page-border-inclusion-and-scope.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: 로컬 Qwen으로 HWP·HWPX의 현재·지정·전체 구역에서 쪽 테두리의 머리말·꼬리말 포함을 바꿨다. 양쪽·홀수·짝수 설정과 구역별 배경의 저장·재열기 및 원본 바이트와 일치하는 되돌리기를 확인했다. 별도 엔진 검사에서 두 색 그러데이션과 내장 그림을 보존했고 종이 기준 또는 확인할 수 없는 그림은 거절했다. 복합 배경과 독립 한글 비교가 남았다.
+- 근거: [49-page-border-inclusion-and-scope.md](<../49-page-border-inclusion-and-scope.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [agent-page-border-inclusion.test.ts](<../../apps/editor/tests/agent-page-border-inclusion.test.ts>) · [agent-page-border-inclusion.ts](<../../apps/editor/src/modules/document/domain/agent-page-border-inclusion.ts>) · [verify-agent-sections.mjs](<../../apps/editor/scripts/verify-agent-sections.mjs>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [65-agent-section-split.md](<../65-agent-section-split.md>) · [verify-agent-split.mjs](<../../apps/editor/scripts/verify-agent-split.mjs>)
+- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -601,11 +601,11 @@
 <summary>G054 · 단색/두 색 쪽 그러데이션 배경</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 지원 배경 region·홀짝/첫 쪽; 고급 gradient 제외
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [50-page-background-region.md](<../50-page-background-region.md>)
+- 다음 작업: HWP·HWPX의 두 색 선형 그러데이션을 AI에 연결했다. 실제 Chrome과 로컬 Qwen에서 색·각도·변경 확인·저장·재열기·한 번 되돌리기를 검증했다. 짝수·홀수와 테두리 및 다른 구역의 보존을 확인했다. 고급 배경과 독립 한글 비교가 남았다.
+- 근거: [50-page-background-region.md](<../50-page-background-region.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
 
 </details>
@@ -627,12 +627,12 @@
 <summary>G056 · 구역 용지·방향·여백 범위 설정</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 현재/선택/전체 구역·복합 원본 거절
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [51-picture-background-and-paper-scope.md](<../51-picture-background-and-paper-scope.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: HWP·HWPX에서 로컬 Qwen이 현재 구역 및 지정 구역의 용지 방향과 전체 구역의 여백을 적용했다. 다른 구역과 본문을 보존하고 저장·재열기 및 한 번 되돌리기로 원본 바이트 복원을 확인했다. 현재 본문 구역을 알 수 없거나 모델이 적용 범위를 바꾸면 변경을 거절한다. 새 구역은 나누기 요청에서 함께 지정한다. 복합 문서와 독립 한글 비교가 남았다.
+- 근거: [51-picture-background-and-paper-scope.md](<../51-picture-background-and-paper-scope.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [verify-agent-sections-engine.mjs](<../../apps/editor/scripts/verify-agent-sections-engine.mjs>) · [verify-agent-sections.mjs](<../../apps/editor/scripts/verify-agent-sections.mjs>) · [65-agent-section-split.md](<../65-agent-section-split.md>) · [verify-agent-split-engine.mjs](<../../apps/editor/scripts/verify-agent-split-engine.mjs>) · [verify-agent-split.mjs](<../../apps/editor/scripts/verify-agent-split.mjs>)
+- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -640,12 +640,12 @@
 <summary>G057 · 기본 텍스트 바탕쪽 수동 편집</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 기본 텍스트·위치·글자 서식; 다중 개체 제외
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [52-master-page-basic-editing.md](<../52-master-page-basic-editing.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: Chrome에서 로컬 Qwen으로 HWP·HWPX의 양쪽 기본 바탕쪽을 생성·수정·삭제했다. 문구 수정 시 위치와 글자 서식을 유지했고 세 작업의 저장·재열기와 한 번 되돌리기를 확인했다. 복합 바탕쪽은 변경을 거절한다. HWP의 일부 홀짝 조합과 독립 한글 비교는 남았다.
+- 근거: [52-master-page-basic-editing.md](<../52-master-page-basic-editing.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [verify-agent-masters.mjs](<../../apps/editor/scripts/verify-agent-masters.mjs>)
+- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -653,12 +653,12 @@
 <summary>G058 · HWPX 기본 본문 줄 번호</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 단일 단·일반 본문·구역/쪽 재시작; HWP 제외
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [53-basic-line-numbers.md](<../53-basic-line-numbers.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: 4개 모의 모델의 Chrome 요청에서 HWPX 단일 단의 줄 번호를 적용했다. 기존 번호 수정·기본 탭과 단일 undo·저장 재실행·범위 밖 거절 10건을 검증했다. 독립 한글 비교는 남았다.
+- 근거: [53-basic-line-numbers.md](<../53-basic-line-numbers.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-agent-sections.mjs](<../../apps/editor/scripts/verify-agent-sections.mjs>)
+- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 

@@ -1,0 +1,68 @@
+diff --git a/src/document_core/queries/field_query.rs b/src/document_core/queries/field_query.rs
+--- a/src/document_core/queries/field_query.rs
++++ b/src/document_core/queries/field_query.rs
+@@ -1449,6 +1449,46 @@
+         self.paginate();
+         self.invalidate_page_tree_cache();
+         Ok(format!("{{\"ok\":true,\"fieldId\":{}}}", field_id))
++    }
++
++    /// Replace the text of a plain body point memo without touching its anchor or metadata.
++    pub fn update_comment_text_v1(
++        &mut self, field_id: u32, expected: &str, text: &str,
++    ) -> Result<String, HwpError> {
++        let unsupported = || HwpError::InvalidField("편집 가능한 본문 점 메모를 확인할 수 없습니다.".into());
++        if self.document.header.encrypted || self.document.header.distribution
++            || self.document.provenance.hwp3_lineage {
++            return Err(unsupported());
++        }
++        if text.encode_utf16().count() > 4000 || text.is_empty() || text.chars().any(char::is_control) {
++            return Err(HwpError::InvalidField("메모는 제어 문자 없이 UTF-16 1~4000자여야 합니다.".into()));
++        }
++        let mut matching = self.collect_all_fields().into_iter().filter(|info| info.field.field_id == field_id);
++        let info = matching.next().ok_or_else(unsupported)?;
++        if matching.next().is_some() || info.field.field_type != FieldType::Memo
++            || !info.location.nested_path.is_empty()
++            || !field_range_bounds(self, &info).is_some_and(|(start, end)| start == end) {
++            return Err(unsupported());
++        }
++        let owner = self.get_para_mut_at_location(&info.location)?;
++        let control_index = owner.field_ranges.get(info.field_range_index).ok_or_else(unsupported)?.control_idx;
++        let Some(Control::Field(field)) = owner.controls.get_mut(control_index) else { return Err(unsupported()); };
++        let [memo] = field.memo_paragraphs.as_mut_slice() else { return Err(unsupported()); };
++        if memo.text != expected || memo.char_shapes.len() != 1 || !memo.controls.is_empty()
++            || !memo.field_ranges.is_empty() || !memo.range_tags.is_empty() || !memo.orphan_field_ends.is_empty()
++            || !memo.markpen_marks.is_empty() || !memo.title_marks.is_empty() || !memo.tab_extended.is_empty() {
++            return Err(unsupported());
++        }
++        if memo.text != text {
++            let char_shape = memo.char_shapes[0].char_shape_id;
++            memo.delete_text_at(0, memo.text.chars().count());
++            memo.insert_text_at(0, text);
++            memo.char_shapes = vec![CharShapeRef { start_pos: 0, char_shape_id: char_shape }];
++            memo.invalidate_layout_inputs();
++            self.document.sections[info.location.section_index].raw_stream = None;
++            self.invalidate_page_tree_cache();
++        }
++        Ok(serde_json::json!({"ok": true, "fieldId": field_id}).to_string())
+     }
+ 
+     /// 셀/글상자 내 문단의 커서 위치에서 필드를 제거한다.
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -5950,6 +5950,14 @@
+                     .replace('"', "\\\"");
+                 format!("{{\"ok\":false,\"error\":\"{}\"}}", escaped)
+             }
++        }
++    }
++
++    #[wasm_bindgen(js_name = updateCommentTextV1)]
++    pub fn update_comment_text_v1_api(&mut self, field_id: u32, expected: &str, text: &str) -> String {
++        match self.update_comment_text_v1(field_id, expected, text) {
++            Ok(value) => value,
++            Err(error) => serde_json::json!({"ok": false, "error": error.to_string()}).to_string(),
+         }
+     }
+ 

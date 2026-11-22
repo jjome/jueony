@@ -1,15 +1,11 @@
-import {sha256} from '@noble/hashes/sha2.js';
+import {parseSingleEquationSelectionBookmarkN015} from '../../modules/preferences/public/index.ts';
+import type {EquationRefN015,SingleEquationSelectionBookmarkN015} from '../../modules/preferences/public/index.ts';
+import {rootObjectSelectionDigest as digest,hasRootObjectSelectionIntegrity} from './root-object-selection-digest.ts';
 
-type EquationRefN015 = Readonly<{section: number; paragraph: number; control: number; type: 'equation'}>;
-
-export type SingleEquationSelectionBookmarkN015 = Readonly<{
-  version: 1;
-  kind: 'single-root-equation-selection';
-  target: EquationRefN015;
-  documentFingerprint: string;
-  objectFingerprint: string;
-  integrity: string;
-}>;
+export function validateSingleEquationSelectionBookmarkN015(value:unknown):SingleEquationSelectionBookmarkN015|undefined{
+  const bookmark=parseSingleEquationSelectionBookmarkN015(value);
+  return bookmark&&hasRootObjectSelectionIntegrity(bookmark)?bookmark:undefined;
+}
 
 export type SingleEquationSelectionTransitionN015 = Readonly<{
   undo(): void;
@@ -60,10 +56,6 @@ export type SingleEquationSelectionSessionN015 = {
 };
 
 type ArtifactN015 = Readonly<{hwp: string; hwpx: string}>;
-const HEX = /^[0-9a-f]{64}$/u;
-const BOOKMARK_KEYS = ['version', 'kind', 'target', 'documentFingerprint', 'objectFingerprint', 'integrity'] as const;
-const TARGET_KEYS = ['section', 'paragraph', 'control', 'type'] as const;
-
 function parsed(value: unknown): unknown { return typeof value === 'string' ? JSON.parse(value) : value; }
 function object(value: unknown): Record<string, unknown> | undefined {
   const result = parsed(value);
@@ -72,20 +64,6 @@ function object(value: unknown): Record<string, unknown> | undefined {
 function array(value: unknown): unknown[] | undefined { const result = parsed(value); return Array.isArray(result) ? result : undefined; }
 function integer(value: unknown): value is number { return Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 2147483647; }
 function instance(value: unknown): value is number { return Number.isSafeInteger(value) && (value as number) > 0 && (value as number) <= 4294967295; }
-function exact(value: Record<string, unknown>, keys: readonly string[]): boolean {
-  const actual = Object.keys(value).sort(), expected = [...keys].sort();
-  return actual.length === expected.length && actual.every((key, index) => key === expected[index]);
-}
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical((value as Record<string, unknown>)[key])]));
-  return value;
-}
-function digest(value: Uint8Array | unknown): string {
-  const bytes = value instanceof Uint8Array ? value : new TextEncoder().encode(JSON.stringify(canonical(value)));
-  return Array.from(sha256(bytes), byte => byte.toString(16).padStart(2, '0')).join('');
-}
-
 function documentOf(session: SingleEquationSelectionSessionN015): DocumentN015 {
   const wrapper = session.wasm as {borrowDocumentHandle?: () => unknown};
   const value = typeof wrapper.borrowDocumentHandle === 'function' ? wrapper.borrowDocumentHandle() : session.wasm;
@@ -190,31 +168,12 @@ function equationFingerprint(document: DocumentN015, ref: EquationRefN015): stri
   return digest({ref, owner: ownerValue, control: {ctrlId: controlValue.ctrlId, lock: controlProps?.Lock ?? null}, properties, text});
 }
 
-function unsigned(value: Omit<SingleEquationSelectionBookmarkN015, 'integrity'>): Omit<SingleEquationSelectionBookmarkN015, 'integrity'> {
-  return {version: 1, kind: 'single-root-equation-selection', target: value.target,
-    documentFingerprint: value.documentFingerprint, objectFingerprint: value.objectFingerprint};
-}
-
-export function validateSingleEquationSelectionBookmarkN015(value: unknown): SingleEquationSelectionBookmarkN015 | undefined {
-  const raw = object(value); if (!raw || !exact(raw, BOOKMARK_KEYS) || raw.version !== 1
-    || raw.kind !== 'single-root-equation-selection' || typeof raw.documentFingerprint !== 'string'
-    || !HEX.test(raw.documentFingerprint) || typeof raw.objectFingerprint !== 'string'
-    || !HEX.test(raw.objectFingerprint) || typeof raw.integrity !== 'string' || !HEX.test(raw.integrity)) return;
-  const targetRaw = object(raw.target); if (!targetRaw || !exact(targetRaw, TARGET_KEYS)) return;
-  const target = rootEquationRef({sec: targetRaw.section, ppi: targetRaw.paragraph, ci: targetRaw.control, type: targetRaw.type});
-  if (!target) return;
-  const checked = unsigned({version: 1, kind: 'single-root-equation-selection', target,
-    documentFingerprint: raw.documentFingerprint, objectFingerprint: raw.objectFingerprint});
-  if (digest(checked) !== raw.integrity) return;
-  return Object.freeze({...checked, integrity: raw.integrity});
-}
-
 export function captureSingleEquationSelectionN015(session: SingleEquationSelectionSessionN015 | undefined): SingleEquationSelectionBookmarkN015 | undefined {
   if (!session || blocked(session)) return;
   try {
     const target = current(session); if (!target) return;
-    const document = documentOf(session), checked = unsigned({version: 1, kind: 'single-root-equation-selection', target,
-      documentFingerprint: documentFingerprint(document), objectFingerprint: equationFingerprint(document, target)});
+    const document = documentOf(session), checked = {version: 1, kind: 'single-root-equation-selection', target,
+      documentFingerprint: documentFingerprint(document), objectFingerprint: equationFingerprint(document, target)} as const;
     return Object.freeze({...checked, integrity: digest(checked)});
   } catch { return; }
 }

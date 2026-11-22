@@ -1,4 +1,4 @@
-﻿param([string]$OutputName = 'jueony-mvp',[string]$FrontendProfile = '',[ValidateRange(1024,65535)][int]$ReviewPort = 4173)
+﻿param([string]$OutputName = 'jueony-mvp',[string]$FrontendProfile = '',[ValidateRange(1024,65535)][int]$ReviewPort = 4173,[switch]$ScriptLauncher)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
@@ -10,12 +10,16 @@ $frontend = if ($FrontendProfile) { Join-Path $projectRoot ('apps/editor/evidenc
 if (-not (Test-Path -LiteralPath (Join-Path $frontend 'build-evidence.json'))) { throw '프런트엔드 빌드를 먼저 실행해 주세요.' }
 $output = Join-Path $projectRoot ('build/' + $OutputName)
 New-Item -ItemType Directory -Force $output | Out-Null
-$previousLauncherAddress = $env:JUEONY_LAUNCHER_ADDRESS
-try {
-    $env:JUEONY_LAUNCHER_ADDRESS = "127.0.0.1:$ReviewPort"
-    & $compiler --edition 2021 -O (Join-Path $projectRoot 'apps/launcher/main.rs') -o (Join-Path $output 'JueonyEditor.exe')
-    if ($LASTEXITCODE -ne 0) { throw 'Rust 런처 빌드 실패' }
-} finally { $env:JUEONY_LAUNCHER_ADDRESS = $previousLauncherAddress }
+$nativeLauncher = Join-Path $output 'JueonyEditor.exe'
+if ($ScriptLauncher -and (Test-Path -LiteralPath $nativeLauncher)) { throw '스크립트 실행 묶음은 기존 exe와 구별되는 출력 폴더 이름을 지정해 주세요.' }
+if (!$ScriptLauncher) {
+    $previousLauncherAddress = $env:JUEONY_LAUNCHER_ADDRESS
+    try {
+        $env:JUEONY_LAUNCHER_ADDRESS = "127.0.0.1:$ReviewPort"
+        & $compiler --edition 2021 -O (Join-Path $projectRoot 'apps/launcher/main.rs') -o $nativeLauncher
+        if ($LASTEXITCODE -ne 0) { throw 'Rust 런처 빌드 실패' }
+    } finally { $env:JUEONY_LAUNCHER_ADDRESS = $previousLauncherAddress }
+}
 $frontendOutput = Join-Path $output 'dist'
 New-Item -ItemType Directory -Force $frontendOutput | Out-Null
 Get-ChildItem -LiteralPath $frontend -Force | Copy-Item -Destination $frontendOutput -Recurse -Force
@@ -26,10 +30,16 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
-foreach ($guide in @('122-hwt-copy-storage.md','123-current-stack-and-preview-storage.md','124-new-document-time-storage.md')) {
+foreach ($guide in @('122-hwt-copy-storage.md','123-current-stack-and-preview-storage.md','124-new-document-time-storage.md','147-checklist-completion.md')) {
     if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) {
         Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force
     }
+}
+$checklistEvidence = Join-Path $projectRoot 'docs/evidence/checklist-completion-2026-11-21/manifest.json'
+if (Test-Path -LiteralPath $checklistEvidence) {
+    $checklistEvidenceOutput = Join-Path $llmEvidence 'checklist-completion-2026-11-21'
+    New-Item -ItemType Directory -Force $checklistEvidenceOutput | Out-Null
+    Copy-Item -LiteralPath $checklistEvidence -Destination $checklistEvidenceOutput -Force
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/42-document-insertion-result.md') -Destination $output -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/43-style-management-result.md') -Destination $output -Force
@@ -56,26 +66,34 @@ $rustNotice = Join-Path $env:RUSTUP_HOME 'toolchains/1.93.1-x86_64-pc-windows-ms
 if (Test-Path -LiteralPath $rustNotice) {
     Copy-Item -LiteralPath $rustNotice -Destination (Join-Path $output 'Rust-COPYRIGHT-library.html') -Force
 }
-$voltaNodes = Join-Path $env:LOCALAPPDATA 'Volta/tools/image/node'
-$installedNode = Get-ChildItem -LiteralPath $voltaNodes -Directory | Where-Object { ([version]$_.Name).Major -eq 22 } | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
-if (-not $installedNode) { throw '실행 묶음에 포함할 Node.js 22 이상이 필요합니다.' }
+$nodeDirectory = Join-Path $projectRoot '.tools/node-v24.22.3-win-x64'
+if (!(Test-Path -LiteralPath (Join-Path $nodeDirectory 'node.exe'))) {
+    $voltaNodes = Join-Path $env:LOCALAPPDATA 'Volta/tools/image/node'
+    if (Test-Path -LiteralPath $voltaNodes) {
+        $nodeDirectory = Get-ChildItem -LiteralPath $voltaNodes -Directory | Where-Object { ([version]$_.Name).Major -ge 22 } |
+            Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1 -ExpandProperty FullName
+    }
+}
+if (!$nodeDirectory -or !(Test-Path -LiteralPath (Join-Path $nodeDirectory 'node.exe')) -or !(Test-Path -LiteralPath (Join-Path $nodeDirectory 'LICENSE'))) {
+    throw '실행 묶음에 포함할 Node.js 22 이상과 동봉 라이선스 파일이 필요합니다.'
+}
 $runtimePath = Join-Path $output 'runtime'
 New-Item -ItemType Directory -Force $runtimePath | Out-Null
-$sourceNode = Join-Path $installedNode.FullName 'node.exe'
+$sourceNode = Join-Path $nodeDirectory 'node.exe'
 $targetNode = Join-Path $runtimePath 'node.exe'
 if (-not (Test-Path -LiteralPath $targetNode) -or (Get-FileHash -LiteralPath $sourceNode).Hash -ne (Get-FileHash -LiteralPath $targetNode).Hash) {
     Copy-Item -LiteralPath $sourceNode -Destination $targetNode -Force
 }
-Copy-Item -LiteralPath (Join-Path $installedNode.FullName 'LICENSE') -Destination (Join-Path $runtimePath 'LICENSE.Node.txt') -Force
+Copy-Item -LiteralPath (Join-Path $nodeDirectory 'LICENSE') -Destination (Join-Path $runtimePath 'LICENSE.Node.txt') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/server.mjs') -Destination $output -Force
 foreach ($supportFile in @('connection-store.mjs', 'credential-protect.ps1')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('apps/launcher/' + $supportFile)) -Destination $output -Force
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'scripts/Start-Jueony.ps1') -Destination (Join-Path $output 'Start-Jueony.ps1') -Force
-$startCmd = "@echo off" + [Environment]::NewLine + ('powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1" -Port ' + $ReviewPort) + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
+$startCmd = "@echo off" + [Environment]::NewLine + ('powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "%~dp0Start-Jueony.ps1" -Port ' + $ReviewPort) + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $output 'Start-Jueony.cmd'), $startCmd, [Text.Encoding]::ASCII)
 if ($ReviewPort -ne 4173) { [IO.File]::WriteAllText((Join-Path $output 'Start-Review.cmd'), $startCmd, [Text.Encoding]::ASCII) }
-$restartCmd = "@echo off" + [Environment]::NewLine + 'echo Save your documents and close Jueony windows before restarting.' + [Environment]::NewLine + ('powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1" -Port ' + $ReviewPort + ' -RestartServer') + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
+$restartCmd = "@echo off" + [Environment]::NewLine + 'echo Save your documents and close Jueony windows before restarting.' + [Environment]::NewLine + ('powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File "%~dp0Start-Jueony.ps1" -Port ' + $ReviewPort + ' -RestartServer') + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $output 'Restart-Jueony.cmd'), $restartCmd, [Text.Encoding]::ASCII)
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/editor-control-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/pane-agent-2026-10-11') -Destination $llmEvidence -Recurse -Force
@@ -299,7 +317,9 @@ $manifest = [ordered]@{
     reviewPort = $ReviewPort
     nodeVersion = $nodeVersion
     nodeSha256 = (Get-FileHash -LiteralPath (Join-Path $runtimePath 'node.exe') -Algorithm SHA256).Hash
-    launcherSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'JueonyEditor.exe') -Algorithm SHA256).Hash
+    launcherKind = if ($ScriptLauncher) { 'powershell' } else { 'native-and-powershell' }
+    launcherSha256 = if ($ScriptLauncher) { $null } else { (Get-FileHash -LiteralPath $nativeLauncher -Algorithm SHA256).Hash }
+    scriptLauncherSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'Start-Jueony.ps1') -Algorithm SHA256).Hash
     serverSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'server.mjs') -Algorithm SHA256).Hash
     connectionStoreSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'connection-store.mjs') -Algorithm SHA256).Hash
     credentialProtectSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'credential-protect.ps1') -Algorithm SHA256).Hash
@@ -309,4 +329,4 @@ $manifest = [ordered]@{
     frontend = Get-Content -LiteralPath (Join-Path $output 'dist/build-evidence.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 }
 $manifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $output 'bundle-evidence.json') -Encoding utf8
-Write-Output "실행 파일: $output\JueonyEditor.exe"
+Write-Output (Join-Path $output $(if ($ScriptLauncher) { 'Start-Jueony.cmd' } else { 'JueonyEditor.exe' }))

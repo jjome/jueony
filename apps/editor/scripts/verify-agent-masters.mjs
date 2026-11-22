@@ -6,9 +6,9 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..'),repo=resolve(app,'../..'),dist=resolve(app,process.env.JUEONY_TEST_DIST),pkg=resolve(repo,process.env.JUEONY_ENGINE_PACKAGE),out=resolve(repo,process.env.JUEONY_TEST_OUTPUT??'docs/evidence/agent-masters-2026-10-14/agent-master-browser');await mkdir(out,{recursive:true});
-const port=4251,origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms)),png=resolve(app,'fixtures/page-background/background-bands.png'),jpg=resolve(app,'fixtures/page-background/background-bands.jpg');
+const port=Number(process.env.JUEONY_TEST_PORT??4251),origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms)),png=resolve(app,'fixtures/page-background/background-bands.png'),jpg=resolve(app,'fixtures/page-background/background-bands.jpg');
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});if(await fetch(origin+'/api/health').then(()=>true,()=>false))throw new Error('Test port occupied');
-const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}}),results=[],failures=[],pageErrors=[],consoleErrors=[],externalRequests=[];let browser,page;
+const server=spawn(process.execPath,[process.env.JUEONY_TEST_SERVER??'apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}}),results=[],failures=[],pageErrors=[],consoleErrors=[],externalRequests=[];let browser,page;
 const active=async()=>(await page.$('.editor-frame:not([hidden])')).contentFrame();
 async function services(){const f=await active();await f.evaluate(()=>{if(window.__pageServices)return;const a=window.rhwpStudio.automation;a.registerCommand({id:'ext:master-inspect',label:'검수',canExecute:()=>true,execute:s=>window.__pageServices=s});a.execute('ext:master-inspect');a.unregisterCommand('ext:master-inspect');});return f;}
 async function execute(id){const r=await(await active()).evaluate(id=>window.jueonyEditor.executeCommand(id),id);assert.equal(r.ok,true,JSON.stringify(r));}
@@ -18,9 +18,34 @@ const state=async()=>(await services()).evaluate(()=>({revision:window.jueonyEdi
 async function save(f,name,ext){const result=await f.evaluate(async()=>{const api=window.jueonyEditor,status=await api.save();return {status,bytes:[...new Uint8Array(await(await api.fileHandle().getFile()).arrayBuffer())]};});assert.equal(result.status,'saved');await writeFile(resolve(out,name+'.'+ext),new Uint8Array(result.bytes));return new HwpDocument(new Uint8Array(result.bytes));}
 async function scenario(name,run){try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
 function body(){const d=HwpDocument.createEmpty();d.createBlankDocument();for(const [i,text] of ['제목 😀','첫 본문','둘째 본문'].entries()){if(i)d.splitParagraph(0,i-1,d.getParagraphLength(0,i-1));d.insertText(0,i,0,text);}return d;}
-const calls=[],providerPort=4253;
+const calls=[],providerPort=Number(process.env.JUEONY_TEST_PROVIDER_PORT??4253);
+const localMasterModelPort=Number(process.env.JUEONY_TEST_LOCAL_MASTER_MODEL_PORT??0);
+const createText='현재 구역의 양쪽 바탕쪽 문구를 "검수 초안"으로 넣어 주세요.';
+const replaceText='1구역의 양쪽 바탕쪽 문구를 “최종 검토 😀”로 바꿔 주세요.';
+const deleteText='1구역의 양쪽 바탕쪽을 삭제해 주세요.';
+const localMasterRequests=new Set([createText,replaceText,deleteText]);
+const localMasterProof=[];
+let expectedLocalMaster;
 if(await fetch('http://127.0.0.1:'+providerPort).then(()=>true,()=>false))throw new Error('Mock provider port occupied');
-const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const chunk of req)raw+=chunk;const request=JSON.parse(raw),id=req.url.endsWith('/responses')?'openai-responses':req.url.endsWith('/messages')?'anthropic':req.url.includes(':generateContent')?'gemini':'openai-compatible';const input=JSON.parse(id==='gemini'?request.contents[0].parts[0].text:id==='anthropic'?request.messages[0].content:id==='openai-responses'?request.input[1].content:request.messages[1].content);calls.push({id,model:request.model??req.url.split('/models/')[1]?.split(':')[0],input});
+const provider=http.createServer(async(req,res)=>{try{req.setEncoding('utf8');let raw='';for await(const chunk of req)raw+=chunk;const request=JSON.parse(raw),id=req.url.endsWith('/responses')?'openai-responses':req.url.endsWith('/messages')?'anthropic':req.url.includes(':generateContent')?'gemini':'openai-compatible';const input=JSON.parse(id==='gemini'?request.contents[0].parts[0].text:id==='anthropic'?request.messages[0].content:id==='openai-responses'?request.input[1].content:request.messages[1].content);calls.push({id,model:request.model??req.url.split('/models/')[1]?.split(':')[0],input});
+ if(localMasterRequests.has(input.instruction)){
+   assert.equal(id,'openai-compatible');
+   assert.deepEqual(input.document,{nodes:[],operations:[expectedLocalMaster]});
+   assert.deepEqual(input.conversation,[]);
+   assert.deepEqual(input.references,[]);
+   res.setHeader('Content-Type','application/json');
+   if(localMasterModelPort){
+     const reply=await fetch(`http://127.0.0.1:${localMasterModelPort}/v1/chat/completions`,{
+       method:'POST',redirect:'error',headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({...request,model:'local-table-size-review'}),signal:AbortSignal.timeout(70_000),
+     });
+     const body=await reply.text();
+     console.log('Local master response',JSON.stringify({kind:expectedLocalMaster.kind,status:reply.status,reply:JSON.parse(body).choices?.[0]?.message?.content}));
+     res.statusCode=reply.status;res.end(body);return;
+   }
+   res.end(JSON.stringify({choices:[{message:{content:JSON.stringify({message:'검수용 바탕쪽 제안입니다.',sourceIds:[],operations:[expectedLocalMaster]})}}]}));
+   return;
+ }
  const kind=input.instruction.includes('홀수')?'odd':input.instruction.includes('짝수')?'even':'both',master={kind:'set_master_page_text',section:0,pageKind:kind,text:input.instruction.includes('후속')?'기관 최종 검토용':'기관 검토용 😀\n작성 중',xMm:5,yMm:6,fontSizePt:18,color:'#996633',bold:false};const operations=input.instruction.includes('삭제')?[{kind:'delete_master_page',section:0,pageKind:kind}]:input.instruction.includes('잘못')?[{kind:'set_section_tabs',section:0,spacingPt:24},{...master,xMm:9999}]:[master];
  if(input.instruction.includes('지연'))await new Promise(r=>setTimeout(r,2000));
  const generation={message:'합성 모델의 기본 바탕쪽 제안입니다.',sourceIds:[],operations};if(id==='anthropic')generation.operations=operations.map(({kind,...args})=>({kind,arguments:JSON.stringify(args)}));const text=JSON.stringify(generation);
@@ -35,8 +60,51 @@ async function configure(id){await page.click('#connection-settings');await page
 const apply=async operations=>(await active()).evaluate(async operations=>{const api=window.jueonyEditor,base=api.snapshot();return api.apply(crypto.randomUUID(),base,{message:'검수 명령',sourceIds:[],operations});},operations);
 try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
- browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',dialog=>dialog.dismiss());page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});
+ browser=await puppeteer.launch({executablePath:process.env.JUEONY_TEST_BROWSER??'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',dialog=>dialog.dismiss());page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});page.on('response',response=>{if(response.status()===404)console.error('Missing resource:',new URL(response.url()).pathname);});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(`${id}: actual model selection, basic master creation, stored-settings diff, request undo/redo and saved reopen`,async()=>{await configure(id);const f=await open('hwpx',body()),before=await snap(),start=calls.length;await send('바탕쪽에 기관 검토용을 넣어줘');assert.equal(calls.length,start+1);const call=calls.at(-1);assert.equal(call.id,id);assert.equal(call.model,id+'-fixture');assert.deepEqual(call.input.document.structure.sections[0].masterPages,{editable:true,pages:[],hiddenOnFirstPage:false});const after=await snap(),actual=after.structure.sections[0].masterPages.pages[0];assert.equal(actual.text,'기관 검토용 😀\n작성 중');assert.equal(actual.color,'#996633');assert.equal(actual.fontSizePt,18);assert.deepEqual(after.nodes,before.nodes);assert.deepEqual(after.structure.paragraphs,before.structure.paragraphs);assert.match(await(await services()).evaluate(()=>window.__pageServices.wasm.renderPageSvg(0)),/#996633/);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);assert.match(await page.$eval('#change-dialog',e=>e.textContent),/저장된 바탕쪽/);await page.click('#change-dialog button');const loaded=await save(f,'provider-'+id,'hwpx');try{assert.equal(JSON.parse(loaded.getMasterPages(0)).pages[0].text,actual.text);}finally{loaded.free();}await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);});
+ for(const format of ['hwp','hwpx'])await scenario(`${format}: local model creates, replaces, and deletes only the verified stored master text`,async()=>{
+   const f=await open(format,body()),before=await state();
+   expectedLocalMaster={kind:'set_master_page_text',section:0,pageKind:'both',text:'검수 초안',xMm:5,yMm:5,fontSizePt:10,color:'#808080',bold:false};
+   await send(createText);
+   assert.equal((await snap()).structure.sections[0].masterPages.pages[0]?.text,'검수 초안');
+   const created=await save(f,'local-master-created-'+format,format);
+   try{assert.equal(JSON.parse(created.getMasterPages(0)).pages[0].text,'검수 초안');}finally{created.free();}
+   await undo();
+   assert.deepEqual((await state()).bytes,before.bytes);
+
+   const styled=body();
+   styled.setMasterPageText(0,'both',JSON.stringify({text:'보호할 합성 원래 문구',x:1763,y:2107,fontSize:1800,color:'#996633',bold:true}));
+   const activeFile=await open(format,styled),original=await state(),originalSnapshot=await snap();
+   const stored=originalSnapshot.structure.sections[0].masterPages.pages[0];
+   const {xMm,yMm,fontSizePt,color,bold}=stored;
+   expectedLocalMaster={kind:'set_master_page_text',section:0,pageKind:'both',text:'최종 검토 😀',xMm,yMm,fontSizePt,color,bold};
+   await send(replaceText);
+   const updatedSnapshot=await snap();
+   assert.deepEqual(updatedSnapshot.structure.sections[0].masterPages.pages[0],{...stored,text:'최종 검토 😀'});
+   assert.deepEqual(updatedSnapshot.nodes,originalSnapshot.nodes);
+   if(process.env.JUEONY_TEST_SECTION_RECEIPTS==='1'){
+     await lastAction('변경 확인');await page.waitForSelector('#change-dialog[open]');
+     assert.match(await page.$eval('#structure-diff-text',node=>node.textContent),/저장된 바탕쪽 \(양쪽 기본\) · 문구 “보호할 합성 원래 문구” → “최종 검토 😀”/u);
+     await page.click('#change-dialog button');
+   }
+   const replaced=await save(activeFile,'local-master-replaced-'+format,format);
+   try{
+     const actual=JSON.parse(replaced.getMasterPages(0)).pages[0];
+     assert.deepEqual([actual.text,actual.x,actual.y,actual.fontSize,actual.color,actual.bold],['최종 검토 😀',1763,2107,1800,'#996633',true]);
+   }finally{replaced.free();}
+   await undo();
+   assert.deepEqual((await state()).bytes,original.bytes);
+
+   expectedLocalMaster={kind:'delete_master_page',section:0,pageKind:'both'};
+   await send(deleteText);
+   assert.deepEqual((await snap()).structure.sections[0].masterPages.pages,[]);
+   const removed=await save(activeFile,'local-master-deleted-'+format,format);
+   try{assert.deepEqual(JSON.parse(removed.getMasterPages(0)).pages,[]);}finally{removed.free();}
+   await undo();
+   assert.deepEqual((await state()).bytes,original.bytes);
+   localMasterProof.push({format,realModel:Boolean(localMasterModelPort),operations:['create','replace','delete'],savedAndReopened:true,undoByteExact:true,
+     receiptTextVerified:process.env.JUEONY_TEST_SECTION_RECEIPTS==='1'});
+ });
  await scenario('follow-up and stored master deletion use the latest unsaved content; one undo restores the deleted original',async()=>{const f=await open('hwpx',body());await send('바탕쪽 생성');await send('후속: 바탕쪽을 최종 검토용으로 바꿔줘');assert.equal(calls.at(-1).input.document.structure.sections[0].masterPages.pages[0].text,'기관 검토용 😀\n작성 중');const before=await snap();assert.equal(before.structure.sections[0].masterPages.pages[0].text,'기관 최종 검토용');await send('바탕쪽 삭제');assert.equal((await snap()).structure.sections[0].masterPages.pages.length,0);const loaded=await save(f,'master-deleted','hwpx');assert.equal(JSON.parse(loaded.getMasterPages(0)).pages.length,0);loaded.free();await undo();assert.deepEqual((await snap()).structure,before.structure);});
  await scenario('HWP odd-only master saves while sparse even-only creation is rejected before document mutation',async()=>{const f=await open('hwp',body());await send('홀수 바탕쪽 생성');assert.equal((await snap()).structure.sections[0].masterPages.pages[0].kind,'odd');const loaded=await save(f,'odd-master','hwp');assert.equal(JSON.parse(loaded.getMasterPages(0)).pages[0].kind,'odd');loaded.free();await undo();const before=await state();await send('짝수 바탕쪽 생성');assert.match(await page.$eval('#request-error',e=>e.textContent),/HWPX/);assert.deepEqual((await state()).bytes,before.bytes);assert.equal((await state()).history,before.history);});
  await scenario('complex table master source and invalid geometry reject full Agent batches without flattening source or applying tabs',async()=>{const d=body();d.createTable(0,1,0,1,1);d.setMasterPageText(0,'both',JSON.stringify({text:'복잡한 원본',x:1417,y:1417,fontSize:1000,color:'#808080',bold:false}));const source=resolve(out,'rich-base.hwpx'),fixture=resolve(out,'rich-master.hwpx');await writeFile(source,d.exportHwpx());d.free();execFileSync(process.env.JUEONY_TEST_PYTHON??'C:/Python314/python.exe',[resolve(repo,'apps/editor/scripts/master-page-fixture.py'),source,fixture,'table'],{windowsHide:true});await open('hwpx',new HwpDocument(await readFile(fixture)));const before=await state();assert.equal((await snap()).structure.sections[0].masterPages.editable,false);await send('바탕쪽 삭제');assert.match(await page.$eval('#request-error',e=>e.textContent),/읽기 전용/);assert.deepEqual((await state()).bytes,before.bytes);await open('hwpx',body());const clean=await state();await send('잘못된 바탕쪽 위치 검수');assert.match(await page.$eval('#request-error',e=>e.textContent),/위치|용지/);assert.deepEqual((await state()).bytes,clean.bytes);assert.equal((await state()).history,clean.history);});
@@ -45,4 +113,4 @@ try{
  await scenario('first-page hide flag is sent to the model and remains hidden after creating the stored master',async()=>{const d=body(),p=JSON.parse(d.insertPageBreak(0,2,d.getParagraphLength(0,2)));d.insertText(0,p.paraIdx,0,'둘째 쪽');d.setSectionDef(0,JSON.stringify({hideMasterPage:true}));const f=await open('hwpx',d);await send('바탕쪽 생성');assert.equal(calls.at(-1).input.document.structure.sections[0].masterPages.hiddenOnFirstPage,true);assert.equal((await snap()).structure.sections[0].masterPages.hiddenOnFirstPage,true);const svg=await(await services()).evaluate(()=>[window.__pageServices.wasm.renderPageSvg(0),window.__pageServices.wasm.renderPageSvg(1)]);assert.ok(!svg[0].includes('#996633'));assert.ok(svg[1].includes('#996633'));const loaded=await save(f,'hidden-first-master','hwpx');assert.equal(JSON.parse(loaded.getSectionDef(0)).hideMasterPage,true);loaded.free();});
  await scenario('host safe save and persisted session reopen retain text, parity, coordinates and font properties after restart',async()=>{await open('hwpx',body());await send('바탕쪽 생성');const before=(await snap()).structure.sections[0].masterPages;await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');await delay(2200);await page.reload();await page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});assert.deepEqual((await snap()).structure.sections[0].masterPages,before);await page.screenshot({path:resolve(out,'agent-master.png')});});
  assert.deepEqual(pageErrors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(externalRequests,[]);
-}finally{await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,pageErrors,consoleErrors,externalRequests,providerCalls:calls.map(c=>({adapterId:c.id,model:c.model,instruction:c.input.instruction,sections:c.input.document.structure?.sections,body:c.input.document.nodes.map(n=>n.text)})),build:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:'Real Edge chat with four provider adapters and local deterministic replies. Checked actual master edit, undo/redo, saved reopen, rollback and stale rejection. Native Hancom and paid models deferred.'},null,2));await browser?.close();server.kill();provider.closeAllConnections();await new Promise(r=>provider.close(r));}if(failures.length)process.exitCode=1;
+}finally{await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,pageErrors,consoleErrors,externalRequests,localMasterProof,providerCalls:calls.map(c=>({adapterId:c.id,model:c.model,instruction:c.input.instruction,sections:c.input.document.structure?.sections,operations:c.input.document.operations,body:c.input.document.nodes.map(n=>n.text)})),build:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:'The narrow stored-master cases use the real loopback model when configured. Other adapter and refusal cases use deterministic synthetic replies. Checked actual master edit, exact undo, saved reopen, rollback and stale rejection.'},null,2));await browser?.close();server.kill();provider.closeAllConnections();await new Promise(r=>provider.close(r));}if(failures.length||pageErrors.length||consoleErrors.length||externalRequests.length)process.exitCode=1;

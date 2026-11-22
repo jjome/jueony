@@ -14,12 +14,12 @@ if(await fetch(origin).then(()=>true,()=>false))throw new Error('Test port occup
 const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}});
 let browser,page,frame,stage='startup';const results=[],errors=[],externalRequests=[];
 const languages=['korean','english','chinese','japanese','other','symbol','user'];
-const families=['함초롬돋움','serif','맑은 고딕','sans-serif','monospace','함초롬바탕','나눔고딕'];
+const families=['나눔고딕','serif','맑은 고딕','sans-serif','monospace','맑은 고딕','나눔고딕'];
 const definition=(name,values=families)=>({name,...Object.fromEntries(languages.map((lang,index)=>[lang,values[index]]))});
 const parse=value=>typeof value==='string'?JSON.parse(value):value;
 const pass=name=>{results.push(name);console.log('PASS',name);};
 async function launch(){
- browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,userDataDir:profile,protocolTimeout:45000,defaultViewport:{width:1700,height:1100},args:['--no-first-run','--disable-background-networking','--disable-background-timer-throttling','--disable-renderer-backgrounding']});
+ browser=await puppeteer.launch({executablePath:process.env.JUEONY_TEST_BROWSER??'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,userDataDir:profile,protocolTimeout:45000,defaultViewport:{width:1700,height:1100},args:['--no-first-run','--disable-background-networking','--disable-background-timer-throttling','--disable-renderer-backgrounding']});
  page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>d.accept());page.on('pageerror',e=>errors.push(String(e)));
  await page.setRequestInterception(true);page.on('request',r=>{if(/^https?:/.test(r.url())&&!r.url().startsWith(origin+'/')){externalRequests.push(r.url());void r.abort();}else void r.continue();});
  await page.goto(origin+'/?storage=download');await page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});
@@ -29,7 +29,7 @@ async function launch(){
 const stored=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('rhwp-settings')??'{}').font?.fontSets??[]);
 async function openLibrary(){const r=await frame.evaluate(()=>window.rhwpStudio.automation.execute('tool:options',undefined,{allowDialog:true}));assert.equal(r.ok,true);await frame.locator('.opt-fontset-btn').click();}
 async function add(){await frame.locator('.fs-toolbar button:first-child').click();await frame.waitForSelector('.fse-body');}
-async function fill(value){await frame.$eval('.fse-name-input',(e,value)=>e.value=value.name,value);await frame.$$eval('.fse-select',(els,{value,languages})=>els.forEach((el,i)=>{el.value=value[languages[i]];el.dispatchEvent(new Event('change',{bubbles:true}));}),{value,languages});}
+async function fill(value){await frame.$eval('.fse-name-input',(e,value)=>e.value=value.name,value);await frame.$$eval('.fse-select',(els,{value,languages})=>els.forEach((el,i)=>{el.value=value[languages[i]];if(el.value!==value[languages[i]])throw Error('Fixture font unavailable: '+value[languages[i]]);el.dispatchEvent(new Event('change',{bubbles:true}));}),{value,languages});}
 const confirm=()=>frame.evaluate(()=>[...document.querySelectorAll('.modal-overlay')].at(-1).querySelector('.dialog-btn-primary').click());
 const closeTop=()=>frame.evaluate(()=>[...document.querySelectorAll('.modal-overlay')].at(-1).querySelector('.dialog-close').click());
 async function closeAll(){for(let i=0;i<5&&await frame.$('.modal-overlay');i++)await closeTop();}

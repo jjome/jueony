@@ -1,16 +1,11 @@
-import {sha256} from '@noble/hashes/sha2.js';
+import {parseMixedRootSelectionBookmarkN015} from '../../modules/preferences/public/index.ts';
+import type {MixedRootObjectRefN015,MixedRootSelectionBookmarkN015} from '../../modules/preferences/public/index.ts';
+import {rootObjectSelectionDigest as digest,hasRootObjectSelectionIntegrity} from './root-object-selection-digest.ts';
 
-export type MixedRootObjectTypeN015 = 'equation' | 'image';
-export type MixedRootObjectRefN015 = Readonly<{section: number; paragraph: number; control: number; type: MixedRootObjectTypeN015}>;
-export type MixedRootSelectionEntryN015 = Readonly<MixedRootObjectRefN015 & {objectFingerprint: string}>;
-export type MixedRootSelectionBookmarkN015 = Readonly<{
-  version: 1;
-  kind: 'mixed-root-object-selection';
-  objects: readonly MixedRootSelectionEntryN015[];
-  active: number;
-  documentFingerprint: string;
-  integrity: string;
-}>;
+export function validateMixedRootSelectionBookmarkN015(value:unknown):MixedRootSelectionBookmarkN015|undefined{
+  const bookmark=parseMixedRootSelectionBookmarkN015(value);
+  return bookmark&&hasRootObjectSelectionIntegrity(bookmark)?bookmark:undefined;
+}
 export type MixedRootSelectionTransitionN015 = Readonly<{undo(): void; redo(): void}>;
 
 type RawRef = {
@@ -39,9 +34,6 @@ export type MixedRootSelectionSessionN015 = {
 };
 
 type Artifact = Readonly<{hwp: string; hwpx: string}>;
-const HEX = /^[0-9a-f]{64}$/u;
-const BOOKMARK_KEYS = ['version', 'kind', 'objects', 'active', 'documentFingerprint', 'integrity'] as const;
-const ENTRY_KEYS = ['section', 'paragraph', 'control', 'type', 'objectFingerprint'] as const;
 const UINT31_MAX = 2147483647;
 
 function parsed(value: unknown): unknown { return typeof value === 'string' ? JSON.parse(value) : value; }
@@ -51,19 +43,6 @@ function object(value: unknown): Record<string, unknown> | undefined {
 function array(value: unknown): unknown[] | undefined { const result = parsed(value); return Array.isArray(result) ? result : undefined; }
 function integer(value: unknown): value is number { return Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= UINT31_MAX; }
 function instance(value: unknown): value is number { return Number.isSafeInteger(value) && (value as number) > 0 && (value as number) <= 4294967295; }
-function exact(value: Record<string, unknown>, keys: readonly string[]): boolean {
-  const actual = Object.keys(value).sort(), expected = [...keys].sort();
-  return actual.length === expected.length && actual.every((key, index) => key === expected[index]);
-}
-function canonical(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonical);
-  if (value && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical((value as Record<string, unknown>)[key])]));
-  return value;
-}
-function digest(value: Uint8Array | unknown): string {
-  const bytes = value instanceof Uint8Array ? value : new TextEncoder().encode(JSON.stringify(canonical(value)));
-  return Array.from(sha256(bytes), byte => byte.toString(16).padStart(2, '0')).join('');
-}
 function key(ref: MixedRootObjectRefN015): string { return `${ref.section}:${ref.paragraph}:${ref.control}:${ref.type}`; }
 function sameRefs(left: readonly MixedRootObjectRefN015[], right: readonly MixedRootObjectRefN015[]): boolean {
   return left.length === right.length && left.every((value, index) => key(value) === key(right[index]));
@@ -88,11 +67,11 @@ function artifact(document: DocumentPort): Artifact {
 function sameArtifact(left: Artifact, right: Artifact): boolean { return left.hwp === right.hwp && left.hwpx === right.hwpx; }
 
 function rootRef(value: RawRef | null | undefined): MixedRootObjectRefN015 | undefined {
-  if (!value || !['equation', 'image'].includes(String(value.type)) || !integer(value.sec) || !integer(value.ppi) || !integer(value.ci)
+  if (!value || (value.type!=='equation'&&value.type!=='image') || !integer(value.sec) || !integer(value.ppi) || !integer(value.ci)
     || value.cellIdx !== undefined || value.cellParaIdx !== undefined || value.outerTableControlIdx !== undefined
     || value.cellPath !== undefined || value.noteRef !== undefined || value.headerFooter !== undefined
     || value.missing !== undefined || value.pageIndex !== undefined) return;
-  return Object.freeze({section: value.sec, paragraph: value.ppi, control: value.ci, type: value.type as MixedRootObjectTypeN015});
+  return Object.freeze({section: value.sec, paragraph: value.ppi, control: value.ci, type: value.type});
 }
 function liveSelection(session: MixedRootSelectionSessionN015): MixedRootObjectRefN015[] | null | undefined {
   if (!session.cursor.isInPictureObjectSelection()) return null;
@@ -178,37 +157,13 @@ function objectFingerprint(document: DocumentPort, ref: MixedRootObjectRefN015):
   return digest({ref: stableRef, ...common, properties, mime, payloadSha256: digest(bytes)});
 }
 
-type UnsignedBookmark = Omit<MixedRootSelectionBookmarkN015, 'integrity'>;
-function unsigned(value: UnsignedBookmark): UnsignedBookmark {
-  return {version: 1, kind: 'mixed-root-object-selection', objects: value.objects, active: value.active,
-    documentFingerprint: value.documentFingerprint};
-}
-
-export function validateMixedRootSelectionBookmarkN015(value: unknown): MixedRootSelectionBookmarkN015 | undefined {
-  const raw = object(value); if (!raw || !exact(raw, BOOKMARK_KEYS) || raw.version !== 1 || raw.kind !== 'mixed-root-object-selection'
-    || !Array.isArray(raw.objects) || raw.objects.length < 2 || raw.objects.length > 32 || !integer(raw.active)
-    || raw.active !== raw.objects.length - 1 || typeof raw.documentFingerprint !== 'string' || !HEX.test(raw.documentFingerprint)
-    || typeof raw.integrity !== 'string' || !HEX.test(raw.integrity)) return;
-  const entries: MixedRootSelectionEntryN015[] = [];
-  for (const item of raw.objects) {
-    const entry = object(item); if (!entry || !exact(entry, ENTRY_KEYS) || typeof entry.objectFingerprint !== 'string' || !HEX.test(entry.objectFingerprint)) return;
-    const ref = rootRef({sec: entry.section, ppi: entry.paragraph, ci: entry.control, type: entry.type}); if (!ref) return;
-    entries.push(Object.freeze({...ref, objectFingerprint: entry.objectFingerprint}));
-  }
-  if (!mixed(entries) || new Set(entries.map(key)).size !== entries.length) return;
-  const checked = unsigned({version: 1, kind: 'mixed-root-object-selection', objects: Object.freeze(entries),
-    active: raw.active, documentFingerprint: raw.documentFingerprint});
-  if (digest(checked) !== raw.integrity) return;
-  return Object.freeze({...checked, integrity: raw.integrity});
-}
-
 export function captureMixedRootSelectionN015(session: MixedRootSelectionSessionN015 | undefined): MixedRootSelectionBookmarkN015 | undefined {
   if (!session || blocked(session)) return;
   try {
     const selected = liveSelection(session); if (!selected || !mixed(selected)) return;
     const document = documentOf(session), entries = selected.map(ref => Object.freeze({...ref, objectFingerprint: objectFingerprint(document, ref)}));
-    const checked = unsigned({version: 1, kind: 'mixed-root-object-selection', objects: Object.freeze(entries),
-      active: entries.length - 1, documentFingerprint: semanticDocumentFingerprint(document)});
+    const checked = {version: 1, kind: 'mixed-root-object-selection', objects: Object.freeze(entries),
+      active: entries.length - 1, documentFingerprint: semanticDocumentFingerprint(document)} as const;
     return Object.freeze({...checked, integrity: digest(checked)});
   } catch { return; }
 }

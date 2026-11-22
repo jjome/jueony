@@ -4,8 +4,11 @@ import { resolve, join, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { providerRegistry as registry } from './providers/registry.mjs';
+import { compileInstitutionEndpoints,createEndpointPolicy } from './providers/endpoint-policy.mjs';
 import { createModelService } from './services/model-service.mjs';
+import { createGeminiOAuth } from './services/gemini-oauth.mjs';
 import { createConnectionStore } from './connection-store.mjs';
+import { createReferenceIndex } from './services/reference-index.mjs';
 
 const here=resolve(fileURLToPath(new URL('.',import.meta.url)));
 const root=await realpath(process.env.JUEONY_DIST??join(here,'dist'));
@@ -14,9 +17,32 @@ if(!Number.isInteger(port)||port<1024||port>65535)throw new Error('Invalid port'
 const origins=new Set([`http://127.0.0.1:${port}`,`http://localhost:${port}`]);
 const hosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
 const token=randomBytes(32).toString('hex');
-const models=await createModelService({registry,connectionStore:createConnectionStore()});
+const institutionOffline=(await readFile(join(root,'build-evidence.json'),'utf8').then(JSON.parse,error=>{
+ if(error.code==='ENOENT')return {};
+ throw error;
+})).institutionOffline===true||process.env.JUEONY_INSTITUTION_OFFLINE==='1';
+const checkOrigin=createEndpointPolicy(process.env.JUEONY_ALLOWED_MODEL_ORIGINS);
+const allowedInstitutionEndpoint=institutionOffline?compileInstitutionEndpoints(JSON.parse(process.env.JUEONY_INSTITUTION_ALLOWED_ENDPOINTS??'[]')):undefined;
+function checkEndpoint(endpoint){
+ checkOrigin(endpoint);
+ if(allowedInstitutionEndpoint&&!allowedInstitutionEndpoint(endpoint)){
+  throw Object.assign(new Error('기관에서 허용한 모델 주소와 경로를 사용하세요.'),{safeMessage:'기관에서 허용한 모델 주소와 경로를 사용하세요.'});
+ }
+}
+const geminiOAuth=institutionOffline?undefined:createGeminiOAuth({clientId:process.env.JUEONY_GEMINI_OAUTH_CLIENT_ID,
+ clientSecret:process.env.JUEONY_GEMINI_OAUTH_CLIENT_SECRET,project:process.env.JUEONY_GEMINI_OAUTH_PROJECT,checkEndpoint});
+const models=await createModelService({registry,connectionStore:createConnectionStore(),checkEndpoint,geminiOAuth});
+const indexPath=process.env.JUEONY_REFERENCE_INDEX??(process.env.LOCALAPPDATA ? join(process.env.LOCALAPPDATA,'Jueony',`reference-index-${port}.sqlite`) : ':memory:');
+let referenceIndex;
+async function indexService() {
+ referenceIndex??=createReferenceIndex(indexPath).catch(()=>{
+  referenceIndex=undefined;
+  throw Object.assign(new Error('Reference index unavailable'),{safeMessage:'로컬 검색 색인을 열 수 없습니다.'});
+ });
+ return referenceIndex;
+}
 const csp="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
-const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.wasm':'application/wasm','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf','.otf':'font/otf','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.wasm':'application/wasm','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf','.otf':'font/otf','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};
 function reply(res,status,data,type='application/json'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':csp,'Referrer-Policy':'no-referrer'});res.end(type==='application/json'?JSON.stringify(data):data);}
 function caller(req){const origin=req.headers.origin;if(origin)return origins.has(origin);return req.headers['sec-fetch-site']==='same-origin'&&['cors','same-origin'].includes(req.headers['sec-fetch-mode']);}
 function authorized(req){const supplied=req.headers['x-jueony-token'];return typeof supplied==='string'&&supplied.length===token.length&&timingSafeEqual(Buffer.from(supplied),Buffer.from(token));}
@@ -35,9 +61,23 @@ const server=http.createServer({maxHeaderSize:16384,requestTimeout:15000,headers
    if(path==='/api/clear-credentials'){reply(res,200,await models.clearCredentials());return;}
    if(path==='/api/remove-connection'){reply(res,200,await models.removeConnection(data.configId));return;}
    if(path==='/api/configure'){reply(res,200,await models.configure(data));return;}
-   if(path==='/api/generate'||path==='/api/test-connection'){
+   if(path==='/api/gemini-oauth/start'){reply(res,200,await models.beginGeminiOAuth(data));return;}
+   if(path==='/api/gemini-oauth/finish'){reply(res,200,await models.finishGeminiOAuth(data.id));return;}
+   if(path==='/api/gemini-oauth/cancel'){reply(res,200,models.cancelGeminiOAuth(data.id));return;}
+   if(path==='/api/discover-local-models'){
     const abort=new AbortController();res.on('close',()=>abort.abort());
-    const result=path==='/api/test-connection'?await models.testConnection(data,abort.signal):await models.generate(data.configId,data.input,abort.signal);
+    const result=await models.discoverLocal(data,abort.signal);if(!res.destroyed)reply(res,200,result);return;
+   }
+   if(path==='/api/reference-index/search'||path==='/api/reference-index/clear'){
+    const service=await indexService();if(res.destroyed)return;
+    reply(res,200,path.endsWith('/clear')?service.clear(data):service.updateAndSearch(data));return;
+   }
+   if(path==='/api/generate'||path==='/api/test-connection'||path==='/api/test-document-tools'||path==='/api/document-tool-turn'){
+    const abort=new AbortController();res.on('close',()=>abort.abort());
+    const result=path==='/api/test-connection'?await models.testConnection(data,abort.signal)
+      :path==='/api/test-document-tools'?await models.testDocumentTools(data,abort.signal)
+      :path==='/api/document-tool-turn'?await models.generateDocumentToolTurn(data.configId,data.input,abort.signal)
+      :await models.generate(data.configId,data.input,abort.signal);
     if(!res.destroyed)reply(res,200,result);return;
    }
    reply(res,404,{error:'없는 API'});return;

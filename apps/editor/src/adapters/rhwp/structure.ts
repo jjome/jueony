@@ -7,11 +7,13 @@ import {readAgentMasterPages} from './agent-master-pages.ts';
 import {readNestedTables} from './nested-tables.ts';
 import {axisFieldSignature,readAxisFormula} from './axis-cell-fields.ts';
 import {axisPictureReader} from './axis-cell-picture.ts';
+import {captureStoredCharacterStyle} from './character-style-reference.ts';
+import {readAgentPageBorderInclusion} from './agent-page-border-inclusion.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
 export const nativeDocument = (wasm: any): any => wasm.borrowDocumentHandle?.() ?? wasm;
-export function readStructure(wasm: any): Structure {
+export function readStructure(wasm: any,nestedTableTemplates?:Record<string,string>): Structure {
   const doc = nativeDocument(wasm), positions: { section: number; paragraph: number }[] = [];
   const sections: Structure['sections'] = [], paragraphs: Structure['paragraphs'] = [];
   for (let section = 0; section < doc.getSectionCount(); section++) {
@@ -29,10 +31,17 @@ export function readStructure(wasm: any): Structure {
     const headerFooters=readAgentHeaderFooters(doc,section);if(headerFooters)entry.headerFooters=headerFooters;
     sections.push(entry);
     if(typeof doc.getMasterPages==='function'&&typeof doc.setMasterPageText==='function')entry.masterPages=readAgentMasterPages(doc,section);
+    const inclusion=readAgentPageBorderInclusion(doc,section);if(inclusion)entry.pageBorderInclusion=inclusion;
     if(typeof doc.getAgentPageBackground==='function')entry.pageBackgrounds=['both','even','odd'].map(kind=>{
       const setting=parsed(doc.getAgentPageBackground(section,kind));
       const visibility=parsed(doc.getPageBorderFillEntry(section,kind));
-      return {kind:setting.kind,fillType:setting.fillType,color:setting.color,applyPage:setting.applyPage,hideFill:visibility.hideFill,firstPageFill:visibility.firstPageFill,editable:setting.editable,...(setting.reason?{reason:setting.reason}:{})};
+      const gradient=setting.gradient;
+      const linearGradient=gradient?.type===1&&Array.isArray(gradient.colors)&&gradient.colors.length===2
+        ?{colors:gradient.colors,angle:gradient.angle}:undefined;
+      return {kind:setting.kind,fillType:setting.fillType,color:setting.color,applyPage:setting.applyPage,
+        hideFill:visibility.hideFill,firstPageFill:visibility.firstPageFill,editable:setting.editable,
+        ...(typeof setting.gradientEditable==='boolean'?{gradientEditable:setting.gradientEditable}:{}),
+        ...(linearGradient?{linearGradient}:{}),...(setting.reason&&!setting.gradientEditable?{reason:setting.reason}:{})};
     });
     for (let paragraph = 0; paragraph < doc.getParagraphCount(section); paragraph++) {
       positions.push({ section, paragraph });
@@ -96,10 +105,18 @@ export function readStructure(wasm: any): Structure {
     const headerRows=cells.every(c=>c.properties.isHeader===(c.row<leading))?leading:null;
     tables.push({...(Number.isSafeInteger(tableProps.cellZoneCount)&&tableProps.cellZoneCount>=0?{cellZoneCount:tableProps.cellZoneCount}:{}),editable:control.props?.Lock===0,...(control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}),headerRows, ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
   }
-  const styleLinks=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,nextStyleId:style.nextStyleId}));
-  const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));
+  const definitions=parsed(doc.getStyleList());
+  const styleLinks=definitions.map((style:any)=>({id:style.id,nextStyleId:style.nextStyleId}));
+  const styles=definitions.map((style:any)=>({id:style.id,name:style.name,type:style.type}));
+  const storedCharacterStyles:NonNullable<Structure['storedCharacterStyles']>=Object.create(null);
+  for (const style of styles) if(style.type===1){
+    try{storedCharacterStyles[style.id]=captureStoredCharacterStyle(doc,style.id);}
+    catch{/* Ambiguous or incomplete definitions stay unavailable. */}
+  }
   if(sections.reduce((total,s)=>total+(s.masterPages?.pages.reduce((n,p)=>n+Array.from(p.text).length,0)??0),0)>120000)throw new Error('바탕쪽 문맥은 전체 120,000자 이하입니다. 원본 바탕쪽은 유지됩니다.');
   if(sections.reduce((total,s)=>total+(s.headerFooters?.reduce((n,h)=>n+Array.from(h.text).length,0)??0),0)>120000)throw new Error('머리말/꼬리말 문맥은 전체 120,000자 이하입니다.');
   const bookmarks=readAgentBookmarks(doc);
-  return {...readNestedTables(doc,controls,lists), ...(bookmarks?{bookmarks}:{}), sectionMergeAvailable:typeof doc.mergeSectionBoundary==='function', sectionSplitAvailable:typeof doc.insertSectionBreak==='function', sections, tables, paragraphs,styles,styleLinks, unsupportedControls: [...new Set(unsupportedControls)] };
+  return {...readNestedTables(doc,controls,lists,nestedTableTemplates), ...(bookmarks?{bookmarks}:{}),
+    ...(Object.keys(storedCharacterStyles).length?{storedCharacterStyles}:{}),
+    sectionMergeAvailable:typeof doc.mergeSectionBoundary==='function', sectionSplitAvailable:typeof doc.insertSectionBreak==='function', sections, tables, paragraphs,styles,styleLinks, unsupportedControls: [...new Set(unsupportedControls)] };
 }

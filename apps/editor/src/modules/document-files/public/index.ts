@@ -1,6 +1,6 @@
 export type {SaveSnapshot,RecoveryRecord,RecoveryIntegrity,RecoveryArtifact,DocumentFormat} from './contracts.ts';
 export type {RecoveryIntegrityPort} from '../ports/recovery-integrity.ts';
-export {assertSaveRevision} from '../domain/save-revision.ts';
+export {assertSaveRevision,SaveSourceConflictError,saveSourceConflictMessage} from '../domain/save-revision.ts';
 export {ProtectedRecoveryError,validateRecoveryArtifact} from '../domain/recovery-export.ts';
 export {assertRecoveryRecord,partitionRecoveryRecords} from '../domain/recovery-record.ts';
 export {createSnapshotWriter} from '../application/write-snapshot.ts';

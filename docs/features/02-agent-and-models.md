@@ -6,21 +6,21 @@
 
 ## 진행 요약
 
-실행 작업 **20개**, 상위 범위 **0개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **21개**, 상위 범위 **0개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 14/20 · 부분 2 · 미구현 4 | — 상위 범위 없음 |
-| 검증 | 완료 9/20 · 부분 3 · 미검증 8 | — 상위 범위 없음 |
-| Agent 연결 | 연결 13/19 · 부분 0 · 미연결 6 · 해당 없음 1 | — 상위 범위 없음 |
+| 구현 | 완료 15/21 · 부분 5 · 미구현 1 | — 상위 범위 없음 |
+| 검증 | 완료 9/21 · 부분 9 · 미검증 3 | — 상위 범위 없음 |
+| Agent 연결 | 연결 16/20 · 부분 3 · 미연결 1 · 해당 없음 1 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
 ## 먼저 할 일
 
-- **구현** [N024](<02-agent-and-models.md#n024>) **브라우저 인증 링크 기반 계정 연결** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N028](<02-agent-and-models.md#n028>) **기관 HyperCLOVA endpoint·권한·망 검증** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N029](<02-agent-and-models.md#n029>) **변경 비교 화면을 문서 구조 중심으로 개선** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N024](<02-agent-and-models.md#n024>) **브라우저 인증 링크 기반 계정 연결** — 승인된 Google 데스크톱 앱 설정에서 Gemini 브라우저 인증을 제공한다. 모의 OAuth의 취소·만료·갱신·철회와 조회 도구 연결을 확인했다. 실제 등록 프로젝트에서 인증·호출하고 타 공급자 지원을 확인해야 한다.
+- **구현** [N028](<02-agent-and-models.md#n028>) **기관 HyperCLOVA endpoint·권한·망 검증** — 허용 모델 주소와 경로를 실행기에서 검사한다. 합성 서비스 앱에서 HCX-005·HCX-007의 문단 조회를 검증했다. 실제 기관망의 승인된 서비스 주소와 접근 권한이 필요하다.
+- **구현** [N029](<02-agent-and-models.md#n029>) **변경 비교 화면을 문서 구조 중심으로 개선** — 참고자료를 읽은 표·쪽 편집을 사본에서 실행하고 저장 재열기 뒤 승인 화면에 실제 행·열 수와 용지·여백의 전후 값을 표시한다. 중첩 표 셀의 전후 값과 긴 본문의 변경 부분 및 합친 구역의 표 위치와 기본 탭을 표시한다. HWP·HWPX에서 로컬 Qwen이 바꾼 쪽 배경 색·각도와 쪽 테두리의 포함·제외 값을 확인했다. 저장 바탕쪽은 문구·위치·기본 서식의 전후 값을 표시하며 실제 Qwen의 문구 변경을 두 형식에서 대조했다. 복합 개체와 독립 한글 비교가 남았다.
 
 ## 기능별 작업표
 
@@ -54,12 +54,12 @@
 | --- | --- | --- | --- | --- |
 | [G082](<02-agent-and-models.md#g082>) · 작업 | 요청 변경 확인·undo/redo | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G083](<02-agent-and-models.md#g083>) · 작업 | 읽기·편집 facade와 제공자 Port 분리 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
-| [N024](<02-agent-and-models.md#n024>) · 작업 | 브라우저 인증 링크 기반 계정 연결 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [N024](<02-agent-and-models.md#n024>) · 작업 | 브라우저 인증 링크 기반 계정 연결 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [N025](<02-agent-and-models.md#n025>) · 작업 | GPT 실제 계정·모델 호출 검증 | ☑ 완료 | ☐ 미검증 | ☑ 연결 |
 | [N026](<02-agent-and-models.md#n026>) · 작업 | Claude 실제 계정 회귀와 오류 검증 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [N027](<02-agent-and-models.md#n027>) · 작업 | Gemini 실제 계정·모델 호출 검증 | ☑ 완료 | ☐ 미검증 | ☑ 연결 |
 | [N028](<02-agent-and-models.md#n028>) · 작업 | 기관 HyperCLOVA endpoint·권한·망 검증 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N029](<02-agent-and-models.md#n029>) · 작업 | 변경 비교 화면을 문서 구조 중심으로 개선 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [N029](<02-agent-and-models.md#n029>) · 작업 | 변경 비교 화면을 문서 구조 중심으로 개선 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 
 <a id="work-3"></a>
 
@@ -67,9 +67,10 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [N030](<02-agent-and-models.md#n030>) · 작업 | 전체 문서 장문 context 예산·선택 확장 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [N031](<02-agent-and-models.md#n031>) · 작업 | 관찰→도구 실행→결과 확인 Agent loop | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N032](<02-agent-and-models.md#n032>) · 작업 | tool 결과 기반 재계획·복구·중단 정책 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [N030](<02-agent-and-models.md#n030>) · 작업 | 전체 문서 장문 context 예산·선택 확장 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [N031](<02-agent-and-models.md#n031>) · 작업 | 관찰→도구 실행→결과 확인 Agent loop | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [N032](<02-agent-and-models.md#n032>) · 작업 | tool 결과 기반 재계획·복구·중단 정책 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [G131](<02-agent-and-models.md#g131>) · 작업 | 모델 도구 지원 확인과 허용 주소 제어 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
 
 <a id="work-4"></a>
 
@@ -230,11 +231,11 @@
 <summary>N024 · 브라우저 인증 링크 기반 계정 연결</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 제공자가 허용한 OAuth/CLI 흐름·취소·토큰 암호화·만료/철회
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [24-next-development-plan.md](<../24-next-development-plan.md>)
+- 다음 작업: 승인된 Google 데스크톱 앱 설정에서 Gemini 브라우저 인증을 제공한다. 모의 OAuth의 취소·만료·갱신·철회와 조회 도구 연결을 확인했다. 실제 등록 프로젝트에서 인증·호출하고 타 공급자 지원을 확인해야 한다.
+- 근거: [24-next-development-plan.md](<../24-next-development-plan.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [gemini-oauth.test.mjs](<../../apps/launcher/tests/gemini-oauth.test.mjs>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>
@@ -285,9 +286,9 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
 - 완료 범위: 일반 개발 계정과 기관 공공/폐쇄망 연결을 구분
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [14-hyperclova-x-api-guide.md](<../14-hyperclova-x-api-guide.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 허용 모델 주소와 경로를 실행기에서 검사한다. 합성 서비스 앱에서 HCX-005·HCX-007의 문단 조회를 검증했다. 실제 기관망의 승인된 서비스 주소와 접근 권한이 필요하다.
+- 근거: [14-hyperclova-x-api-guide.md](<../14-hyperclova-x-api-guide.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [expanded-model-tools.test.mjs](<../../apps/launcher/tests/expanded-model-tools.test.mjs>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -295,12 +296,12 @@
 <summary>N029 · 변경 비교 화면을 문서 구조 중심으로 개선</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 표/쪽/개체 실제 변경만 표시; 긴 내부 dump와 누락 방지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 참고자료를 읽은 표·쪽 편집을 사본에서 실행하고 저장 재열기 뒤 승인 화면에 실제 행·열 수와 용지·여백의 전후 값을 표시한다. 중첩 표 셀의 전후 값과 긴 본문의 변경 부분 및 합친 구역의 표 위치와 기본 탭을 표시한다. HWP·HWPX에서 로컬 Qwen이 바꾼 쪽 배경 색·각도와 쪽 테두리의 포함·제외 값을 확인했다. 저장 바탕쪽은 문구·위치·기본 서식의 전후 값을 표시하며 실제 Qwen의 문구 변경을 두 형식에서 대조했다. 복합 개체와 독립 한글 비교가 남았다.
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [agent-changes.ts](<../../apps/editor/src/ui/agent-changes.ts>) · [agent-changes.test.ts](<../../apps/editor/tests/agent-changes.test.ts>) · [reference-change-review.ts](<../../apps/editor/src/ui/reference-change-review.ts>) · [reference-change-details.ts](<../../apps/editor/src/ui/reference-change-details.ts>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [agent-flow.test.ts](<../../apps/editor/tests/agent-flow.test.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21;SCOPED_CHECKLIST_COMPLETION_2026_11_21;STRUCTURAL_REVIEW_CHECKPOINT_2026_11_22`
 
 </details>
 
@@ -308,12 +309,12 @@
 <summary>N030 · 전체 문서 장문 context 예산·선택 확장</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 잘림 표시·분할 읽기·최신 버전·누락 대상 거절
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 초기 목록과 문단별 조회를 분리하고 조회 4,000자·40개 문단 ID 한도를 지킨다. 요청에서 허용한 편집 가능 문단의 읽은 범위 한 곳을 저장 보존 검사와 원자 적용에 연결한다.
+- 다음 작업: 문단 번호가 없는 질문에서도 로컬 Qwen3.5가 122,595자 HWPX의 전체 본문 없이 마지막 문단을 읽고 2039년 02월 17일을 답했다. Chrome에서 허용한 범위만 편집·저장·재열기·한 번 되돌리기를 확인했다. 운영 모델의 장문·복합 문단 검증이 남았다.
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-local-model.mjs](<../../apps/editor/scripts/verify-local-model.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [document-tool-contract.mjs](<../../apps/launcher/providers/document-tool-contract.mjs>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -321,12 +322,12 @@
 <summary>N031 · 관찰→도구 실행→결과 확인 Agent loop</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 최대 비용/횟수·진행·취소·오류·중복 실행·atomic 경계
-- 다음 작업: IU03-A: ModelGateway 도구 요청/결과 계약과 읽기·찾기 loop를 연결; 모델4회·읽기8회·180초·최종편집1회 예산, 실제 도구 결과 기반 후속 호출과 공급자 검증
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 5가지 제공자 경로를 연결했다. 로컬 Qwen3.5가 실제 조회 도구를 호출해 HWPX에서 읽은 12,500천원을 단위까지 그대로 답했다. 모의 HCX-005·HCX-007 및 다른 경로의 조회 왕복도 확인했다. 각 운영 계정의 실제 품질 검증이 남았다.
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>) · [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [expanded-model-tools.test.mjs](<../../apps/launcher/tests/expanded-model-tools.test.mjs>) · [verify-local-model.mjs](<../../apps/editor/scripts/verify-local-model.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21;SCOPED_CHECKLIST_COMPLETION_2026_11_21;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -334,12 +335,25 @@
 <summary>N032 · tool 결과 기반 재계획·복구·중단 정책</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 이미 변경한 요청의 무조건 재시도 금지·partial state 기록
-- 다음 작업: IU03-B: 동일 호출 반복·연속오류2회·취소·예산 중단, 사용자 편집·문서 전환 보호와 journal·receipt·요청 undo를 검증; 기존 single/bounded 유지
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 첫 미검증 인용을 폐기하고 로컬 Qwen이 장문의 마지막 문단에서 날짜를 다시 확인했다. 읽기 전용 조회에서 이미 근거를 확보한 뒤 조회 오류가 반복되면 남은 한도 내에서 최종 답변을 요청한다. 편집 요청과 근거를 확보하기 전의 연속 오류는 중단하며 허용되지 않은 도구·재차 잘못된 출처도 거절한다. 운영 모델의 복구·무답 평가가 남았다.
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>) · [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [document-tool-loop.test.ts](<../../apps/editor/tests/document-tool-loop.test.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [run-document-tools.ts](<../../apps/editor/src/modules/agent/application/run-document-tools.ts>) · [expanded-model-tools.test.mjs](<../../apps/launcher/tests/expanded-model-tools.test.mjs>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>)
+- 원래 기록: `SCOPED_IEUM_IMPLEMENTATION_2026_11_21;READ_ONLY_RECOVERY_FROM_OBSERVED_RESULTS_2026_11_22`
+
+</details>
+
+<details id="g131">
+<summary>G131 · 모델 도구 지원 확인과 허용 주소 제어</summary>
+
+- 종류: 실행 작업 · 우선순위: P2.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 합성 모델 도구 지원 시험과 실행기에 설정한 호출 origin 제한.
+- 다음 작업: 실제 모델과 기관망에서 정책·응답을 확인해야 한다.
+- 근거: [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

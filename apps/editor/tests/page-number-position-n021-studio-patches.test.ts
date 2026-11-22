@@ -17,24 +17,40 @@ import {
 
 const requested = Object.freeze({format: 3, position: 6, sideChar: '-'});
 
-function fixture(options: {story?: 'body'|'header'|'footnote'|'textbox'; sections?: number; exists?: boolean} = {}) {
+function fixture(options: {story?: 'body'|'header'|'footnote'|'textbox'; sections?: number; section?: number; exists?: boolean; update?:boolean} = {}) {
   let revision = 'r1';
   let identity = 'document-1';
   let composing = false;
-  let position = {sectionIndex: 0, paragraphIndex: 0, charOffset: 0};
+  const expectedSection = options.section ?? 0;
+  let position = {sectionIndex: expectedSection, paragraphIndex: 0, charOffset: 0};
   let state: Record<string, unknown> = options.exists
-    ? {ok: true, exists: true, paragraphIdx: 0, ...requested}
+    ? {ok: true, exists: true, paragraphIdx: options.update?2:0, ...requested}
     : {ok: true, exists: false};
   let inserts = 0;
+  let updates=0;
   const operations: any[] = [];
   const document = {
     getSectionCount: () => options.sections ?? 1,
-    getPageNumberPosition: () => state,
-    insertPageNumberPosition(_section: number, paragraph: number, json: string) {
+    getPageNumberPosition(section: number) {
+      assert.equal(section, expectedSection);
+      return state;
+    },
+    insertPageNumberPosition(section: number, paragraph: number, json: string) {
+      assert.equal(section, expectedSection);
       inserts++;
       state = {ok: true, exists: true, paragraphIdx: paragraph, ...JSON.parse(json)};
       return {ok: true, inserted: true};
     },
+    ...(options.update?{
+      updatePageNumberPosition(section:number,paragraph:number,expected:string,replacement:string){
+        assert.equal(section,expectedSection);
+        assert.equal(paragraph,state.paragraphIdx);
+        assert.deepEqual(JSON.parse(expected),{format:state.format,position:state.position,sideChar:state.sideChar});
+        state={...state,...JSON.parse(replacement)};
+        updates++;
+        return {ok:true,updated:true};
+      },
+    }:{}),
   };
   const story = options.story ?? 'body';
   const cursor = {
@@ -55,7 +71,8 @@ function fixture(options: {story?: 'body'|'header'|'footnote'|'textbox'; section
   const editor = {busy: () => false, revision: () => revision, documentIdentity: () => identity};
   const environment = {input: () => input, editor: () => editor, context: () => context};
   return {
-    context, environment, operations, inserts: () => inserts,
+    context, environment, operations, inserts: () => inserts, updates:()=>updates,
+    changeNumber:(value:number)=>{state={...state,position:value};},
     setRevision: (value: string) => { revision = value; },
     setIdentity: (value: string) => { identity = value; },
     setComposing: (value: boolean) => { composing = value; },
@@ -93,11 +110,11 @@ test('N021 integration patch writes only the two generated pinned-Studio seams',
   }
 });
 
-test('N021 command admission is exact-body, single-section, no-control and non-IME only', () => {
+test('N021 command admission requires an exact body section and no active IME', () => {
   assert.equal(canOpenPageNumberPositionDialogN021(fixture().context, fixture().environment), true);
   for (const options of [
     {story: 'header' as const}, {story: 'footnote' as const}, {story: 'textbox' as const},
-    {sections: 2}, {exists: true},
+    {sections: 2, section: 2}, {exists: true},
   ]) {
     const f = fixture(options);
     assert.equal(canOpenPageNumberPositionDialogN021(f.context, f.environment), false);
@@ -114,6 +131,24 @@ test('N021 confirmation keeps the captured owner and routes through exactly one 
   assert.equal(f.operations[0].kind, 'snapshot');
   assert.equal(f.operations[0].operationType, 'jueonyPageNumberPositionN021');
   assert.equal(f.inserts(), 1);
+});
+
+test('N021 updates an existing page number at its original paragraph and rejects a stale value',()=>{
+  const f=fixture({sections:3,section:1,exists:true,update:true});
+  const target=capturePageNumberPositionDialogTargetN021(f.environment);
+  assert.deepEqual(target.existing,{paragraphIndex:2,properties:requested});
+  assert.equal(target.position.paragraphIndex,0);
+  assert.equal(target.position.sectionIndex,1);
+  assert.equal(target.sectionCount,3);
+  commitPageNumberPositionDialogN021(f.environment,target,{format:1,position:8,sideChar:'.'});
+  assert.equal(f.operations.length,1);
+  assert.equal(f.inserts(),0);
+  assert.equal(f.updates(),1);
+  const stale=capturePageNumberPositionDialogTargetN021(f.environment);
+  f.changeNumber(9);
+  assert.throws(()=>commitPageNumberPositionDialogN021(f.environment,stale,requested),/바뀌었습니다/u);
+  assert.equal(f.operations.length,1);
+  assert.equal(f.updates(),1);
 });
 
 test('N021 revision, identity, caret and IME staleness fail before any snapshot', () => {

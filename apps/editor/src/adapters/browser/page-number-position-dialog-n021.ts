@@ -1,7 +1,9 @@
 import {
   applyPageNumberPositionN021,
-  readPageNumberPositionN021,
+  pageNumberSectionCountN021,
+  readStoredPageNumberPositionN021,
   type PageNumberPositionN021,
+  type StoredPageNumberPositionN021,
 } from '../rhwp/page-number-position-n021.ts';
 import {inspectShortcutStoryContextN021} from '../../shortcuts/special-story-context-n021.ts';
 
@@ -18,7 +20,9 @@ export type PageNumberPositionDialogTargetN021 = Readonly<{
   document: JsonRecord;
   revision: string;
   identity: string;
+  sectionCount: number;
   position: Readonly<{sectionIndex: number; paragraphIndex: number; charOffset: number}>;
+  existing?:StoredPageNumberPositionN021;
 }>;
 
 const record = (value: unknown): value is JsonRecord =>
@@ -42,7 +46,7 @@ function positionOf(input: JsonRecord): PageNumberPositionDialogTargetN021['posi
   if (typeof input.getPosition !== 'function') throw new Error('현재 본문 위치를 확인하지 못했습니다.');
   const value = input.getPosition.call(input);
   if (!record(value) || !integer(value.sectionIndex) || !integer(value.paragraphIndex)
-    || !integer(value.charOffset) || value.sectionIndex !== 0) {
+    || !integer(value.charOffset)) {
     throw new Error('현재 본문 위치를 확인하지 못했습니다.');
   }
   return Object.freeze({
@@ -58,10 +62,8 @@ function documentOf(input: JsonRecord): JsonRecord {
     throw new Error('문서 엔진 연결을 확인하지 못했습니다.');
   }
   const document = wasm.borrowDocumentHandle.call(wasm);
-  if (!record(document) || typeof document.getSectionCount !== 'function'
-    || document.getSectionCount.call(document) !== 1
-    || typeof document.insertPageNumberPosition !== 'function') {
-    throw new Error('쪽 번호 매기기는 단일 구역 본문에서만 지원합니다.');
+  if (!record(document) || typeof document.insertPageNumberPosition !== 'function') {
+    throw new Error('이 편집 엔진은 쪽 번호 매기기를 지원하지 않습니다.');
   }
   return document;
 }
@@ -98,8 +100,11 @@ export function capturePageNumberPositionDialogTargetN021(
     throw new Error('쪽 번호 매기기는 최상위 본문에서만 실행할 수 있습니다.');
   }
   const document = documentOf(input);
-  if (readPageNumberPositionN021(document, 0).exists === true) {
-    throw new Error('현재 구역에 이미 쪽 번호 위치 컨트롤이 있습니다.');
+  const position = positionOf(input);
+  const sectionCount = pageNumberSectionCountN021(document, position.sectionIndex);
+  const existing=readStoredPageNumberPositionN021(document,position.sectionIndex);
+  if(existing&&typeof document.updatePageNumberPosition!=='function'){
+    throw new Error('이 편집 엔진은 기존 쪽 번호 위치 변경을 지원하지 않습니다.');
   }
   const editor = environment.editor();
   if (!record(editor) || typeof editor.busy !== 'function' || editor.busy.call(editor)) {
@@ -110,7 +115,9 @@ export function capturePageNumberPositionDialogTargetN021(
     document,
     revision: stringCall(editor, 'revision', '문서 버전을 확인하지 못했습니다.'),
     identity: stringCall(editor, 'documentIdentity', '문서 identity를 확인하지 못했습니다.'),
-    position: positionOf(input),
+    sectionCount,
+    position,
+    ...(existing?{existing}:{}),
   });
 }
 
@@ -135,7 +142,8 @@ export function assertPageNumberPositionDialogTargetN021(
   if (story.kind !== 'body' || !story.exact
     || documentOf(target.input) !== target.document
     || JSON.stringify(positionOf(target.input)) !== JSON.stringify(target.position)
-    || readPageNumberPositionN021(target.document, 0).exists === true) {
+    || pageNumberSectionCountN021(target.document, target.position.sectionIndex) !== target.sectionCount
+    || JSON.stringify(readStoredPageNumberPositionN021(target.document,target.position.sectionIndex))!==JSON.stringify(target.existing)) {
     throw new Error('본문 위치나 쪽 번호 상태가 바뀌었습니다. 창을 다시 여세요.');
   }
 }
@@ -149,7 +157,7 @@ export function commitPageNumberPositionDialogN021(
 ): void {
   if (options.composing) throw new Error('대화상자 입력 조합을 마친 뒤 적용해 주세요.');
   assertPageNumberPositionDialogTargetN021(environment, target, options.dialog);
-  applyPageNumberPositionN021(target.input, value);
+  applyPageNumberPositionN021(target.input,value,target.existing);
 }
 
 export function canOpenPageNumberPositionDialogN021(
@@ -192,10 +200,17 @@ export function showPageNumberPositionDialogN021(
   dialog.style.maxWidth = 'min(520px,calc(100vw - 32px))';
   const title = document.createElement('h2'); title.textContent = '쪽 번호 매기기';
   const scope = document.createElement('p');
-  scope.textContent = '현재 단일 구역의 최상위 본문에 쪽 번호 위치와 모양을 지정합니다.';
+  const section = target.sectionCount === 1 ? '현재 구역' : `${target.position.sectionIndex + 1}구역`;
+  scope.textContent = target.existing
+    ? `${section}의 기존 쪽 번호 위치와 모양을 바꿉니다.`
+    : `${section}에 쪽 번호 위치와 모양을 지정합니다.`;
+  if (target.position.sectionIndex + 1 < target.sectionCount) {
+    scope.append(' 뒤에 쪽 번호 설정이 없는 구역은 앞 구역의 설정을 이어받습니다.');
+  }
   const format = select(formats, 0);
-  const position = select(positions, 1); position.value = '5';
-  const side = document.createElement('input'); side.value = '-'; side.maxLength = 1;
+  format.value=String(target.existing?.properties.format??0);
+  const position = select(positions, 1); position.value = String(target.existing?.properties.position??5);
+  const side = document.createElement('input'); side.value = target.existing?.properties.sideChar??'-'; side.maxLength = 1;
   side.setAttribute('aria-label', '쪽 번호 장식 문자');
   let composing = false;
   side.addEventListener('compositionstart', () => { composing = true; });

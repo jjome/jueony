@@ -1,6 +1,6 @@
 import type {WorkspaceState} from '../../workspace/public/index.ts';
 import type {Snapshot} from '../../document/public/index.ts';
-import type {Source,ReferenceFacade} from '../../references/public/index.ts';
+import type {Source,ReferenceFacade,RetrievalMode} from '../../references/public/index.ts';
 import {chatOf} from '../../workspace/public/index.ts';
 import type {ModelInput as LLMInput} from '../../connections/public/index.ts';
 export function buildContext(state:WorkspaceState,workspaceId:string,chatId:string,document:Snapshot,references:Source[],request:string):LLMInput{
@@ -13,11 +13,9 @@ export function buildContext(state:WorkspaceState,workspaceId:string,chatId:stri
 }
 
 /** Opt-in retrieval; the default buildContext continues sending the full selected sources. */
-export async function buildRetrievedContext(state:WorkspaceState,workspaceId:string,chatId:string,document:Snapshot,references:Source[],request:string,signal:AbortSignal|undefined,retrieval:ReferenceFacade){
+export async function buildRetrievedContext(state:WorkspaceState,workspaceId:string,chatId:string,document:Snapshot,references:Source[],request:string,signal:AbortSignal|undefined,retrieval:ReferenceFacade,mode:RetrievalMode='lexical'){
  const context=buildContext(state,workspaceId,chatId,document,references,request);
- const {index:indexSelectedSources,search:searchSelectedSources}=retrieval;
- signal?.throwIfAborted();const scope={workspaceId,chatId};
- const index=await indexSelectedSources(scope,references,signal);
- const selected=searchSelectedSources(index,scope,request,signal);
+ signal?.throwIfAborted();
+ const selected=await retrieval.retrieve({workspaceId,chatId},references,request,signal,mode);
  return {context:{...context,references:selected.references},retrieval:selected.retrieval};
 }

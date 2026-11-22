@@ -8,6 +8,8 @@ export { defaultDocumentDefaults, validateDocumentDefaults } from '../domain/doc
 export { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
 export type {SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, HeaderFooterBookmark, FootnoteBookmark, EndnotePoint, EndnoteRestoreTarget, EndnoteSelectionBookmark, ObjectSelectionBookmark, ObjectSelectionEntry, RestorableObjectRef, RestorableObjectType, RootClickHereFieldSelectionBookmarkN016} from './contracts.ts';
 export {validateSessionCursor} from '../domain/session-cursor.ts';
+export {parseSingleEquationSelectionBookmarkN015,parseMixedRootSelectionBookmarkN015} from '../domain/root-object-bookmarks.ts';
+export type {EquationRefN015,MixedRootObjectRefN015,SingleEquationSelectionBookmarkN015,MixedRootSelectionBookmarkN015} from './contracts.ts';
 export {validateEndnoteSelectionBookmark} from '../domain/endnote-bookmark.ts';
 export {createDocumentViewJournal,VIEW_JOURNAL_KEY} from '../application/view-journal.ts';
 export type {ViewJournalEntry} from '../application/view-journal.ts';

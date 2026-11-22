@@ -3,6 +3,12 @@ import type {DocumentViewState,ViewRestoreResult} from '../../modules/preference
 import type {StoredFileConnection,FileConnectionResult} from '../files/file-connection.ts';
 import type {BoundSaveExpected,BoundSaveResult} from '../files/bound-save.ts';
 import type {HistoryScope} from '../../modules/document-files/public/index.ts';
+import type {OfficeBlock} from '../files/office-copy.ts';
+import type {InstitutionTemplateField,WorkTemplateId,WorkTemplateValues} from '../../modules/document/public/work-templates.ts';
+import type {HwpReferenceAddress} from '../../modules/references/public/index.ts';
+import type {ExtractedReference,LiveReference} from '../files/references.ts';
+import type {ScriptMacroB142} from '../../modules/script-macros/public/index.ts';
+import type {DocumentToolOutline,DocumentToolWindow} from '../../modules/document/public/document-tool-reading.ts';
 /** Same-origin browser integration only. File handles never enter domain contracts. */
 export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteractionFacade {
  bridgeVersion:1;
@@ -28,6 +34,22 @@ export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteract
  fileHandle():FileSystemFileHandle|null;
  open(bytes:Uint8Array,name:string,handle?:FileSystemFileHandle|null,dirty?:boolean):Promise<void>;
  readReference(bytes:Uint8Array):Promise<string>;
+ readReferenceDetails?(bytes:Uint8Array):Promise<ExtractedReference>;
+ readOpenReference?():LiveReference;
+ inspectDocumentToolOutline?():DocumentToolOutline|undefined;
+ readDocumentToolWindow?(expectedRevision:string,section:number,paragraph:number,start:number,count:number,allowEdit?:boolean):DocumentToolWindow;
+ captureDocumentToolEditBase?(expectedRevision:string,target:string):Snapshot;
+ jumpToReference?(address:HwpReferenceAddress,expectedRevision:string):void;
+ startAlignmentMacro?():void;
+ finishAlignmentMacro?(name:string):ScriptMacroB142;
+ cancelAlignmentMacro?():void;
+ bindImportedAlignmentMacro?(macro:ScriptMacroB142):ScriptMacroB142;
+ prepareAlignmentMacro?(macro:ScriptMacroB142):import('../../modules/agent/public/index.ts').Generation;
+ replayAlignmentMacro?(macro:ScriptMacroB142):Promise<unknown>;
+ createOfficeCopy?(blocks:OfficeBlock[]):Uint8Array;
+ createWorkTemplateCopy?(id:WorkTemplateId,values:WorkTemplateValues):Uint8Array;
+ inspectInstitutionTemplate?(bytes:Uint8Array,name:string):InstitutionTemplateField[];
+ createInstitutionTemplateCopy?(bytes:Uint8Array,name:string,values:WorkTemplateValues):Uint8Array;
  recovery():{name:string;dirty:boolean;bytes:Uint8Array;fileConnection?:StoredFileConnection}|null;
  restoreFileConnection(connection:StoredFileConnection,requestPermission?:boolean):Promise<FileConnectionResult>;
  captureDocumentView():DocumentViewState|undefined;

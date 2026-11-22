@@ -1,0 +1,88 @@
+diff --git a/src/document_core/commands/table_ops.rs b/src/document_core/commands/table_ops.rs
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2639,6 +2639,64 @@
+         self.recompose_section(section);
+         self.paginate_if_needed();
+         Ok(r#"{"ok":true}"#.into())
++    }
++
++    /// Merge or split adjacent columns of one nested table row with witnessed dimensions.
++    pub fn reshape_nested_table_cells_native(
++        &mut self, section: usize, paragraph: usize, path: &[(usize, usize, usize)],
++        row: u16, column: u16, end_column: Option<u16>,
++    ) -> Result<String, HwpError> {
++        let invalid = || HwpError::RenderError("중첩 표의 단일 행 셀 범위·크기·보호 상태를 확인하세요.".into());
++        let source = self.nested_axis_table(section, paragraph, path).ok_or_else(invalid)?;
++        let edges = source.witnessed_track_edges(false).ok_or_else(invalid)?;
++        let cell = source.cells.iter().find(|cell| cell.row == row && cell.col == column).ok_or_else(invalid)?;
++        let end = end_column.or_else(|| column.checked_add(cell.col_span)?.checked_sub(1)).ok_or_else(invalid)?;
++        if end <= column || end >= source.col_count || cell.row_span != 1 || source.cell_spacing != 0
++            || source.cells.iter().any(|c| c.field_name.as_ref().is_some_and(|name| !name.is_empty())
++                || c.paragraphs.iter().any(|p| !p.controls.is_empty() || !p.field_ranges.is_empty())) {
++            return Err(invalid());
++        }
++        let same_format = |other: &crate::model::table::Cell| {
++            other.border_fill_id == cell.border_fill_id && other.vertical_align == cell.vertical_align
++                && other.apply_inner_margin == cell.apply_inner_margin && other.text_direction == cell.text_direction
++                && other.line_wrap == cell.line_wrap && other.padding.left == cell.padding.left
++                && other.padding.right == cell.padding.right && other.padding.top == cell.padding.top
++                && other.padding.bottom == cell.padding.bottom && other.height == cell.height
++        };
++        if end_column.is_some() && !(column..=end).all(|col| source.cells.iter().any(|c|
++            c.row == row && c.col == col && c.row_span == 1 && c.col_span == 1 && same_format(c))) {
++            return Err(invalid());
++        }
++        let expected_width = edges[usize::from(end)+1] - edges[usize::from(column)];
++        if expected_width == 0 || expected_width > i32::MAX as u32
++            || (end_column.is_none() && cell.width != expected_width) {
++            return Err(invalid());
++        }
++        let mut updated = source.clone();
++        if end_column.is_some() { updated.merge_cells(row,column,row,end) } else { updated.split_cell(row,column) }
++            .map_err(HwpError::RenderError)?;
++        let changed: Vec<_> = updated.cells.iter().enumerate().filter(|(_,c)|
++            c.row == row && c.col >= column && c.col <= end
++        ).map(|(index,c)| (index,c.paragraphs.len(),c.width)).collect();
++        if changed.iter().map(|entry| u64::from(entry.2)).sum::<u64>() != u64::from(expected_width) {
++            return Err(invalid());
++        }
++        let count = updated.cells.len();
++        *self.resolve_table_mut_by_cell_path(section,paragraph,path)? = updated;
++        let mut leaf = path.to_vec();
++        let depth = leaf.len()-1;
++        for (index, paragraph_count, _) in changed {
++            leaf[depth].1 = index;
++            for inner in 0..paragraph_count {
++                leaf[depth].2 = inner;
++                self.reflow_cell_paragraph_by_path(section,paragraph,&leaf,inner);
++                self.recalculate_cell_paragraph_vpos_by_path(section,paragraph,&leaf,inner,None);
++            }
++        }
++        self.document.sections[section].raw_stream = None;
++        self.recompose_section(section);
++        self.paginate_if_needed();
++        Ok(serde_json::json!({"ok":true,"cellCount":count}).to_string())
+     }
+ 
+     /// [#7189] 중첩 표의 셀 크기를 셀 경로로 조절한다.
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -3712,6 +3712,16 @@
+     ) -> Result<String, JsValue> {
+         let path = parse_cell_path_arg(path_json)?;
+         self.edit_nested_table_axis_native(section as usize, para as usize, &path, row, insert, index)
++            .map_err(Into::into)
++    }
++
++    #[wasm_bindgen(js_name = reshapeNestedTableCells)]
++    pub fn reshape_nested_table_cells(
++        &mut self, section: u32, para: u32, path_json: &str,
++        row: u16, column: u16, end_column: Option<u16>,
++    ) -> Result<String, JsValue> {
++        let path = parse_cell_path_arg(path_json)?;
++        self.reshape_nested_table_cells_native(section as usize,para as usize,&path,row,column,end_column)
+             .map_err(Into::into)
+     }
+ 

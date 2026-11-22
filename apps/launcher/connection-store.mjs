@@ -9,7 +9,7 @@ function transform(mode,bytes){
  if(process.platform!=='win32')return Promise.reject(storageError());
  return new Promise((accept,reject)=>{
   const executable=join(process.env.SystemRoot??'C:/Windows','System32/WindowsPowerShell/v1.0/powershell.exe');
-  const child=spawn(executable,['-NoLogo','-NoProfile','-NonInteractive','-File',fileURLToPath(new URL('./credential-protect.ps1',import.meta.url)),'-Mode',mode],{windowsHide:true,stdio:['pipe','pipe','ignore']});
+  const child=spawn(executable,['-NoLogo','-NoProfile','-NonInteractive','-ExecutionPolicy','RemoteSigned','-File',fileURLToPath(new URL('./credential-protect.ps1',import.meta.url)),'-Mode',mode],{windowsHide:true,stdio:['pipe','pipe','ignore']});
   let output='',failed=false;
   const fail=()=>{failed=true;child.kill();reject(storageError());};
   const timer=setTimeout(fail,15000);

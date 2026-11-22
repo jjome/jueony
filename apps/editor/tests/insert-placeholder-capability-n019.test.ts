@@ -51,9 +51,8 @@ function completeEvidence(commandId: InsertPlaceholderCommandIdN019): InsertPlac
   };
 }
 
-test('current Rust/WASM and Studio expose both N019 commands only as disabled placeholders', () => {
+test('Studio disables both N019 placeholders even when WASM exposes the comment API', () => {
   const methods = new Set(Reflect.ownKeys(HwpDocument.prototype).filter((key): key is string => typeof key === 'string'));
-  assert.equal(methods.has('insertCommentAtCursorV1'), false);
   assert.equal(methods.has('insertParagraphBandAtCursorV1'), false);
 
   const studio = readFileSync(new URL('../../../upstream/rhwp-source/rhwp-studio/src/command/commands/insert.ts', import.meta.url), 'utf8');
@@ -67,7 +66,8 @@ test('current Rust/WASM and Studio expose both N019 commands only as disabled pl
     const projection = projectInsertPlaceholderRegistryN019(commandId, bodyContext, evidence);
     assert.equal(projection.enabled, false);
     assert.equal(projection.canReportSuccess, false);
-    assert.equal(projection.reason, 'native-api-missing');
+    const hasCommentApi = commandId === 'insert:comment' && methods.has('insertCommentAtCursorV1');
+    assert.equal(projection.reason, hasCommentApi ? 'durable-model-contract-missing' : 'native-api-missing');
     assert.equal(rejectInsertPlaceholderDispatchN019(projection).ok, false);
   }
 });

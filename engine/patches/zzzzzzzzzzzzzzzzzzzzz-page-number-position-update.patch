@@ -1,0 +1,135 @@
+diff --git a/src/document_core/commands/page_number_position.rs b/src/document_core/commands/page_number_position.rs
+--- a/src/document_core/commands/page_number_position.rs
++++ b/src/document_core/commands/page_number_position.rs
+@@ -120,6 +120,63 @@
+         .to_string())
+     }
+ 
++    /// Updates one verified root page-number control without moving its anchor.
++    pub fn update_page_number_position_native(
++        &mut self,
++        section_idx: usize,
++        paragraph_idx: usize,
++        expected_json: &str,
++        props_json: &str,
++    ) -> Result<String, HwpError> {
++        let expected = parse_input(expected_json)?;
++        let requested = parse_input(props_json)?;
++        if self.document.sections.len() != 1 || section_idx != 0 {
++            return Err(invalid("다구역 쪽 번호 매기기는 아직 지원하지 않습니다"));
++        }
++        let (owner, previous) = self
++            .root_page_number_position(section_idx)?
++            .ok_or_else(|| invalid("기존 쪽 번호 위치를 찾지 못했습니다"))?;
++        if owner != paragraph_idx
++            || previous.format != expected.format
++            || previous.position != expected.position
++            || previous.dash_char != expected.dash_char
++        {
++            return Err(invalid("현재 구역의 쪽 번호 상태가 변경되었습니다"));
++        }
++        if previous.format == requested.format
++            && previous.position == requested.position
++            && previous.dash_char == requested.dash_char
++        {
++            return Err(invalid("현재 쪽 번호 위치와 모양이 같습니다"));
++        }
++        let section = &mut self.document.sections[section_idx];
++        let position = section.paragraphs[paragraph_idx]
++            .controls
++            .iter_mut()
++            .find_map(|control| match control {
++                Control::PageNumberPos(value) => Some(value),
++                _ => None,
++            })
++            .ok_or_else(|| invalid("기존 쪽 번호 위치를 찾지 못했습니다"))?;
++        position.format = requested.format;
++        position.position = requested.position;
++        position.dash_char = requested.dash_char;
++        section.raw_stream = None;
++        self.recompose_section(section_idx);
++        self.paginate_if_needed();
++
++        Ok(serde_json::json!({
++            "ok": true,
++            "updated": true,
++            "sectionIdx": section_idx,
++            "paragraphIdx": paragraph_idx,
++            "format": requested.format,
++            "position": requested.position,
++            "sideChar": requested.dash_char.to_string(),
++        })
++        .to_string())
++    }
++
+     /// Reads only a unique top-level control. Ambiguous controls are errors.
+     pub fn get_page_number_position_native(&self, section_idx: usize) -> Result<String, HwpError> {
+         let value = self.root_page_number_position(section_idx)?;
+@@ -229,6 +286,39 @@
+     }
+ 
+     #[test]
++    fn update_preserves_the_existing_control_anchor_and_survives_both_formats() {
++        const NEXT: &str = r#"{"format":1,"position":8,"sideChar":"."}"#;
++        let mut document = blank();
++        document
++            .insert_page_number_position_native(0, 0, PROPS)
++            .expect("initial insert");
++        let original_count = document.document().sections[0].paragraphs[0].controls.len();
++        let before = document.export_hwp_native().expect("before update");
++        assert!(document.update_page_number_position_native(0, 0, NEXT, PROPS).is_err());
++        assert!(document.update_page_number_position_native(0, 0, PROPS, PROPS).is_err());
++        assert_eq!(document.export_hwp_native().expect("after refusal"), before);
++        let snapshot = document.save_snapshot_native();
++        document
++            .update_page_number_position_native(0, 0, PROPS, NEXT)
++            .expect("update page number position");
++        assert_eq!(document.document().sections[0].paragraphs[0].controls.len(), original_count);
++        let state_after = state(&document);
++        assert_eq!(state_after["paragraphIdx"], 0);
++        assert_eq!(state_after["format"], 1);
++        assert_eq!(state_after["position"], 8);
++        assert_eq!(state_after["sideChar"], ".");
++        for bytes in [
++            document.export_hwp_native().expect("updated HWP"),
++            document.export_hwpx_native().expect("updated HWPX"),
++        ] {
++            let reopened = HwpDocument::from_bytes(&bytes).expect("reopen update");
++            assert_eq!(state(&reopened), state_after);
++        }
++        document.restore_snapshot_native(snapshot).expect("undo update");
++        assert_eq!(document.export_hwp_native().expect("undo bytes"), before);
++    }
++
++    #[test]
+     fn hwp_and_hwpx_save_reopen_preserve_position_format_and_side_character() {
+         let mut document = blank();
+         document
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8790,6 +8790,24 @@
+         .map_err(|e| e.into())
+     }
+ 
++    /// Updates a uniquely owned root-body page-number position.
++    #[wasm_bindgen(js_name = updatePageNumberPosition)]
++    pub fn update_page_number_position(
++        &mut self,
++        section_idx: u32,
++        paragraph_idx: u32,
++        expected_json: &str,
++        props_json: &str,
++    ) -> Result<String, JsValue> {
++        self.update_page_number_position_native(
++            section_idx as usize,
++            paragraph_idx as usize,
++            expected_json,
++            props_json,
++        )
++        .map_err(|e| e.into())
++    }
++
+     /// Unique root-body page-number-position state for readback/preflight.
+     #[wasm_bindgen(js_name = getPageNumberPosition)]
+     pub fn get_page_number_position(&self, section_idx: u32) -> Result<String, JsValue> {

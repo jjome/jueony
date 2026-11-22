@@ -6,7 +6,7 @@ import {captureTemplate} from '../src/modules/automation/public/index.ts';
 import {executeAgentSectionSplit} from '../src/adapters/rhwp/agent-section-split.ts';
 const base=():any=>({revision:'r',name:'split.hwpx',limitations:[],nodes:[{id:'s0p0',section:0,paragraph:0,text:'제😀목',editable:true},{id:'s0p1',section:0,paragraph:1,text:'본문',editable:true}],structure:{sectionSplitAvailable:true,sections:[{index:0,page:{},columns:{columnCount:1}}],paragraphs:[{id:'s0p0',characters:{},paragraph:{},controls:['secd','cold']},{id:'s0p1',characters:{},paragraph:{},controls:[]}],tables:[],unsupportedControls:[]}});
 const split={kind:'split_section' as const,target:'s0p0',offset:2};
-test('split wire is provider-neutral and uses an explicit zero-based Unicode offset',()=>{const schema=generationSchema().properties.operations.items.anyOf;assert.equal(schema.length,60);assert.deepEqual(schema.find(o=>o.properties.kind.enum[0]==='split_section')!.required,['kind','target','offset']);const s=base(),before=structuredClone(s);assert.deepEqual(validateEditOperations([split],s),[split]);assert.deepEqual(s,before);});
+test('split wire is provider-neutral and uses an explicit zero-based Unicode offset',()=>{const schema=generationSchema().properties.operations.items.anyOf;assert.equal(schema.length,62);assert.deepEqual(schema.find(o=>o.properties.kind.enum[0]==='split_section')!.required,['kind','target','offset']);const s=base(),before=structuredClone(s);assert.deepEqual(validateEditOperations([split],s),[split]);assert.deepEqual(s,before);});
 test('split rejects missing and nonboolean capabilities, unavailable and protected body targets',()=>{for(const change of [undefined,false,'true']){const s=base();s.structure.sectionSplitAvailable=change;assert.throws(()=>validateEditOperations([split],s),/엔진/);}for(const target of ['missing','s0p0']){const s=base();s.nodes[0].editable=false;assert.throws(()=>validateEditOperations([{...split,target}],s));}});
 test('Unicode offset accepts boundaries but rejects UTF16 end, fractions, strings and script fields',()=>{for(const offset of [0,1,2,3])assert.deepEqual(validateEditOperations([{...split,offset}],base()),[{...split,offset}]);for(const offset of [-1,4,0.5,'1',NaN,undefined])assert.throws(()=>validateEditOperations([{...split,offset}],base()));assert.throws(()=>validateEditOperations([{...split,execute:'script'}],base()),/속성/);});
 test('structural splitting is isolated and cannot reinterpret IDs in the same batch',()=>{for(const ops of [[split,{kind:'set_columns',section:0,count:1,spacingMm:0}],[{kind:'replace_body_text',target:'s0p1',start:0,count:1,text:'새'},split],[split,split]])assert.throws(()=>validateEditOperations(ops,base()),/단독/);});
@@ -16,3 +16,23 @@ test('100-section limit and unavailable structure are rejected without changing 
 test('split requests cannot be saved as a repeat template with stale section/body IDs',()=>{assert.throws(()=>captureTemplate({message:'구역',sourceIds:[],operations:[split]},base()),/아직 기록/);});
 test('native split wrapper rechecks original content and required native capability before mutation',()=>{let calls=0;const doc={getSectionCount:()=>1,getParagraphCount:()=>2,getParagraphLength:()=>2,getTextRange:()=> '다름',insertSectionBreak:()=>{calls++;}};assert.throws(()=>executeAgentSectionSplit(doc,base(),split),/원문/);assert.equal(calls,0);assert.throws(()=>executeAgentSectionSplit({},base(),split),/엔진/);});
 test('native split wrapper rejects lying results even when a setter says success',()=>{const data=[['제😀목','본문']],doc={getSectionCount:()=>data.length,getParagraphCount:(s:number)=>data[s].length,getParagraphLength:(s:number,p:number)=>Array.from(data[s][p]).length,getTextRange:(s:number,p:number)=>data[s][p],insertSectionBreak:()=>({ok:true,sectionIdx:1})};assert.throws(()=>executeAgentSectionSplit(doc,base(),split),/결과/);});
+
+test('the split command accepts bounded settings only for its new section',()=>{
+  const snapshot=base();
+  snapshot.structure.sections[0].page={width:59528,height:84188,marginLeft:8504,marginRight:8504,marginTop:5668,marginBottom:4252,
+    marginHeader:4252,marginFooter:4252,marginGutter:0,landscape:false,binding:0};
+  snapshot.structure.sections[0].pageBorderInclusion={editable:true,entries:[]};
+  const valid={...split,newPageSetup:{landscape:true,marginTopMm:22},newPageBorder:{headerInside:true,footerInside:false}};
+  assert.deepEqual(validateEditOperations([valid],snapshot),[valid]);
+  assert.deepEqual(validateEditOperations([{...split,newPageBorder:{headerInside:false}}],snapshot),[{...split,newPageBorder:{headerInside:false}}]);
+  const shape=generationSchema().properties.operations.items.anyOf.find(item=>item.properties.kind.enum[0]==='split_section')!;
+  assert.deepEqual(shape.required,['kind','target','offset']);
+  assert.deepEqual(Object.keys(shape.properties.newPageBorder.properties),['headerInside','footerInside']);
+  assert.equal(shape.properties.newPageSetup.properties.marginTopMm.type,'number');
+  for(const options of [
+    {newPageSetup:{section:3}},{newPageSetup:{marginTopMm:300}},{newPageSetup:{}},{newPageSetup:null},
+    {newPageBorder:{}},{newPageBorder:{headerInside:'yes'}},{newPageBorder:{section:1,headerInside:true}},
+  ])assert.throws(()=>validateEditOperations([{...split,...options}],snapshot));
+  snapshot.structure.sections[0].pageBorderInclusion.editable=false;
+  assert.throws(()=>validateEditOperations([valid],snapshot),/쪽 기준/);
+});

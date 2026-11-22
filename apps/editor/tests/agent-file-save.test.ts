@@ -4,7 +4,7 @@ import {createAgentFilePort} from '../src/adapters/desktop/agent-files.ts';
 import type {AgentFileHooks,AgentFileHostState,AgentFileSaveResult} from '../src/adapters/desktop/agent-files.ts';
 import {validateEditOperations} from '../src/modules/document/public/index.ts';
 import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
-import {runOnce} from '../src/modules/agent/application/run-once.ts';
+import {runOnce,type RunOptions} from '../src/modules/agent/application/run-once.ts';
 import {runInNewContext} from 'node:vm';
 test('iframe-realm pre-write rejection retains no-write classification while real partial failures stay partial',async()=>{for(const name of ['BoundSaveRejectedError','PartialApplyError']){const f=fixture(),foreign=runInNewContext('Object.assign(new Error("iframe failure"),{name})',{name});assert.equal(foreign instanceof Error,false);f.hooks.saveActive=async()=>{throw foreign;};await assert.rejects(f.port.execute('iframe-error',f.operation(),f.port.snapshot(),signal()),e=>e.name===name);assert.equal(f.saves,0);assert.equal(f.frozen,false);}});
 
@@ -19,6 +19,29 @@ function fixture(){
  return{state,hooks,port,operation,get saves(){return saves;},get frozen(){return frozen;}};
 }
 const signal=()=>new AbortController().signal;
+test('a reference-fed save cannot write before approval and uses the reviewed snapshot of its command',async()=>{
+ const f=fixture(),context=f.port.snapshot();
+ const snapshot=()=>({revision:'1:1',name:'a.hwpx',nodes:[],limitations:[],fileContext:context});
+ const operation=f.operation();
+ const options:RunOptions={
+  runId:'approved-save',
+  context:{document:snapshot(),references:[{id:'fixture',name:'자료.txt',text:'합성 문구',sha256:'0'.repeat(64),characters:5}],history:[],request:'자료 검토'},
+  model:{id:'mock',label:'mock',adapterId:'openai-compatible',endpoint:'https://example.invalid',modelId:'fixture'},
+  port:{generate:async()=>({message:'저장',sourceIds:[],operations:[operation]})},
+  editor:{snapshot,apply:async()=>{throw Error('Native must not run');}},filePort:f.port,
+  createDocument:async()=>{throw Error('new document must not run');},signal:signal(),isCurrent:()=>true,state(){},
+ };
+ await assert.rejects(runOnce(options),/변경을 검토/);
+ assert.equal(f.saves,0);
+ const result=await runOnce({...options,reviewReferenceChanges:async proposal=>{
+  assert.equal(f.saves,0);
+  assert.deepEqual(proposal.operations,[operation]);
+  operation.contextStamp='f'.repeat(64);
+  return true;
+ }});
+ assert.equal(result.fileReceipt?.save?.status,'saved');
+ assert.equal(f.saves,1);
+});
 test('bound save public wire has only contextStamp, no path/format/handle/target; cannot batch document writes',()=>{const f=fixture(),source=f.port.snapshot(),base={revision:'1:1',name:'a.hwpx',nodes:[],limitations:[],fileContext:source},schema=generationSchema().properties.operations.items.anyOf.find((v:any)=>v.properties.kind.enum[0]==='save_active_document');assert.deepEqual(schema.required,['kind','contextStamp']);assert.equal(source.capabilities.saveBound,true);for(const key of ['path','handle','format','tabId','workspaceId'])assert.throws(()=>validateEditOperations([{...f.operation(),[key]:'untrusted'}],base));assert.throws(()=>validateEditOperations([f.operation(),f.operation()],base),/단독/);const json=JSON.stringify(source);assert.ok(!json.includes('secret'));assert.ok(!json.includes('connection'));assert.ok(!json.includes('a'.repeat(64)));});
 test('save emits verified dedicated receipt, preserves all non-active and other-workspace tabs and consumes run ID',async()=>{const f=fixture(),before=structuredClone(f.state.tabs.slice(1)),context=f.port.snapshot(),r=await f.port.execute('save',f.operation(),context,signal());assert.equal(f.saves,1);assert.deepEqual(r.save,{status:'saved',tabId:'a',beforeRevision:'1:1',afterRevision:'1:1'});assert.equal(r.documentMutations,0);assert.equal(r.after.activeTabId,'a');assert.equal(r.after.tabs[0].dirty,false);assert.deepEqual(f.state.tabs.slice(1),before);assert.equal(f.frozen,false);await assert.rejects(f.port.execute('save',f.operation(),f.port.snapshot(),signal()),/이미/);assert.equal(f.saves,1);});
 test('unbound, absent hook and stale connection/revision/instance/workspace/active owner refuse without invoking save',async()=>{for(const change of [(f:any)=>f.state.tabs[0].boundSave=false,(f:any)=>f.state.tabs[0].connection=undefined,(f:any)=>f.hooks.saveActive=undefined,(f:any)=>f.state.tabs[0].connection='c'.repeat(64),(f:any)=>f.state.tabs[0].revision='1:2',(f:any)=>f.state.tabs[0].instance='replacement',(f:any)=>f.state.workspaceId='other',(f:any)=>f.state.activeTabId='b']){const f=fixture(),context=f.port.snapshot(),op=f.operation();change(f);await assert.rejects(f.port.execute('stale',op,context,signal()));assert.equal(f.saves,0);assert.equal(f.frozen,false);}});

@@ -1,9 +1,11 @@
 // Canonical provider-neutral wire shape; semantic validation remains in this module's domain.
-export const controlKinds = ['list_document_tabs','new_document_tab','save_active_document','activate_document_tab','close_document_tab','set_document_metadata','insert_table_formula_field','update_table_formula_field','replace_cell_paragraph','split_table_cell_into','split_table','attach_table','split_table_cell','merge_table_cells','set_table_header','set_table_pagination','set_next_paragraph_style','rename_paragraph_style','create_paragraph_style','set_paragraph_outline','set_basic_numbering','clone_paragraph_numbering','set_basic_bullet','set_paragraph_list','format_paragraph_decoration','set_paragraph_tabs','add_bookmark','rename_bookmark','delete_bookmark','create_header_footer','delete_header_footer','format_header_footer_paragraph','format_header_footer','set_header_footer_text','merge_sections','remove_empty_section','split_section','format_characters', 'format_paragraph', 'fill_table_series', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers','set_page_background','set_master_page_text','delete_master_page'];
+export const controlKinds = ['list_document_tabs','new_document_tab','save_active_document','activate_document_tab','close_document_tab','set_document_metadata','set_shape_fill','insert_table_formula_field','update_table_formula_field','replace_cell_paragraph','split_table_cell_into','split_table','attach_table','split_table_cell','merge_table_cells','set_table_header','set_table_pagination','set_next_paragraph_style','rename_paragraph_style','create_paragraph_style','set_paragraph_outline','set_basic_numbering','clone_paragraph_numbering','set_basic_bullet','set_paragraph_list','format_paragraph_decoration','set_paragraph_tabs','add_bookmark','rename_bookmark','delete_bookmark','create_header_footer','delete_header_footer','format_header_footer_paragraph','format_header_footer','set_header_footer_text','merge_sections','remove_empty_section','split_section','format_characters', 'format_paragraph', 'fill_table_series', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup','set_page_border_inclusion','insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers','set_page_background','set_master_page_text','delete_master_page'];
 const text = { type: 'string' }, number = { type: 'number' }, bool = { type: 'boolean' }, integer = { type: 'integer', minimum: 0 };
 const object = properties => ({ type: 'object', properties, required: Object.keys(properties) });
 const properties = values => ({ type: 'object', properties: values });
 const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,fontSizePt:number,color:text,fontFamily:text,ratioPercent:integer,spacingPercent:{type:'integer'},superscript:bool,subscript:bool};
+const pageDimensions = {widthMm:number,heightMm:number,landscape:bool,marginLeftMm:number,marginRightMm:number,marginTopMm:number,marginBottomMm:number,marginHeaderMm:number,marginFooterMm:number};
+const pageBorderFlags = {headerInside:bool,footerInside:bool};
 const formulaFormat = {type:'string',enum:['%g','%g,','%.0f','%.0f,','%.1f','%.1f,','%.2f','%.2f,']};
 const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
 export function controlSchemas() {
@@ -11,6 +13,7 @@ export function controlSchemas() {
   ...['list_document_tabs','new_document_tab','save_active_document'].map(kind=>operation(kind,{contextStamp:{type:'string',pattern:'^[a-f0-9]{64}$'}})),
   ...['activate_document_tab','close_document_tab'].map(kind=>operation(kind,{contextStamp:{type:'string',pattern:'^[a-f0-9]{64}$'},tabId:text})),
   operation('set_document_metadata',{originalFingerprint:{type:'string',pattern:'^[a-f0-9]{64}$'},values:object(Object.fromEntries(['title','subject','author','keywords','description'].map(k=>[k,{type:'string',maxLength:4096}])))}),
+  operation('set_shape_fill',{target:{type:'string',pattern:'^s[0-9]+p[0-9]+o[0-9]+$'},originalFingerprint:{type:'string',pattern:'^[a-f0-9]{64}$'},color:{type:'string',pattern:'^#[0-9A-Fa-f]{6}$'}}),
   operation('update_table_formula_field',{target:text,row:integer,column:integer,fieldId:integer,originalCommand:text,formula:text,resultFormat:formulaFormat}),
   operation('insert_table_formula_field',{target:text,row:integer,column:integer,originalText:text,formula:text,resultFormat:formulaFormat}),
   {...operation('replace_cell_paragraph',{target:text,row:integer,column:integer,paragraph:integer,originalText:text,text,spanTexts:{type:'array',minItems:2,maxItems:128,items:text},
@@ -44,16 +47,20 @@ export function controlSchemas() {
   operation('set_header_footer_text',{section:integer,story:{type:'string',enum:['header','footer']},pageKind:{type:'string',enum:['both','odd','even']},originalText:text,text}),
   operation('merge_sections',{rightSection:{type:'integer',minimum:1}}),
   operation('remove_empty_section',{section:integer}),
-  operation('split_section',{target:text,offset:integer}),
+  {...operation('split_section',{target:text,offset:integer,newPageSetup:properties(pageDimensions),newPageBorder:properties(pageBorderFlags)}),required:['kind','target','offset']},
   operation('set_master_page_text',{section:integer,pageKind:{type:'string',enum:['both','even','odd']},text,xMm:number,yMm:number,fontSizePt:number,color:text,bold:bool}),
   operation('delete_master_page',{section:integer,pageKind:{type:'string',enum:['both','even','odd']}}),
-  operation('set_page_background',{section:integer,pageKind:{type:'string',enum:['both','even','odd']},fillType:{type:'string',enum:['none','solid']},color:text}),
+  {...operation('set_page_background',{section:integer,pageKind:{type:'string',enum:['both','even','odd']},
+    fillType:{type:'string',enum:['none','solid','gradient']},color:text,endColor:text,angle:{type:'integer',minimum:0,maximum:360}}),
+    required:['kind','section','pageKind','fillType','color']},
   operation('set_section_tabs',{section:integer,spacingPt:{type:'number',minimum:0.1,maximum:9999}}),
   operation('set_line_numbers',{section:integer,enabled:bool,restart:{type:'string',enum:['page','section','continuous']},countBy:{type:'integer',minimum:1,maximum:65535},startNumber:{type:'integer',minimum:1,maximum:65535},distanceMm:{type:'number',minimum:0,maximum:50}}),
   operation('apply_paragraph_style',{target:text,styleId:integer}),
   operation('set_columns',{section:integer,count:{type:'integer',minimum:1,maximum:6},spacingMm:number}),
   operation('set_page_hide',{target:text,properties:properties({hideHeader:bool,hideFooter:bool,hideMasterPage:bool,hideBorder:bool,hideFill:bool,hidePageNum:bool})}),
-  operation('format_characters', { target: text, properties: properties(characters) }),
+  operation('format_characters', { target: text, properties: properties({...characters,
+    storedStyle:object({styleId:{type:'integer',minimum:0,maximum:255},start:integer,count:{type:'integer',minimum:1,maximum:4000},originalText:text}),
+  }) }),
   operation('format_paragraph', { target: text, properties: properties({ alignment: text, lineSpacingPercent: number, marginLeftMm: number, marginRightMm: number, indentMm: number, beforeMm: number, afterMm: number, keepWithNext: bool, keepLines: bool, pageBreakBefore: bool }) }),
   {...operation('fill_table_series',{target:text,startRow:integer,startColumn:integer,endRow:integer,endColumn:integer,mode:{type:'string',enum:['days','months','years','formula','calculated-value']},axis:{type:'string',enum:['rows','columns']}}),
    required:['kind','target','startRow','startColumn','endRow','endColumn','mode']},
@@ -61,7 +68,8 @@ export function controlSchemas() {
   {...operation('set_table_cell', {target:text,row:integer,column:integer,originalText:text,text,paragraph:integer,spanTexts:{type:'array',minItems:2,maxItems:128,items:text}}),
     required:['kind','target','row','column','originalText','text']},
   operation('format_table_cells', { target: text, startRow: integer, rowCount: integer, startColumn: integer, columnCount: integer, properties: properties({ ...characters, background: text, alignment: text, verticalAlignment: text, equalizeColumns:bool,columnWidthMm:number,equalizeRows:bool,rowHeightMm:number, paddingMode:{type:'string',enum:['custom','table']},paddingLeftMm:number,paddingRightMm:number,paddingTopMm:number,paddingBottomMm:number }) }),
-  operation('set_page_setup', { section: integer, properties: properties({ widthMm: number, heightMm: number, landscape: bool, marginLeftMm: number, marginRightMm: number, marginTopMm: number, marginBottomMm: number, marginHeaderMm: number, marginFooterMm: number }) }),
+  operation('set_page_setup', {section:integer,properties:properties({...pageDimensions,borderIncludesHeader:bool,borderIncludesFooter:bool})}),
+  {...operation('set_page_border_inclusion',{sections:{type:'array',minItems:1,maxItems:100,items:integer},...pageBorderFlags}),required:['kind','sections']},
   operation('insert_table_row',{target:text,index:integer,values:{type:'array',items:text}}),
   operation('insert_table_column',{target:text,index:integer,values:{type:'array',items:text}}),
   operation('delete_table_row',{target:text,index:integer}),

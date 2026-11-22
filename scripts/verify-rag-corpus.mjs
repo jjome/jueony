@@ -9,6 +9,7 @@ import {readReferences} from '../apps/editor/src/adapters/files/references.ts';
 import {TemporaryReferences} from '../apps/editor/src/adapters/files/temporary-references.ts';
 import {createReferenceFacade} from '../apps/editor/src/modules/references/public/index.ts';
 import {createAgentFacade} from '../apps/editor/src/modules/agent/public/index.ts';
+import {evaluateEmbeddingRanking} from './evaluate-rag-embeddings.mjs';
 
 // Evaluation only: no provider, credential, production registry, index, or score changes.
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -26,8 +27,21 @@ const signal = () => controller().signal;
 const normalize = text => String(text).normalize('NFKC').replace(/[\s,]/gu, '');
 const engineBytes = await readFile(path.join(packageRoot, 'rhwp_bg.wasm'));
 const engineJsBytes = await readFile(path.join(packageRoot, 'rhwp.js'));
-assert.equal(sha(engineBytes),manifest.engine.wasmSha256,'evaluation WASM differs from corpus generation engine');
-assert.equal(sha(engineJsBytes),manifest.engine.jsSha256,'evaluation JS binding differs from corpus generation engine');
+const embeddingComparison = process.argv.includes('--compare-embeddings');
+const comparison = embeddingComparison||process.argv.includes('--compare-bm25');
+const newEngine = process.argv.includes('--compare-new-engine');
+if (comparison || newEngine) {
+  assert.ok(process.env.JUEONY_RAG_OUTPUT && !output.startsWith(path.resolve(root, 'docs/evidence/rag-evaluation-2026-10-13')), 'Choose a separate comparison output');
+}
+if (newEngine) {
+  const engine = JSON.parse(await readFile(path.join(packageRoot, 'jueony-engine-build.json'), 'utf8'));
+  assert.equal(engine.baseCommit, manifest.engine.baseCommit);
+  assert.equal(sha(engineBytes), engine.wasmSha256);
+  assert.equal(sha(engineJsBytes), engine.jsSha256);
+} else {
+  assert.equal(sha(engineBytes),manifest.engine.wasmSha256,'evaluation WASM differs from corpus generation engine');
+  assert.equal(sha(engineJsBytes),manifest.engine.jsSha256,'evaluation JS binding differs from corpus generation engine');
+}
 const {default: init, HwpDocument} = await import(pathToFileURL(path.join(packageRoot, 'rhwp.js')).href);
 await init({module_or_path: engineBytes});
 const parse = async bytes => {
@@ -128,7 +142,7 @@ const load = async (workspaceId, withTemporary=false) => {
   for (const item of items) idToDoc.set(item.id, temporaryDoc.id);
   return {sources, idToDoc};
 };
-const rows = [];
+const rows = [],embeddingCases=[];
 for (const item of suite.cases) {
   const workspaceId = owner(item.workspace), scope = {workspaceId,chatId:chatId(workspaceId)};
   const start = performance.now(); const {sources,idToDoc} = await load(workspaceId,item.temporary);
@@ -143,6 +157,17 @@ for (const item of suite.cases) {
   const ranked = [...new Set(result.references.map(source => idToDoc.get(source.originSourceId)))];
   assert.ok(ranked.every(Boolean), 'fabricated source identity');
   const relevant = new Set(item.expectedDocs);
+  let bm25;
+  if (comparison) {
+    const start = performance.now();
+    const selected = references.search(index, scope, item.query, signal(), 'bm25');
+    const ids = [...new Set(selected.references.map(reference => idToDoc.get(reference.originSourceId)))];
+    assert.ok(ids.every(Boolean), 'candidate returned a source outside the selected set');
+    const rank = ids.findIndex(id => relevant.has(id));
+    bm25 = { ids, rank, milliseconds: performance.now() - start };
+    if(embeddingComparison)embeddingCases.push({...item,idToDoc,bm25: selected.references.map(reference=>reference.id),
+      bm25Milliseconds:bm25.milliseconds,chunks:new Map(index.chunks.map(chunk=>[chunk.id,chunk]))});
+  }
   const recall = k => relevant.size ? ranked.slice(0,k).filter(id => relevant.has(id)).length / relevant.size : null;
   const precision = k => ranked.length ? ranked.slice(0,k).filter(id => relevant.has(id)).length / Math.min(k,ranked.length) : null;
   const first = ranked.findIndex(id => relevant.has(id));
@@ -155,6 +180,7 @@ for (const item of suite.cases) {
   if (evidence.some(item => !item.found)) qualityIssues.push('expected answer span missing from authority chunks');
   if (!relevant.size && result.references.length) qualityIssues.push('unanswerable question still returned lexical matches; no automatic abstention');
   const row = {id:item.id,category:item.category,query:item.query,workspaceId,temporary:!!item.temporary,
+    ...(bm25 ? { bm25 } : {}),
     expectedDocs:item.expectedDocs, rankedSourceIds:ranked, expectedEvidence:evidence,
     recallAt1:recall(1),recallAt3:recall(3),recallAt8:recall(8),precisionAt1:precision(1),precisionAt3:precision(3),precisionAt8:precision(8),
     reciprocalRank:relevant.size ? (first < 0 ? 0 : 1/(first+1)) : null,
@@ -284,6 +310,7 @@ const result = {
   invocation:'node --experimental-strip-types scripts/verify-rag-corpus.mjs',enginePackage:path.relative(root,packageRoot).split(path.sep).join('/'),
   provenance:{wasmSha256:sha(engineBytes),engineJsSha256:sha(engineJsBytes),manifestSha256:sha(await readFile(path.join(corpusRoot,'manifest.json'))),casesSha256:sha(await readFile(path.join(corpusRoot,'evaluation-cases.json'))),evaluationScriptSha256:sha(await readFile(fileURLToPath(import.meta.url)))},
   networkRequests:0,llmCalls:0,semanticDocumentCount:documents.size,physicalFileCount:physical.size,
+  corpusGenerationEngine: !newEngine,
   contractChecks:{passed:checks.filter(item=>item.status==='pass').length,failed:checks.filter(item=>item.status==='fail').length},
   metrics:{queryCount:rows.length,answerableCount:answerable.length,unanswerableCount:unknown.length,
     sourceRecallAt1:mean(answerable.map(row=>row.recallAt1)),sourceRecallAt3:mean(answerable.map(row=>row.recallAt3)),sourceRecallAt8:mean(answerable.map(row=>row.recallAt8)),
@@ -304,12 +331,50 @@ const result = {
     'Missing answer does not trigger abstention or confidence threshold. Zero-hit unfamiliar vocabulary and overlapping unanswerable questions are measured separately.',
     'Synthetic corpus quality is not public-document, Hancom rendering, semantic understanding, or real-world RAG accuracy validation.',
     'Instructions remain reference data at context boundary; no real-model prompt-injection resistance or answer safety validation.',
-    'No embeddings, reranker, vector DB, OCR, provider calls, autonomous loop, output factuality evaluation, or production Agent reconstruction.'
+    ...(embeddingComparison?['Embedding and fusion are local evaluation candidates. No semantic confidence threshold, production integration or real-model quality was validated.']:
+      ['No embeddings, reranker, vector DB, OCR, provider calls, autonomous loop, output factuality evaluation, or production Agent reconstruction.'])
   ],extraction,checks,queries:rows
 };
+if (comparison) {
+  const candidate = {
+    sourceRecallAt1: mean(answerable.map(row => Number(row.bm25.rank === 0))),
+    sourceRecallAt8: mean(answerable.map(row => Number(row.bm25.rank >= 0 && row.bm25.rank < 8))),
+    meanReciprocalRank: mean(answerable.map(row => row.bm25.rank >= 0 ? 1 / (row.bm25.rank + 1) : 0)),
+    unanswerableFalsePositiveQueries: unknown.filter(row => row.bm25.ids.length > 0).length,
+    meanSearchMilliseconds: mean(rows.map(row => row.bm25.milliseconds)),
+  };
+  result.bm25 = { ...candidate, passesAdoptionGate: candidate.sourceRecallAt1 > result.metrics.sourceRecallAt1
+    && candidate.sourceRecallAt8 >= result.metrics.sourceRecallAt8
+    && candidate.meanReciprocalRank > result.metrics.meanReciprocalRank
+    && candidate.unanswerableFalsePositiveQueries < result.metrics.unanswerableFalsePositiveQueries };
+}
+if(embeddingComparison){
+  result.embeddingComparison=await evaluateEmbeddingRanking(embeddingCases,process.env.JUEONY_RAG_PYTHON,process.env.JUEONY_RAG_EMBEDDING_ASSETS);
+  for(const name of ['evaluate-rag-embeddings.mjs','evaluate-rag-embeddings.py']){
+    result.provenance[name]=sha(await readFile(new URL(name,import.meta.url)));
+  }
+}
 await mkdir(output,{recursive:true});
 await writeFile(path.join(output,'result.json'),JSON.stringify(result,null,2)+'\n');
 const percentages = value => value === null ? 'n/a' : (value*100).toFixed(1)+'%';
+const candidateReport = result.bm25 ? [
+  '', '## Korean BM25 comparison', '',
+  '| Metric | Existing lexical | Korean BM25 |', '| --- | ---: | ---: |',
+  `| Source recall @1 | ${percentages(result.metrics.sourceRecallAt1)} | ${percentages(result.bm25.sourceRecallAt1)} |`,
+  `| Source recall @8 | ${percentages(result.metrics.sourceRecallAt8)} | ${percentages(result.bm25.sourceRecallAt8)} |`,
+  `| Mean reciprocal rank | ${result.metrics.meanReciprocalRank.toFixed(3)} | ${result.bm25.meanReciprocalRank.toFixed(3)} |`,
+  `| Unanswerable queries with matches | ${result.metrics.unanswerableFalsePositiveQueries}/${unknown.length} | ${result.bm25.unanswerableFalsePositiveQueries}/${unknown.length} |`,
+  `| Mean search time (ms) | ${result.metrics.meanSearchMilliseconds.toFixed(2)} | ${result.bm25.meanSearchMilliseconds.toFixed(2)} |`,
+  '', `Adoption gate: ${result.bm25.passesAdoptionGate ? 'pass' : 'fail'}. Both rankings used the same locally extracted files and selected scopes.`,
+] : [];
+const embeddingReport = result.embeddingComparison ? [
+  '', '## Local multilingual embedding comparison', '',
+  '| Ranking | Source hit @1 | Source hit @8 | MRR | Unanswerable queries with matches | Mean search (ms) |',
+  '| --- | ---: | ---: | ---: | ---: | ---: |',
+  ...Object.entries(result.embeddingComparison.summary).map(([name,metric])=>
+    `| ${name} | ${percentages(metric.sourceHitAt1)} | ${percentages(metric.sourceHitAt8)} | ${metric.meanReciprocalRank.toFixed(3)} | ${metric.unanswerableFalsePositiveQueries}/${unknown.length} | ${metric.meanSearchMilliseconds.toFixed(2)} |`),
+  '', result.embeddingComparison.selection,
+] : [];
 const report = ['# Local RAG corpus evaluation','',`Contracts: ${result.contractChecks.passed} passed, ${result.contractChecks.failed} failed.`,
   `Corpus: ${documents.size} semantic documents / ${physical.size} physical files. Queries: ${rows.length}. LLM calls: 0.`,
   `Source recall @1/@3/@8: ${[result.metrics.sourceRecallAt1,result.metrics.sourceRecallAt3,result.metrics.sourceRecallAt8].map(percentages).join(' / ')}.`,
@@ -317,9 +382,12 @@ const report = ['# Local RAG corpus evaluation','',`Contracts: ${result.contract
   `Unanswerable queries returning matches: ${result.metrics.unanswerableFalsePositiveQueries}/${unknown.length}.`, '',
   '| Case | First source | Recall @8 | Answer spans | Quality issue |','|---|---|---:|---:|---|',
   ...rows.map(row=>`| ${row.id} | ${row.rankedSourceIds[0] ?? 'none'} | ${percentages(row.recallAt8)} | ${percentages(row.evidenceRecall)} | ${row.qualityIssues.join('; ') || 'none'} |`),
+  ...candidateReport,
+  ...embeddingReport,
   '', 'These are deterministic extraction/context/search observations, not model-answer scores. Quality issues do not change production code or the ground truth.',
   '',...result.limitations.map(text=>'- '+text),''];
 await writeFile(path.join(output,'report.md'),report.join('\n'));
-console.log(JSON.stringify({output:path.relative(root,output),contractChecks:result.contractChecks,metrics:result.metrics},null,2));
+console.log(JSON.stringify({output:path.relative(root,output),contractChecks:result.contractChecks,metrics:result.metrics,bm25:result.bm25,
+  embedding:result.embeddingComparison?.summary},null,2));
 if (result.contractChecks.failed) process.exitCode=1;
 else if (process.argv.includes('--strict-quality') && result.metrics.queriesWithQualityIssues) process.exitCode=2;

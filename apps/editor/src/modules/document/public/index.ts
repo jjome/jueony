@@ -2,7 +2,7 @@ export type {AgentCellParagraphOp,AgentCellParagraphSource,AgentTableSubdivision
 export type {AgentTableStructureOp,AgentTableStructureSource} from './types.ts';
 export type {AgentTableSplitOp,AgentTableSplitSource} from './types.ts';
 export type {AgentTableMergeOp,AgentTableMergeSource} from './types.ts';
-export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
+export type { JsonValue, DocumentProperties, Cell, Table, NestedTable, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
 export type {AgentEmptySectionOp,AgentEmptySectionEligibility} from './types.ts';
 export type {AgentTableHeaderOp, AgentTableHeaderSource, AgentTablePaginationOp, AgentTablePaginationSource, TablePaginationMode, AgentNextParagraphStyleOp, AgentRenameParagraphStyleOp, AgentCreateParagraphStyleOp,AgentParagraphOutlineOp,AgentParagraphOutlineSource,AgentBasicNumberingOp,AgentNumberingCloneOp,AgentNumberingDefinitionSource,AgentBasicBulletOp,AgentParagraphListOp,AgentListCatalog} from "./types.ts";
 export type {AgentBookmark,AgentBookmarks,AgentBookmarkOp} from './types.ts';
@@ -11,15 +11,20 @@ export type {AgentSectionMergeOp} from './types.ts';
 export type {AgentSectionSplitOp} from './types.ts';
 export type {AgentSectionOp,AgentLineNumbers,LineNumberRestart} from './types.ts';
 export type {AgentPageBackground,AgentPageBackgroundOp} from './types.ts';
+export {agentPageBorderSections} from '../domain/agent-page-border-inclusion.ts';
+export type {AgentPageBorderFlags,AgentPageBorderInclusionOp} from './types.ts';
 export type {AgentMasterPage,AgentMasterPages,AgentMasterPageOp} from './types.ts';
-export { plainSnapshot } from './types.ts';
+export { plainSnapshot,sectionChangeReceipt } from './types.ts';
 export { calendarStampFormats, formatCalendarStamp } from '../domain/calendar-stamp.ts';
 export type { CalendarStamp, CalendarStampFormat } from '../domain/calendar-stamp.ts';
 export { validateEditOperations, assertRevision } from '../domain/edit-operations.ts';
 export type { EditProposal } from './types.ts';
 export { validateEditProposal } from '../domain/edit-proposal.ts';
-export type {DocumentQueryFacade, DocumentEditFacade, DocumentFacades} from './facades.ts';
+export type {DocumentQueryFacade, DocumentEditFacade, DocumentFacades, LayoutDiagnostics} from './facades.ts';
 export {createDocumentFacades} from '../application/facades.ts';
+export type {AuditAddress, AuditOptions, AuditProfile, AdministrativeAuditResult} from '../domain/administrative-audit.ts';
+export type {TableCellPathStep} from './types.ts';
+export {planPrintImposition,type PrintImposition} from '../domain/print-imposition.ts';
 export type {DocumentEnginePort} from '../ports/engine.ts';
 export {describeStructure} from '../application/describe-structure.ts';
 export type {EditorCommand,EditorMenu,EditorMenuItem,DocumentInteractionFacade} from './interaction.ts';
@@ -62,3 +67,7 @@ export type {AgentDocumentInformation,AgentDocumentMetadataOp} from './types.ts'
 
 export type {AgentFileContext,AgentFileOp,AgentFileReceipt} from './types.ts';
 export {agentFileKinds,validateAgentFileOperation} from '../domain/agent-file-operations.ts';
+export {DOCUMENT_CONTEXT_TEXT_LIMIT,DOCUMENT_TOOL_READ_LENGTH,DOCUMENT_TOOL_PAGE_SIZE,
+  DOCUMENT_TOOL_SECTION_LIMIT,DOCUMENT_TOOL_PARAGRAPH_LIMIT} from './document-tool-reading.ts';
+export type {DocumentToolOutline,DocumentToolWindow} from './document-tool-reading.ts';
+export {shapeFillColor,shapeFillDigest,shapeFillId} from '../domain/agent-shape-fill.ts';

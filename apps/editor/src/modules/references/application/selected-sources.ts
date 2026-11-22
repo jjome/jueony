@@ -1,4 +1,6 @@
-import type {Source,RetrievalScope,SourceChunk,RetrievalHit,RetrievalSummary,RetrievalIndex,RetrievedSource} from '../public/contracts.ts';
+import type {Source,RetrievalScope,SourceChunk,RetrievalHit,RetrievalSummary,RetrievalIndex,RetrievedSource,RetrievalMode} from '../public/contracts.ts';
+import {scoreKoreanBm25} from '../domain/korean-ranking.ts';
+import {sourceLocationsInRange,validSourceLocations} from '../domain/source-locations.ts';
 const MAX_CHUNK = 1000, MAX_RESULTS = 8, MAX_CHARACTERS = 8000, MAX_PER_SOURCE = 3;
 const stopped = (signal?: AbortSignal) => signal?.throwIfAborted();
 const normalize = (text: string) => text.normalize('NFKC').toLocaleLowerCase('ko-KR');
@@ -22,6 +24,7 @@ export async function indexSelectedSources(scope: RetrievalScope, sources: Sourc
   for (const source of [...sources].sort((a, b) => compare(a.id, b.id))) {
     stopped(signal);
     if (!source.id || seen.has(source.id) || !/^[0-9a-f]{64}$/i.test(source.sha256)) throw new Error('자료 식별자 또는 버전 hash가 올바르지 않습니다.');
+    if (source.locations!==undefined&&!validSourceLocations(source.locations,source.text.length)) throw new Error('참고 자료의 문단·셀 위치가 추출문과 일치하지 않습니다.');
     seen.add(source.id);
     const starts = [0]; for (const match of source.text.matchAll(/\r\n|\r|\n/g)) starts.push(match.index! + match[0].length);
     for (let start = 0; start < source.text.length;) {
@@ -34,8 +37,10 @@ export async function indexSelectedSources(scope: RetrievalScope, sources: Sourc
       }
       const text = source.text.slice(start, end), contentSha256 = await sha256(text);
       const id = 'chunk:' + await sha256(JSON.stringify([scope.workspaceId, scope.chatId, source.id, source.sha256, start, end, contentSha256]));
+      const locations = sourceLocationsInRange(source.locations,start,end);
       chunks.push({ ...scope, id, sourceId: source.id, name: source.name, sourceSha256: source.sha256, contentSha256,
-        start, end, startLine: lineAt(starts, start), endLine: lineAt(starts, Math.max(start, end - 1)), text, limitation: source.limitation });
+        start, end, startLine: lineAt(starts, start), endLine: lineAt(starts, Math.max(start, end - 1)), text, limitation: source.limitation,
+        ...(locations?{locations}:{}),...(source.sourceVersion?{sourceVersion:source.sourceVersion}:{}) });
       start = end;
     }
   }
@@ -56,14 +61,19 @@ function occurrences(text: string, word: string) {
   let count = 0, from = 0; while (count < 20) { const at = text.indexOf(word, from); if (at < 0) break; count++; from = at + word.length; } return count;
 }
 
-export function searchSelectedSources(index: RetrievalIndex, scope: RetrievalScope, query: string, signal?: AbortSignal): { references: RetrievedSource[]; retrieval: RetrievalSummary } {
+export function searchSelectedSources(index: RetrievalIndex, scope: RetrievalScope, query: string, signal?: AbortSignal, mode: RetrievalMode = 'lexical', indexedRanks?: ReadonlyMap<string, number>): { references: RetrievedSource[]; retrieval: RetrievalSummary } {
   verifyScope(scope); stopped(signal);
   if (index.workspaceId !== scope.workspaceId || index.chatId !== scope.chatId || index.chunks.some(chunk => chunk.workspaceId !== scope.workspaceId || chunk.chatId !== scope.chatId)) throw new Error('다른 업무 또는 채팅의 검색 자료입니다.');
   if (typeof query !== 'string' || query.length > 12000) throw new Error('검색 요청은 12,000자 이내여야 합니다.');
   const terms = queryTerms(query), content = index.chunks.map(chunk => ({ chunk, text: normalize(chunk.text), title: normalize(chunk.name) }));
   const frequencies = terms.map(([term]) => content.filter(item => item.text.includes(term) || item.title.includes(term)).length);
-  const scored = content.map(({ chunk, text, title }) => {
+  const candidate = mode === 'bm25' ? scoreKoreanBm25(index.chunks, query, signal) : undefined;
+  const scored = content.map(({ chunk, text, title }, index) => {
     stopped(signal); let score = 0;
+    if (candidate) {
+      const rank = indexedRanks?.get(chunk.id);
+      return { chunk, score: candidate[index] * (rank === undefined ? 1 : 1 + 0.1 / (1 + rank)) };
+    }
     for (let termIndex = 0; termIndex < terms.length; termIndex++) {
       const [term, weight] = terms[termIndex], frequency = frequencies[termIndex];
       if (!frequency) continue;
@@ -80,14 +90,15 @@ export function searchSelectedSources(index: RetrievalIndex, scope: RetrievalSco
     selected.push(item); perSource.set(item.chunk.sourceId, count + 1); characters += item.chunk.text.length;
   }
   stopped(signal);
-  const hits: RetrievalHit[] = selected.map(({ chunk: { text, workspaceId, chatId, limitation, ...metadata }, score }) => ({ ...metadata, score }));
+  const hits: RetrievalHit[] = selected.map(({ chunk: { text, workspaceId, chatId, limitation, sourceVersion, ...metadata }, score }) => ({ ...metadata, score }));
   const references: RetrievedSource[] = selected.map(({ chunk }) => ({
     id: chunk.id, name: `${chunk.name} · 추출문 ${chunk.startLine}–${chunk.endLine}줄`, text: chunk.text, characters: chunk.text.length,
     sha256: chunk.sourceSha256, originSourceId: chunk.sourceId, contentSha256: chunk.contentSha256,
     locator: { start: chunk.start, end: chunk.end, startLine: chunk.startLine, endLine: chunk.endLine },
-    limitation: [chunk.limitation, `선택한 원본 중 관련 구간만 전달. 위치는 추출 텍스트의 0부터 시작하는 UTF-16 [${chunk.start}, ${chunk.end}) 범위이며 한글 쪽/셀 좌표가 아닙니다. 원본 ID: ${chunk.sourceId}. 구간 SHA-256: ${chunk.contentSha256}.`].filter(Boolean).join(' '),
+    ...(chunk.locations?{locations:chunk.locations}:{}),...(chunk.sourceVersion?{sourceVersion:chunk.sourceVersion}:{}),
+    limitation: [chunk.limitation, `선택한 원본 중 관련 구간만 전달. 구간은 추출 텍스트의 UTF-16 [${chunk.start}, ${chunk.end}) 범위입니다. ${chunk.locations?'완전히 포함된 근거의 문단·셀 주소를 함께 표시합니다.':'이 구간의 문단·셀 주소는 확인되지 않았습니다.'} 원본 ID: ${chunk.sourceId}. 구간 SHA-256: ${chunk.contentSha256}.`].filter(Boolean).join(' '),
   }));
-  return { references, retrieval: { mode: 'lexical', selectedSourceCount: index.sourceCount, indexedChunkCount: index.chunks.length,
+  return { references, retrieval: { mode, selectedSourceCount: index.sourceCount, indexedChunkCount: index.chunks.length,
     matchedChunkCount: scored.length, sentCharacters: characters, totalSourceCharacters: index.sourceCharacters, hits,
-    warnings: selected.length ? ['문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다.'] : ['선택한 자료에서 관련 구간을 찾지 못했습니다. 이번 요청에는 참고 자료 본문을 전달하지 않습니다. 검색어를 구체화하거나 전체 자료 전달 모드를 사용하세요.'] } };
+    warnings: selected.length ? [mode === 'bm25' ? '한국어 키워드 기준으로 찾은 구간입니다. 실제 답의 근거인지는 원문에서 확인하세요.' : '문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다.'] : ['선택한 자료에서 관련 구간을 찾지 못했습니다. 이번 요청에는 참고 자료 본문을 전달하지 않습니다. 검색어를 구체화하거나 전체 자료 전달 모드를 사용하세요.'] } };
 }

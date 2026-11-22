@@ -4,14 +4,19 @@ import {applyPageNumberPositionN021, validatePageNumberPositionN021} from '../sr
 
 const next = Object.freeze({format: 3, position: 6, sideChar: '-'});
 
-function fixture(options: {sections?: number; exists?: boolean; story?: 'body' | 'header' | 'footnote' | 'textbox'} = {}) {
+function fixture(options: {sections?: number; section?: number; exists?: boolean; story?: 'body' | 'header' | 'footnote' | 'textbox'} = {}) {
+  const expectedSection = options.section ?? 0;
   let state = options.exists ? {...next, exists: true, paragraphIdx: 0} : {exists: false};
   let inserts = 0;
   const operations: any[] = [];
   const document = {
     getSectionCount: () => options.sections ?? 1,
-    getPageNumberPosition: () => ({ok: true, ...state}),
-    insertPageNumberPosition(_section: number, paragraph: number, json: string) {
+    getPageNumberPosition(section: number) {
+      assert.equal(section, expectedSection);
+      return {ok: true, ...state};
+    },
+    insertPageNumberPosition(section: number, paragraph: number, json: string) {
+      assert.equal(section, expectedSection);
       inserts++;
       const value = JSON.parse(json);
       state = {...value, exists: true, paragraphIdx: paragraph};
@@ -34,7 +39,7 @@ function fixture(options: {sections?: number; exists?: boolean; story?: 'body' |
       borrowDocumentHandle: () => document,
       getNoteEditInfo: () => ({ok: true, kind: 'footnote'}),
     },
-    getPosition: () => ({sectionIndex: 0, paragraphIndex: 0, charOffset: 0}),
+    getPosition: () => ({sectionIndex: expectedSection, paragraphIndex: 0, charOffset: 0}),
     getCursorPosition: () => ({isTextBox: story === 'textbox'}),
     executeOperation(operation: any) {
       operations.push(operation);
@@ -68,12 +73,19 @@ test('N021 routes one exact root-body mutation through one snapshot and verifies
   });
 });
 
-test('N021 special stories, multi-section documents and existing controls fail before snapshot', () => {
+test('N021 inserts at the current section in a multi-section body', () => {
+  const f = fixture({sections: 3, section: 1});
+  applyPageNumberPositionN021(f.input, next);
+  assert.equal(f.inserts(), 1);
+  assert.equal(f.operations.length, 1);
+});
+
+test('N021 special stories, out-of-bounds sections and existing controls fail before snapshot', () => {
   for (const options of [
     {story: 'header' as const},
     {story: 'footnote' as const},
     {story: 'textbox' as const},
-    {sections: 2},
+    {sections: 2, section: 2},
     {exists: true},
   ]) {
     const f = fixture(options);

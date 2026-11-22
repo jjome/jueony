@@ -1,0 +1,33 @@
+--- a/src/document_core/commands/section_ops.rs
++++ b/src/document_core/commands/section_ops.rs
+@@ -240,6 +240,30 @@
+             hwp3_layout,
+         );
+         self.rebuild_derived_state();
++        // The completed native row path can prove and store the freshly
++        // allocated whole table and its plain successors after moving them.
++        let profile = self.document.layout_profile();
++        if (profile.native_hwp5_layout() || profile.hwp5_origin_hwpx())
++            && !profile.hwp3_layout()
++            && self.pagination.get(left_idx).is_some_and(|allocation| {
++                matches!(allocation.pages.as_slice(), [page] if page.layout.column_areas.len() == 1)
++            })
++        {
++            let paragraphs = &self.document.sections[left_idx].paragraphs;
++            let moved = &paragraphs[left_para_idx + 1..];
++            let whole_table = |paragraph: &&Paragraph| {
++                matches!(paragraph.controls.as_slice(), [Control::Table(table)]
++                    if crate::model::native_computed_rows::valid_native_empty_host(
++                        paragraph, 0, table.outer_margin_top,
++                    ))
++            };
++            if moved.iter().filter(whole_table).count() == 1
++                && moved.iter().all(|paragraph| paragraph.controls.is_empty() || whole_table(&paragraph))
++            {
++                let eligible = (0..paragraphs.len()).map(|index| index > left_para_idx).collect();
++                self.finish_completed_native_edit(left_idx, Some(eligible));
++            }
++        }
+         Ok(
+             serde_json::json!({"ok":true,"sectionIdx":left_idx,"paraIdx":left_para_idx,
+             "charOffset":caret_offset,"pageCount":self.page_count()})

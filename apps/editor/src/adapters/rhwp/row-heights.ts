@@ -4,7 +4,7 @@ import {readEqualColumnSources} from './equal-columns.ts';
 import {nativeDocument,parsed,readStructure} from './structure.ts';
 import {assertNativeTableWritable} from './table-write-guard.ts';
 import {capturePreservationEvidence} from './preservation.ts';
-import {tableLayoutEvidence,sameTableLayout} from './table-layout-evidence.ts';
+import {assertTableSizeRoundTrip} from './table-layout-evidence.ts';
 const canonical=(v:any):any=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 const same=(a:any,b:any)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
 function frame(d:any,t:Table):{cells:any[];scale:number} {
@@ -25,7 +25,7 @@ export function readRowHeightSources(wasm:any,tables:Table[],name:string):Record
   const maxTableHeight=(page.landscape?page.width:page.height)-page.marginTop-page.marginBottom-page.marginHeader-page.marginFooter-p.outerTop-p.outerBottom-p.vertOffset;
   if(!Number.isSafeInteger(maxTableHeight)||maxTableHeight<200)throw new Error('unsupported');
   return [t.id,{editable:true,fingerprint:source.fingerprint,defaultsMm:source.defaultsMm,tableHeight:total,maxTableHeight}];
- }catch{return [t.id,{editable:false,reason:'AI 행 높이는 HWPX의 한 쪽 본문 단순 표만 지원합니다. 단일 단·왼쪽 문단 배치·일치하는 저장 행/표 높이가 필요하며 보호·병합·중첩·필드·복합 원본은 제외합니다.'}];}}));
+ }catch{return [t.id,{editable:false,reason:'AI 행 높이는 HWP·HWPX의 한 쪽 본문 단순 표만 지원합니다. 단일 단·왼쪽 문단 배치·일치하는 저장 행/표 높이가 필요하며 보호·병합·중첩·필드·복합 원본은 제외합니다.'}];}}));
 }
 /** Also called INSIDE the strict post-render transaction before history commit. */
 export function assertRowHeightResult(wasm:any,base:Snapshot,op:Extract<ControlOp,{kind:'format_table_cells'}>):void {
@@ -33,7 +33,7 @@ export function assertRowHeightResult(wasm:any,base:Snapshot,op:Extract<ControlO
  if(!after||after.rows!==t.rows||after.columns!==t.columns||after.cells.some(c=>c.properties.height!==plan.heights[c.row]))throw new Error('적용한 행의 저장 높이가 계획과 다릅니다.');
  const rendered=frame(d,after);
  for(const c of rendered.cells)if(c.row>=op.startRow&&c.row<op.startRow+op.rowCount&&Math.abs(c.h-plan.heights[c.row]*rendered.scale)>0.2)throw new Error('셀 내용·서식·안 여백 때문에 요청한 실제 행 높이를 맞출 수 없습니다. 적용하지 않습니다.');
- let reopened:any;try{reopened=new d.constructor(d.exportHwpx());if(!sameTableLayout(tableLayoutEvidence(d,t),tableLayoutEvidence(reopened,t)))throw new Error('행 높이 변경 후 저장 재열기의 실제 셀/글줄 배치가 다릅니다. 적용하지 않습니다.');}finally{reopened?.free();}
+ assertTableSizeRoundTrip(d,t,base.name,'행 높이');
 }
 export function executeRowHeights(wasm:any,base:Snapshot,op:Extract<ControlOp,{kind:'format_table_cells'}>):void {
  const plan=rowHeightPlan(op,base),d=nativeDocument(wasm),structure=readStructure(d),t=structure.tables.find(v=>v.id===op.target),source=readRowHeightSources(d,structure.tables,base.name)?.[op.target];

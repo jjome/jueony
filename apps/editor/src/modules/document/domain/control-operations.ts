@@ -10,6 +10,7 @@ import {agentSeriesRange} from './agent-table-series.ts';
 import {tableStructurePlan} from './table-structure.ts';
 import {tableSplitPlan} from './table-split.ts';
 import {tableMergePlan} from './table-merge.ts';
+import {nestedRowReshapePlan} from './nested-row-reshape.ts';
 import {rowHeightPlan} from './row-heights.ts';
 import {equalColumnsPlan,explicitColumnWidthPlan} from './equal-columns.ts';
 import {cellPaddingPlan} from './cell-padding.ts';
@@ -30,22 +31,25 @@ import {validateAgentHeaderFooter,validateAgentHeaderFooterFormat,validateAgentH
 import {validateAgentSectionMerge} from './agent-section-merge.ts';
 import {validateAgentEmptySection} from './agent-empty-section.ts';
 import {validateAgentSectionSplit} from './agent-section-split.ts';
-import type { Snapshot, Table, ControlOp, EditOp, DocumentProperties } from '../public/types.ts';
+import type { Snapshot, Table, ControlOp, EditOp } from '../public/types.ts';
 import {tableAxisKinds,controlKinds} from '../public/wire-schema.mjs';
 import {agentTabSpacingRaw,agentLineNumberSettings} from './agent-section-settings.ts';
 import {agentMasterPagePayload,assertAgentMasterKinds} from './agent-master-pages.ts';
+import {agentStoredCharacterStyle} from './agent-stored-character-style.ts';
+import {shapeFillTarget} from './agent-shape-fill.ts';
+import {agentPageBorderSections} from './agent-page-border-inclusion.ts';
+import {mm,pageProperties} from './page-setup-settings.ts';
 export {tableAxisKinds,controlKinds};
+export {mm,pageProperties} from './page-setup-settings.ts';
 const fail = (m: string): never => { throw new Error(m); };
 const object = (v: unknown): Record<string, unknown> => { if (!v || typeof v !== 'object' || Array.isArray(v)) return fail('명령 객체가 필요합니다.'); return v as Record<string, unknown>; };
 const only = (v: unknown, fields: string[]) => { if (Object.keys(object(v)).some(k => !fields.includes(k))) fail('지원하지 않는 명령 속성입니다.'); };
 const integer = (v: unknown, min: number, max: number) => { if (typeof v !== 'number' || !Number.isSafeInteger(v) || v < min || v > max) fail('대상 범위가 잘못되었습니다.'); return v as number; };
 const text = (v: unknown) => { if (typeof v !== 'string' || Array.from(v).length > 4000 || /[\u0000-\u001f\u007f]/u.test(v)) fail('셀은 제어문자 없이 4,000자 이내여야 합니다.'); return v as string; };
-export const mm = (v: number) => Math.round(v * 7200 / 25.4);
 type PropertyRule = 'boolean' | 'font' | 'color' | [number, number] | string[];
 export const charRules: Record<string, PropertyRule> = { bold: 'boolean', italic: 'boolean', underline: 'boolean', strikethrough: 'boolean', fontSizePt: [1, 200], color: 'color',fontFamily:'font',ratioPercent:[50,200],spacingPercent:[-50,50],superscript:'boolean',subscript:'boolean' };
 const paraRules: Record<string, PropertyRule> = { alignment: ['left', 'right', 'center', 'justify', 'distribute'], lineSpacingPercent: [50, 500], marginLeftMm: [0, 100], marginRightMm: [0, 100], indentMm: [-100, 100], beforeMm: [0, 100], afterMm: [0, 100], keepWithNext: 'boolean', keepLines: 'boolean', pageBreakBefore: 'boolean' };
 const cellRules: Record<string, PropertyRule> = { ...charRules, background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'],equalizeColumns:'boolean',columnWidthMm:[1,500],equalizeRows:'boolean',rowHeightMm:[1,300],paddingMode:['custom','table'],paddingLeftMm:[0,100],paddingRightMm:[0,100],paddingTopMm:[0,100],paddingBottomMm:[0,100] };
-const pageRules: Record<string, PropertyRule> = { widthMm: [20, 1000], heightMm: [20, 1000], landscape: 'boolean', marginLeftMm: [0, 300], marginRightMm: [0, 300], marginTopMm: [0, 300], marginBottomMm: [0, 300], marginHeaderMm: [0, 100], marginFooterMm: [0, 100] };
 function properties(value: unknown, rules: Record<string, PropertyRule>) {
   const v = object(value);
   only(v, Object.keys(rules)); if (!Object.keys(v).length) fail('변경할 속성이 없습니다.');
@@ -89,14 +93,6 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
    ?{...cell,properties:{...cell.properties,isHeader:cell.row<headerRows}}:cell);
  return {...table,rows,columns,cells,...(headerRows!==undefined?{headerRows}:{})};
 }
-export function pageProperties(current: DocumentProperties | undefined, props: Record<string, unknown>) {
-  const next: Record<string, unknown> = { ...current };
-  for (const [k, v] of Object.entries(props)) next[k.endsWith('Mm') ? k.slice(0, -2) : k] = k.endsWith('Mm') ? mm(v as number) : v;
-  // setPageDef stores unrotated paper dimensions; layout rotates on landscape.
-  const width = next.landscape ? next.height : next.width, height = next.landscape ? next.width : next.height;
-  if ((width as number) - (next.marginLeft as number) - (next.marginRight as number) < mm(10) || (height as number) - (next.marginTop as number) - (next.marginBottom as number) < mm(10)) fail('여백이 용지의 본문 영역을 벗어납니다.');
-  return next as DocumentProperties;
-}
 export function validateControlOperations(operations: EditOp[], snapshot: Snapshot): void {
  const insertFormula=operations.find(op=>op.kind==='insert_table_formula_field');
  if(insertFormula){if(operations.length!==1)throw Error('계산식 필드 삽입은 단독 요청으로 실행하세요.');agentFormulaInsertTarget(insertFormula,snapshot);return;}
@@ -104,6 +100,10 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
  if(formulaField){if(operations.length!==1)throw Error('계산식 필드 편집은 한 번에 하나씩 요청하세요.');agentTableFormulaTarget(formulaField,snapshot);return;}
  if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind))){if(operations.length!==1)throw Error('파일 명령은 문서 편집과 섞지 말고 단독 요청하세요.');validateAgentFileOperation(operations[0],snapshot.fileContext);return;}
  if(operations.some(op=>op.kind==='set_document_metadata')){if(operations.length!==1)throw Error('문서 요약 변경은 단독 요청으로 실행하세요.');validateAgentDocumentMetadata(operations[0],snapshot);return;}
+ const shape=operations.find(op=>op.kind==='set_shape_fill');
+ if(shape){if(operations.length!==1)throw Error('도형 채우기 색은 한 번에 한 개만 바꿀 수 있습니다.');shapeFillTarget(shape,snapshot);return;}
+ const inclusion=operations.find(op=>op.kind==='set_page_border_inclusion');
+ if(inclusion){if(operations.length!==1)throw Error('쪽 테두리 포함은 다른 편집과 분리해 요청하세요.');agentPageBorderSections(inclusion,snapshot);return;}
   const structure = snapshot.structure; if (!structure) fail('이 문서는 구조 조회 후 편집해야 합니다.');
   const tables = new Map(structure!.tables.map(t => [t.id, structuredClone(t)]));
   const pages = new Map(structure!.sections.map(s => [s.index, s.page]));
@@ -149,8 +149,8 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     if(op.kind==='replace_cell_paragraph'){only(op,['kind','target','row','column','paragraph','originalText','text','spanTexts','spanFormats']);if(operations.length!==1)fail('셀 문단 교체는 단독 요청으로 실행하세요.');cellParagraphPlan(op,snapshot);continue;}
     if(op.kind==='split_table_cell_into'){only(op,['kind','target','row','column','rows','columns','distributeParagraphs']);if(operations.length!==1)fail('임의 셀 분할은 단독 요청으로 실행하세요.');tableSubdivisionPlan(op,snapshot);continue;}
     if(op.kind==='split_table'||op.kind==='attach_table'){only(op,op.kind==='split_table'?['kind','target','atRow']:['kind','target','nextTarget']);if(operations.length!==1)fail('표 나누기·붙이기는 단독 요청으로 실행하세요.');tableStructurePlan(op,snapshot);continue;}
-    if(op.kind==='split_table_cell'){only(op,['kind','target','row','column']);if(operations.length!==1)fail('셀 기본 분할은 단독 요청으로 실행하세요.');tableSplitPlan(op,snapshot);continue;}
-    if(op.kind==='merge_table_cells'){only(op,['kind','target','startRow','startColumn','rowCount','columnCount']);if(operations.length!==1)fail('셀 병합은 단독 요청으로 실행하세요.');tableMergePlan(op,snapshot);continue;}
+    if(op.kind==='split_table_cell'){only(op,['kind','target','row','column']);if(operations.length!==1)fail('셀 기본 분할은 단독 요청으로 실행하세요.');if(!nestedRowReshapePlan(op,snapshot))tableSplitPlan(op,snapshot);continue;}
+    if(op.kind==='merge_table_cells'){only(op,['kind','target','startRow','startColumn','rowCount','columnCount']);if(operations.length!==1)fail('셀 병합은 단독 요청으로 실행하세요.');if(!nestedRowReshapePlan(op,snapshot))tableMergePlan(op,snapshot);continue;}
     if(op.kind==='set_table_header'){only(op,['kind','target','headerRows','repeatHeader','paginationMode']);if(operations.length!==1)fail('표 제목 행은 단독 명령으로 실행하세요.');validateAgentTableHeader(op,snapshot);continue;}
     if(op.kind==='set_table_pagination'){only(op,['kind','target','mode']);if(operations.length!==1)fail('표 쪽 나눔은 단독 명령으로 실행하세요.');validateAgentTablePagination(op,snapshot);continue;}
     if(op.kind==='set_next_paragraph_style'){only(op,['kind','styleId','nextStyleId']);if(operations.length!==1)fail('다음 문단 스타일 설정은 단독 명령으로 실행하세요.');validateAgentNextParagraphStyle(op,snapshot);continue;}
@@ -171,7 +171,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     if(op.kind==='set_header_footer_text'){only(op,['kind','section','story','pageKind','originalText','text']);if(operations.length!==1)fail('머리말/꼬리말 수정은 현재 단독 명령으로 실행하세요.');validateAgentHeaderFooter(op,snapshot);continue;}
     if(op.kind==='merge_sections'){only(op,['kind','rightSection']);if(operations.length!==1)fail('구역 합치기는 단독 명령으로 실행하세요. 남은 구역 편집은 후속 요청에서 지정합니다.');validateAgentSectionMerge(op,snapshot);continue;}
     if(op.kind==='remove_empty_section'){only(op,['kind','section']);if(operations.length!==1)fail('빈 구역 삭제는 단독 명령으로 실행하세요. 남은 구역의 편집은 후속 요청에서 지정합니다.');validateAgentEmptySection(op,snapshot);continue;}
-    if(op.kind==='split_section'){only(op,['kind','target','offset']);if(operations.length!==1)fail('구역 나누기는 단독 명령으로 실행하세요. 새 구역 설정은 후속 요청에서 지정합니다.');validateAgentSectionSplit(op,snapshot);continue;}
+    if(op.kind==='split_section'){only(op,['kind','target','offset','newPageSetup','newPageBorder']);if(operations.length!==1)fail('구역 나누기는 단독 명령으로 실행하세요.');validateAgentSectionSplit(op,snapshot);continue;}
     if(op.kind==='insert_body_paragraphs')continue;
     // Body commands are already validated by validateGeneration. Track their
     // resulting text so later format commands are checked at execution time.
@@ -181,7 +181,10 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     } else if (op.kind === 'format_characters' || op.kind === 'format_paragraph') {
       only(op, ['kind', 'target', 'properties']); const n = body(op.target);
       if (op.kind === 'format_characters' && !n.text) fail('빈 문단에는 글자 서식을 적용할 수 없습니다.');
-      properties(op.properties, op.kind === 'format_characters' ? charRules : paraRules);
+      if(op.kind==='format_characters'&&Object.hasOwn(object(op.properties),'storedStyle')){
+        if(operations.length!==1)fail('저장 글자 스타일은 단독 명령으로 적용하세요.');
+        agentStoredCharacterStyle(op.target,op.properties,snapshot);
+      }else properties(op.properties, op.kind === 'format_characters' ? charRules : paraRules);
     } else if(op.kind==='apply_paragraph_style'){
       only(op,['kind','target','styleId']);body(op.target);
       if(!structure!.styles?.some(style=>style.id===op.styleId&&style.type===0))fail('현재 문서의 문단 스타일 ID가 필요합니다.');
@@ -197,10 +200,19 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       assertAgentMasterKinds(snapshot.name,rest.map(p=>p.kind));current!.pages=rest;
       const changed=changedMasters.get(op.section)??new Set();changed.add(op.pageKind);changedMasters.set(op.section,changed);checkMasterStarts(op.section);
     } else if(op.kind==='set_page_background'){
-      only(op,['kind','section','pageKind','fillType','color']);integer(op.section,0,structure!.sections.length-1);
-      if(!['both','even','odd'].includes(op.pageKind)||!['none','solid'].includes(op.fillType)||typeof op.color!=='string'||!/^#[0-9a-f]{6}$/i.test(op.color))fail('쪽 배경은 양쪽·홀수·짝수 쪽의 없음·단색(#RRGGBB)만 지원합니다.');
+      const gradient=op.fillType==='gradient';
+      only(op,gradient?['kind','section','pageKind','fillType','color','endColor','angle']:['kind','section','pageKind','fillType','color']);
+      integer(op.section,0,structure!.sections.length-1);
+      if(!['both','even','odd'].includes(op.pageKind)||!['none','solid','gradient'].includes(op.fillType)||typeof op.color!=='string'||!/^#[0-9a-f]{6}$/i.test(op.color))fail('쪽 배경은 양쪽·홀수·짝수 쪽의 없음·단색·두 색 그러데이션을 지원합니다.');
+      if(gradient){
+        integer(op.angle,0,360);
+        if(typeof op.endColor!=='string'||!/^#[0-9a-f]{6}$/i.test(op.endColor)||op.endColor.toLowerCase()===op.color.toLowerCase()){
+          fail('그러데이션은 서로 다른 두 색(#RRGGBB)이 필요합니다.');
+        }
+      }
       const settings=structure!.sections.find(s=>s.index===op.section)?.pageBackgrounds;
-      if(!settings?.find(s=>s.kind===op.pageKind)?.editable)fail('이 구역의 원본 쪽 배경은 읽기 전용이거나 조회되지 않았습니다.');
+      const current=settings?.find(s=>s.kind===op.pageKind);
+      if(!(gradient?current?.gradientEditable:current?.editable))fail('이 구역의 원본 쪽 배경은 읽기 전용이거나 조회되지 않았습니다.');
     } else if(op.kind==='set_section_tabs'){
       only(op,['kind','section','spacingPt']);integer(op.section,0,structure!.sections.length-1);agentTabSpacingRaw(op.spacingPt);
       if(structure!.sections.find(s=>s.index===op.section)?.defaultTabSpacingPt===undefined)fail('기본 탭 설정을 조회한 구역이 필요합니다.');
@@ -223,7 +235,16 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       properties(op.properties,{hideHeader:'boolean',hideFooter:'boolean',hideMasterPage:'boolean',hideBorder:'boolean',hideFill:'boolean',hidePageNum:'boolean'});
     } else if (op.kind === 'set_page_setup') {
       only(op, ['kind', 'section', 'properties']); integer(op.section, 0, structure!.sections.length - 1);
-      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);checkLineNumbers(op.section);checkMasterStarts(op.section);
+      const setup=object(op.properties);
+      if(Object.hasOwn(setup,'borderIncludesHeader')||Object.hasOwn(setup,'borderIncludesFooter')){
+        properties(setup,{borderIncludesHeader:'boolean',borderIncludesFooter:'boolean'});
+        if(operations.length!==1)fail('쪽 테두리의 머리말·꼬리말 포함은 한 구역의 단독 명령으로 적용하세요.');
+        if(!structure!.sections.find(item=>item.index===op.section)?.pageBorderInclusion?.editable){
+          fail('쪽 기준이며 보존을 확인할 수 있는 테두리가 필요합니다.');
+        }
+        continue;
+      }
+      pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);checkLineNumbers(op.section);checkMasterStarts(op.section);
     } else if (op.kind === 'create_table') {
       only(op, ['kind', 'after', 'resultId', 'rows']); body(op.after);
       const section=body(op.after).section;tableSections.add(section);checkLineNumbers(section);

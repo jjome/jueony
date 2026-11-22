@@ -9,9 +9,11 @@ import {
   auditDocumentCommentsB092,
   captureCreateCommentB092,
   captureDeleteCommentB092,
+  captureUpdateCommentB092,
   readDocumentCommentsB092,
   type CommentContextB092,
 } from '../src/adapters/rhwp/document-comments-b092.ts';
+import {verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
 
 const packageRoot = process.env.JUEONY_ENGINE_PACKAGE;
 const engine = packageRoot ? await import(pathToFileURL(resolve(packageRoot, 'rhwp.js')).href) : undefined;
@@ -103,6 +105,53 @@ test('actual Rust/WASM point comment creates, queries, deletes, restores, and su
     removed.command.dispose();
   } finally { document.free(); }
 });
+
+test('updating a memo preserves its source ID, anchor, author command and the other memo in HWP and HWPX',
+  {skip: typeof HwpDocument?.prototype.updateCommentTextV1 !== 'function' && 'requires the memo update engine'}, () => {
+    const blank = HwpDocument.createEmpty();
+    try {
+      blank.createBlankDocument();
+      blank.insertText(0,0,0,'그대로 유지되는 본문');
+      const first = JSON.parse(blank.insertCommentAtCursorV1(0,0,3,'원래 내용','작성자'));
+      assert.equal(first.ok,true);
+      assert.equal(JSON.parse(blank.insertCommentAtCursorV1(0,0,8,'다른 메모','검수자')).ok,true);
+      for (const format of ['hwp','hwpx']) {
+        const exportBytes = (doc: any) => format === 'hwp' ? doc.exportHwp() : doc.exportHwpx();
+        const doc = new HwpDocument(exportBytes(blank));
+        try {
+          const original=readDocumentCommentsB092(doc)!;
+          const authorMetadata=JSON.parse(doc.getFieldList()).find((item:any)=>item.fieldId===first.fieldId).command;
+          const scope=port(doc);
+          assert.equal(JSON.parse(doc.updateCommentTextV1(first.fieldId,'stale','실패해야 함')).ok,false);
+          const capture=captureUpdateCommentB092(doc,scope,first.fieldId,'고친 내용 📝');
+          assert.equal(capture.status,'ready');
+          if(capture.status!=='ready')throw new Error('capture failed');
+          const update=applyCommentPlanB092(doc,scope,capture.plan);
+          assert.equal(update.status,'applied');
+          if(update.status!=='applied')throw new Error('update failed');
+          const proof=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
+          try{
+            const bytes=proof.takeBytes(),loss=proof.contentLoss();
+            assert.ok(verifyPreservedExport(doc,bytes,format,loss,data=>new HwpDocument(data)).checked.includes('document-memos'));
+            assert.throws(()=>verifyPreservedExport(doc,bytes,format,loss,data=>{
+              const replaced=new HwpDocument(data);
+              replaced.getCommentListV1=()=>'[]';
+              return replaced;
+            }),/document-memos/);
+          }finally{proof.free();}
+          const saved=new HwpDocument(exportBytes(doc));
+          try {
+            assert.deepEqual(readDocumentCommentsB092(saved),[{...original[0],text:'고친 내용 📝'},original[1]]);
+            assert.equal(JSON.parse(saved.getFieldList()).find((item:any)=>item.fieldId===first.fieldId).command,authorMetadata);
+            assert.equal(saved.getTextRange(0,0,0,100),'그대로 유지되는 본문');
+          } finally { saved.free(); }
+          assert.equal(update.command.undo().status,'restored');
+          assert.deepEqual(readDocumentCommentsB092(doc),original);
+          update.command.dispose();
+        } finally { doc.free(); }
+      }
+    } finally { blank.free(); }
+  });
 
 test('B092/B136 rejects protected, non-body, stale, malformed, and ranged-comment mutations without snapshots',
   {skip: !HwpDocument ? 'set JUEONY_ENGINE_PACKAGE to the freshly built Jueony engine' : false}, () => {

@@ -47,7 +47,7 @@ async function state(){return (await services()).evaluate(async()=>{
  const api=window.jueonyEditor,s=window.__sessionExpansionServices,c=s.getInputHandler().cursor;
  const bytes=s.wasm.exportHwpx(),digest=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');
  const ih=s.getInputHandler();
- return {view:api.captureDocumentView(),dirty:api.state().dirty,revision:api.revision(),digest,position:c.getPosition(),picture:c.getSelectedPictureRef(),block:c.captureCellSelection(),
+ return {view:api.captureDocumentView(),dirty:api.state().dirty,revision:api.revision(),digest,position:c.getPosition(),picture:c.getSelectedPictureRef(),pictures:c.getSelectedPictureRefs(),block:c.captureCellSelection(),
   keyboard:{active:ih.active,composing:ih.isComposing,form:ih.isFormMode(),requiresPassword:s.wasm.requiresPasswordForSave,context:window.rhwpStudio.automation.getContext(),literalEnabled:window.rhwpStudio.automation.isEnabled('ext:jueony-literal-table-tab'),hint:document.getElementById('jueony-key-hint')?.textContent,focused:document.activeElement?.getAttribute('aria-label')},
   header:c.headerFooterMode,note:c.isInFootnote(),noteRange:c.getFootnoteSelection(),headerRange:c.getHeaderFooterSelectionOrdered(),range:c.getSelection()};
  });}
@@ -68,13 +68,17 @@ async function checkpointAndReload(saved,label){
   const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,canonical(value[key])])):value;
   const same=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
   if(kind==='picture-object')return c.isInPictureObjectSelection()&&c.getSelectedPictureRef()?.ci===saved.picture.ci;
+  if(kind==='mixed-root-object-selection'||kind==='single-root-equation-selection'){
+   const keys=refs=>refs.map(({sec,ppi,ci,type})=>[sec,ppi,ci,type]);
+   return c.isInPictureObjectSelection()&&same(keys(c.getSelectedPictureRefs()),keys(saved.pictures));
+  }
   if(kind==='header-footer')return c.headerFooterMode===saved.header&&c.hfParaIdx===saved.view.cursor.caret.paragraph&&c.hfCharOffset===saved.view.cursor.caret.offset;
   if(kind==='footnote')return c.isInFootnote()&&c.fnParaIdx===saved.view.cursor.parentParagraph&&c.fnControlIdx===saved.view.cursor.control&&c.fnInnerParaIdx===saved.view.cursor.caret.paragraph&&c.fnCharOffset===saved.view.cursor.caret.offset;
   if(kind==='cells')return same(c.captureCellSelection(),saved.block);
   return same(c.getPosition(),saved.position)&&same(c.getSelection(),saved.range);
  },{timeout:20000},saved);
  const actual=await settledState();await writeFile(resolve(out,`${label}-observation.json`),JSON.stringify({saved,persisted,actual},null,2));assert.deepEqual(actual.view.cursor,saved.view.cursor,`${label}: restart changed cursor`);
- for(const key of ['position','picture','block','header','note','noteRange','headerRange','range'])assert.deepEqual(actual[key],saved[key],`${label}: real ${key} was not restored`);
+ for(const key of ['position','picture','pictures','block','header','note','noteRange','headerRange','range'])assert.deepEqual(actual[key],saved[key],`${label}: real ${key} was not restored`);
  assert.ok(Math.abs(actual.view.scrollY-saved.view.scrollY)<=1,`${label}: vertical viewport changed ${saved.view.scrollY} -> ${actual.view.scrollY}`);assert.ok(Math.abs(actual.view.scrollX-saved.view.scrollX)<=1,`${label}: horizontal viewport changed`);
  assert.equal(actual.dirty,false,`${label}: restore dirtied file`);assert.equal(actual.digest,saved.digest,`${label}: restore changed bytes`);
  await page.$eval('#request-input',e=>e.focus());const before=await state();await frame.evaluate(view=>window.jueonyEditor.restoreDocumentView(view),saved.view);
@@ -102,6 +106,16 @@ function imageFixture(){const doc=HwpDocument.createEmpty();try{
  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4AWPgmnbnPwAEpgJ8+MzEcgAAAABJRU5ErkJggg==','base64');
  const ref=parse(doc.insertPicture(0,0,1,'',png,7200,7200,1,1,'png','합성 검수'));return {bytes:doc.exportHwpx(),ref};
 }finally{doc.free();}}
+function equationImageFixture(format){
+ const doc=HwpDocument.createEmpty();
+ try{
+  doc.createBlankDocument();doc.insertText(0,0,0,'수식·그림 선택 확인');
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4AWPgmnbnPwAEpgJ8+MzEcgAAAABJRU5ErkJggg==','base64');
+  assert.equal(parse(doc.insertPicture(0,0,0,'',png,7200,7200,1,1,'png','합성 검수')).ok,true);
+  assert.equal(parse(doc.insertEquation(0,0,1,'a over b',1100,255)).ok,true);
+  return format==='hwp'?doc.exportHwp():doc.exportHwpx();
+ }finally{doc.free();}
+}
 async function nestedFixture(){const doc=HwpDocument.createEmpty();try{
  doc.createBlankDocument();doc.insertText(0,0,0,'중첩 표 확인');const ref=parse(doc.createTable(0,0,7,2,2));
  doc.insertTextInCell(0,ref.paraIdx,ref.controlIdx,0,0,0,'가😀나다라');doc.insertTextInCell(0,ref.paraIdx,ref.controlIdx,1,0,0,'다른 셀');
@@ -123,7 +137,7 @@ async function createTab(){
 }
 try{
  for(let n=0;n<100;n++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
- browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1600,height:1000}});
+ browser=await puppeteer.launch({executablePath:process.env.JUEONY_TEST_BROWSER??'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1600,height:1000}});
  page=await browser.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>pageErrors.push(String(error)));page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text());});page.on('dialog',dialog=>{dialogs.push({type:dialog.type(),message:dialog.message()});void dialog.accept();});
  await page.setRequestInterception(true);page.on('request',request=>{if(![origin,'data:','blob:'].some(prefix=>request.url().startsWith(prefix))){externalRequests.push(request.url());void request.abort();}else void request.continue();});
  await page.goto(origin);await ready();
@@ -155,6 +169,33 @@ try{
   const saved=await settledState();assert.equal(saved.view.cursor?.kind,'picture-object');await checkpointAndReload(saved,'picture');
   await assertStaleRejected(saved,ref=>{const ih=window.__sessionExpansionServices.getInputHandler();ih.cursor.exitPictureObjectSelection();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:0});ih.wasm.borrowDocumentHandle().setPictureProperties(0,ref.paraIdx,ref.controlIdx,JSON.stringify({width:14400}));ih.updateCaret();},()=>!window.__sessionExpansionServices.getInputHandler().cursor.isInPictureObjectSelection(),'picture',image.ref);
  });
+ for(const format of ['hwp','hwpx'])for(const kind of ['equation','mixed'])await scenario(`${format} root ${kind} object selection persists actual restart and rejects changed content`,async()=>{
+  const label=`root-${kind}-${format}`;
+  const frame=await openBytes(equationImageFixture(format),`session-${label}.${format}`);
+  await frame.evaluate(kind=>{
+   const s=window.__sessionExpansionServices,ih=s.getInputHandler(),c=ih.cursor;
+   const objects=JSON.parse(ih.wasm.borrowDocumentHandle().getObjects());
+   const equation=objects.find(value=>value.kind==='equation'),image=objects.find(value=>value.kind==='picture');
+   ih.selectPictureObject(0,equation.para,equation.controlIndex,'equation');
+   if(kind==='mixed'){
+    c.togglePictureObjectSelection(0,image.para,image.controlIndex,'image');
+    ih.renderPictureObjectSelection();
+    s.eventBus.emit('picture-object-selection-changed',true);
+    s.eventBus.emit('command-state-changed');
+   }
+  },kind);
+  const saved=await settledState();
+  assert.equal(saved.view.cursor?.kind,kind==='mixed'?'mixed-root-object-selection':'single-root-equation-selection');
+  assert.deepEqual(saved.pictures.map(ref=>ref.type),kind==='mixed'?['equation','image']:['equation']);
+  await checkpointAndReload(saved,label);
+  await assertStaleRejected(saved,()=>{
+   const ih=window.__sessionExpansionServices.getInputHandler();
+   ih.cursor.exitPictureObjectSelection();
+   ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:0});
+   ih.wasm.insertText(0,0,0,'변경');
+   ih.updateCaret();
+  },()=>!window.__sessionExpansionServices.getInputHandler().cursor.isInPictureObjectSelection(),label);
+ });
  for(const isHeader of [true,false])await scenario(`${isHeader?'header':'footer'} backwards selection persists target and body return across workspace restart`,async()=>{
   const label=isHeader?'header':'footer',frame=await openBytes(headerFixture(isHeader),`session-${label}.hwpx`);
   await frame.evaluate(isHeader=>{
@@ -181,8 +222,14 @@ try{
   await frame.evaluate(()=>{const ih=window.__sessionExpansionServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:2});ih.updateCaret();});
   const first=await settledState();await createTab();frame=await openBytes(bodyFixture('둘째 문서 본문'),'session-tab-second.hwpx');
   await frame.evaluate(()=>{const ih=window.__sessionExpansionServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:3});ih.updateCaret();ih.focus();});
-  const second=await settledState();await chord('Control','Tab');
-  await page.waitForFunction(()=>document.getElementById('active-document-name').textContent==='session-tab-first.hwpx');frame=await services();
+  const second=await settledState();
+  await page.bringToFront();await frame.evaluate(()=>window.jueonyEditor.focusEditor());
+  await frame.waitForFunction(()=>document.activeElement?.getAttribute('aria-label')==='문서 편집 입력');
+  await chord('Control','Tab');
+  await page.waitForFunction(()=>document.getElementById('active-document-name').textContent==='session-tab-first.hwpx').catch(async error=>{
+   const tabs=await page.$$eval('.document-tab',nodes=>nodes.map(node=>({name:node.textContent,active:node.getAttribute('aria-selected')})));
+   throw Error(`${error.message}: ${JSON.stringify({tabs,keyboard:second.keyboard,cursor:second.view.cursor})}`);
+  });frame=await services();
   assert.deepEqual((await settledState()).view.cursor,first.view.cursor);assert.equal((await state()).digest,first.digest);assert.equal((await state()).dirty,false);
   await chord('Control','Shift','Tab');await page.waitForFunction(()=>document.getElementById('active-document-name').textContent==='session-tab-second.hwpx');frame=await services();
   assert.deepEqual((await settledState()).view.cursor,second.view.cursor);assert.equal((await state()).digest,second.digest);assert.equal((await state()).dirty,false);

@@ -12,10 +12,12 @@ if ((Test-Path -LiteralPath (Join-Path $bundleRoot 'runtime/node.exe')) -and (Te
     $dist = Join-Path $appRoot 'dist'
     $serverScript = Join-Path $projectRoot 'apps/launcher/server.mjs'
     $nodePath = (Get-Command node -ErrorAction SilentlyContinue).Source
+    $portableNode = Join-Path $projectRoot '.tools/node-v24.22.3-win-x64/node.exe'
+    if (Test-Path -LiteralPath $portableNode) { $nodePath = $portableNode }
     $voltaNodes = Join-Path $env:LOCALAPPDATA 'Volta/tools/image/node'
     if (Test-Path -LiteralPath $voltaNodes) {
         $installed = Get-ChildItem -LiteralPath $voltaNodes -Directory | Where-Object { ([version]$_.Name).Major -ge 22 } | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
-        if ($installed) { $nodePath = Join-Path $installed.FullName 'node.exe' }
+        if ($installed -and -not (Test-Path -LiteralPath $portableNode)) { $nodePath = Join-Path $installed.FullName 'node.exe' }
     }
 }
 if (-not (Test-Path -LiteralPath (Join-Path $dist 'index.html'))) { throw 'scripts/Build-Jueony.ps1을 먼저 실행해 주세요.' }

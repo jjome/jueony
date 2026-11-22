@@ -1,6 +1,8 @@
 import type {Snapshot,AgentSectionSplitOp} from '../public/types.ts';
+import {pageProperties,validatePageSetup,type PageSetupSettings} from './page-setup-settings.ts';
+import {validateAgentPageBorderFlags} from './agent-page-border-inclusion.ts';
 /** The operation is isolated because inserting a section invalidates later numeric IDs. */
-export function validateAgentSectionSplit(op:AgentSectionSplitOp,snapshot:Snapshot):void {
+export function validateAgentSectionSplit(op:AgentSectionSplitOp,snapshot:Snapshot) {
  const structure=snapshot.structure,node=snapshot.nodes.find(n=>n.id===op.target);
  if(structure?.sectionSplitAvailable!==true)throw new Error('이 엔진에는 AI 구역 나누기가 없습니다.');
  if(!node?.editable)throw new Error('구역 나누기는 편집 가능한 일반 본문 문단에서 요청하세요.');
@@ -9,4 +11,8 @@ export function validateAgentSectionSplit(op:AgentSectionSplitOp,snapshot:Snapsh
  const section=structure.sections.find(s=>s.index===node.section),nodes=snapshot.nodes.filter(n=>n.section===node.section);
  if(!section||section.columns?.columnCount!==1||section.lineNumbers?.enabled||structure.tables.some(t=>t.section===node.section)||nodes.some(n=>!n.editable))throw new Error('AI 구역 나누기는 줄 번호·표·개체·복잡한 문단이 없는 한 단 일반 본문 구역부터 지원합니다.');
  for(const n of nodes){const p=structure.paragraphs.find(p=>p.id===n.id);if(!p||p.pageHide?.exists||!Array.isArray(p.controls)||p.controls.some(c=>n.paragraph!==0||!['secd','cold'].includes(c)))throw new Error('감추기·필드·특수 제어가 있는 구역은 나누지 않습니다. 원본을 유지합니다.');}
+ const newPage=Object.hasOwn(op,'newPageSetup')?validatePageSetup(pageProperties(section.page,op.newPageSetup) as PageSetupSettings):undefined;
+ const newBorder=Object.hasOwn(op,'newPageBorder')?validateAgentPageBorderFlags(op.newPageBorder):undefined;
+ if(newBorder&&!section.pageBorderInclusion?.editable)throw new Error('새 구역의 머리말·꼬리말 포함을 바꾸려면 원래 구역에 보존할 수 있는 쪽 기준 테두리가 필요합니다.');
+ return {node,section,newPage,newBorder};
 }

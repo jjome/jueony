@@ -1,6 +1,8 @@
 import {readSessionHeaderFooterStory,readSessionFootnoteStory} from './session-story.ts';
 import {captureTextBoxCursor,restoreTextBoxCursor} from './session-textbox.ts';
 import {captureObjectSelection,restoreObjectSelection} from './session-object-selection.ts';
+import {captureMixedRootSelectionN015,restoreMixedRootSelectionN015,type MixedRootSelectionSessionN015} from './object-selection-n015-mixed-root.ts';
+import {captureSingleEquationSelectionN015,restoreSingleEquationSelectionN015,type SingleEquationSelectionSessionN015} from './object-selection-n015-single-equation.ts';
 import {captureEndnoteSelection,restoreEndnoteSelection} from './session-endnote.ts';
 import {inspectRootClickHereFieldSelectionN016,restoreRootClickHereFieldSelectionN016} from './session-field-selection-n016.ts';
 import type {RestorableObjectRef} from './session-object-selection.ts';
@@ -17,6 +19,7 @@ export type SessionCursorInput = {
   restoreSessionTableObject?(ref:{sec:number;ppi:number;ci:number}):boolean;
   restoreSessionPictureObject?(ref:{sec:number;ppi:number;ci:number;type:'image'}):boolean;
   restoreSessionObjectSelection?(refs:RestorableObjectRef[]):boolean;
+  selectPictureObject?(section:number,paragraph:number,control:number,type:'equation'):void;
   restoreSessionHeaderFooter?(saved:HeaderFooterBookmark):boolean;
   restoreSessionFootnote?(saved:FootnoteBookmark):boolean;
   restoreSessionEndnoteSelection?(target:EndnoteRestoreTarget):boolean;
@@ -26,6 +29,7 @@ export type SessionCursorInput = {
     getSelectedTableRef?():{sec:number;ppi:number;ci:number;cellPath?:unknown[]}|null;
     getSelectedPictureRef?():{sec:number;ppi:number;ci:number;type:string;cellIdx?:number;cellParaIdx?:number;outerTableControlIdx?:number;cellPath?:unknown[];headerFooter?:unknown;noteRef?:unknown;missing?:boolean;pageIndex?:number}|null;
     getSelectedPictureRefs?():{sec:number;ppi:number;ci:number;type:string;cellIdx?:number;cellParaIdx?:number;outerTableControlIdx?:number;cellPath?:unknown[];headerFooter?:unknown;noteRef?:unknown;missing?:boolean;pageIndex?:number}[];
+    exitPictureObjectSelection?():void;
     isMultiPictureSelection?():boolean;
     readonly headerFooterMode?:'none'|'header'|'footer';readonly hfSectionIdx?:number;readonly hfApplyTo?:number;readonly hfParaIdx?:number;readonly hfCharOffset?:number;
     getHeaderFooterSelectionOrdered?():{start:{sectionIdx:number;isHeader:boolean;applyTo:number;paraIdx:number;charOffset:number};end:{sectionIdx:number;isHeader:boolean;applyTo:number;paraIdx:number;charOffset:number}}|null;
@@ -50,6 +54,11 @@ export type SessionCursorInput = {
     getFootnoteInfo?(section:number,parent:number,control:number):{ok:boolean;paraCount:number;totalTextLen:number;number:number;texts:string[]};
     getPageFootnoteInfo?(page:number,index:number):{ok:boolean;sectionIdx:number;paraIdx:number;controlIdx:number;sourceType:string}|null;};
 };
+
+function rootObjectAccess(input:SessionCursorInput):input is SessionCursorInput&MixedRootSelectionSessionN015&SingleEquationSelectionSessionN015{
+ return Boolean(input.restoreSessionObjectSelection&&input.selectPictureObject&&input.cursor.getSelectedPictureRefs
+  &&input.cursor.getSelectedPictureRef&&input.cursor.exitPictureObjectSelection);
+}
 const integer=(v:unknown):v is number=>Number.isSafeInteger(v)&&(v as number)>=0&&(v as number)<=2147483647;
 const hash=(value:unknown)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(value))),v=>v.toString(16).padStart(2,'0')).join('');
 function unsupported(input:SessionCursorInput){const c=input.cursor;return input.wasm.requiresPasswordForSave||c.isInHeaderFooter()||c.isInFootnote()||c.isInTextBox()||c.isInTableObjectSelection()||c.isInPictureObjectSelection();}
@@ -201,6 +210,10 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
   return;
  }
  if(input?.cursor.isInPictureObjectSelection()&&input.restoreSessionObjectSelection){
+  if(rootObjectAccess(input)){
+   const root=captureMixedRootSelectionN015(input)??captureSingleEquationSelectionN015(input);
+   if(root)return validateSessionCursor(root);
+  }
   const saved=captureObjectSelection(input);
   if(saved)return validateSessionCursor(saved);
  }
@@ -247,6 +260,14 @@ export function restoreSessionCursor(input:SessionCursorInput|undefined,value:un
  if(saved.kind==='root-clickhere-field-selection')return restoreRootClickHereFieldSelectionN016(input,saved);
  if(saved.kind==='textbox')return restoreTextBoxCursor(input,saved);
  if(saved.kind==='object-selection')return restoreObjectSelection(input,saved);
+ if(saved.kind==='mixed-root-object-selection'||saved.kind==='single-root-equation-selection'){
+  if(!rootObjectAccess(input))return false;
+  try{
+   if(saved.kind==='mixed-root-object-selection')restoreMixedRootSelectionN015(input,saved);
+   else restoreSingleEquationSelectionN015(input,saved);
+   return true;
+  }catch{return false;}
+ }
  if(saved.kind==='endnote-selection')return restoreEndnoteSelection(input,saved);
  if(saved.kind==='header-footer'||saved.kind==='footnote'){
   if(input.wasm.requiresPasswordForSave||input.cursor.isInTextBox()||input.cursor.isInTableObjectSelection()||input.cursor.isInPictureObjectSelection())return false;

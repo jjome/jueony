@@ -30,7 +30,7 @@
 | kordoc와 Node runtime | 선언 `kordoc ^3.11.0`; 실제 배포 시 고정 | gongmuwon manifest·고지 | npm 해석 버전, runner와 Node binary의 전문·재배포 조건 |
 | python-hwpx | 2.9.1 고정 | sidecar pyproject, upstream Apache-2.0 표기 | wheel의 LICENSE·NOTICE와 변경 표시 의무 |
 | Python·FastAPI·lxml·pypdf 등 | 일부 버전 범위, 일부 고정 | sidecar manifest | 실제 설치 패키지와 전이 라이브러리별 전문; Python PSF·기타 고지 |
-| WebView2 Runtime | 최종 설치본 미정 | Tauri offlineInstaller 설정 | Microsoft 배포 약관, Runtime 방식·버전·보안 업데이트 절차 |
+| WebView2 Runtime | 기관 검수용 고정 버전 `158.0.4370.33` x64 | Microsoft 서명 CAB·공식 약관·내장 제3자 고지의 해시 검증 및 별도 Windows 검수 창 실행 | 기관 서명 설치본과 보안 업데이트·재배포 절차는 확정 필요 |
 | OFL 계열 글꼴 | 파일별 선택 예정 | `assets/fonts/FONTS.md`·rhwp 고지 | 저작권·OFL 전문, 수정·subset·이름 조건, 실제 글꼴 해시 |
 | Latin Modern Math | 수식용 후보 | rhwp 고지 GUST Font License 표기 | 수식 기능 필요 여부와 GUST 조건 |
 | Cafe24·행복고딕 등 | 포함 여부 미정 | rhwp 고지의 별도 무료 배포 표기 | 무료라는 설명을 MIT로 해석하지 않고 개별 조건 확인 |

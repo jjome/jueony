@@ -45,7 +45,7 @@ try{
  if(await fetch(origin+'/api/health').then(()=>true,()=>false))throw Error('Own test port occupied');
  server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}});
  for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
- browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,userDataDir:join(out,'edge-profile'),args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1500,height:1050}});page=await browser.newPage();page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',msg=>{if(msg.type()==='error'){if(expectedFailure&&/^\[file:save(?:-as)?\]/.test(msg.text()))expectedErrors.push(msg.text());else consoleErrors.push(msg.text());}});page.on('dialog',d=>d.accept());await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});
+ browser=await puppeteer.launch({executablePath:process.env.JUEONY_TEST_BROWSER??'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,userDataDir:join(out,'edge-profile'),args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1500,height:1050}});page=await browser.newPage();page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',msg=>{if(msg.type()==='error'){if(expectedFailure&&/^\[file:save(?:-as)?\]/.test(msg.text()))expectedErrors.push(msg.text());else consoleErrors.push(msg.text());}});page.on('dialog',d=>d.accept());await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});
  for(const format of ['hwpx','hwp'])for(const name of ['auto-zero','large'])await scenario(name+' '+format+': actual SaveAs sync5181, one undo, repeat Save and exact source preservation',async()=>{
   const ctx=await open(name,format),{f}=ctx,before=await probe(f);assert.equal(before.state.dirty,false);assert.equal(before.plan.beforeHeight,name==='auto-zero'?0:9000);assert.equal(before.plan.afterHeight,5181);await installTarget(ctx);await uiSaveAs(ctx);await f.waitForFunction(()=>!window.jueonyEditor.state().dirty&&window.jueonyEditor.fileHandle()===window.__heightTarget,{timeout:25000});
   let saved=await disk(f);assert.equal(saved.writes,1);assert.equal(saved.pickers,1);assert.deepEqual(saved.source,[...ctx.bytes]);const call=saved.calls[0];assert.ok(call);assert.equal(call.result.changedTables,1);assert.equal(call.after.plan.beforeHeight,5181);assert.equal(call.after.state.dirty,true);assert.notEqual(call.after.revision,call.before.revision);assert.equal(call.after.undo,call.before.undo+1);assert.equal(call.after.top,'snapshot:jueony:save-table-frames');assert.deepEqual(call.after.cursor,before.cursor);assert.deepEqual(call.after.selection,before.selection);const first=checkRoundtrip(call.after.bytes,saved.target,format);await writeFile(join(out,name+'-'+format+'-saved.'+format),new Uint8Array(saved.target));
@@ -66,6 +66,35 @@ try{
  await scenario('OS picker AbortError writes nothing and keeps synchronized edit undoable/dirty',async()=>{
   const ctx=await open('auto-zero'),before=await probe(ctx.f);await installTarget(ctx,true);await uiSaveAs(ctx);await waitCall(ctx.f,1);await ctx.f.waitForFunction(()=>window.__heightPicker===1);await delay(250);const saved=await disk(ctx.f),after=await probe(ctx.f);assert.equal(saved.writes,0);assert.deepEqual(saved.source,[...ctx.bytes]);assert.deepEqual(saved.target,[1,2,3]);assert.equal(after.plan.beforeHeight,5181);assert.equal(after.undo,before.undo+1);assert.equal(after.state.dirty,true);assert.equal(await ctx.f.evaluate(()=>window.jueonyEditor.fileHandle()===window.__heightSource),true);observations.push({name:'picker-cancel',pickers:1,writes:0,dirty:true,historyAdded:1,sourceUnchanged:true});
  });
+ for(const format of ['hwp','hwpx']) await scenario(format+' request undo follows an absorbed save frame only after verified write',async()=>{
+  const ctx=await open('auto-zero',format),{f}=ctx,before=await probe(f);
+  const receipt=await f.evaluate(async()=>{
+   const api=window.jueonyEditor,base=api.snapshot(),node=base.nodes.find(node=>node.editable&&node.paragraph!==1);
+   if(!node)throw Error('The height fixture needs an editable ordinary paragraph');
+   const operation={kind:'format_paragraph',target:node.id,properties:{alignment:'center'}};
+   const proposal={message:'검수 문단 정렬',sourceIds:[],operations:[operation]};
+   await api.preflight(base,proposal);
+   return api.apply('verified-save-rebase',base,proposal);
+  });
+  const edit=await probe(f);assert.equal(edit.undo,before.undo+1);
+  await installTarget(ctx,true);await uiSaveAs(ctx);await waitCall(f,1);
+  await f.waitForFunction(()=>window.__heightPicker===1&&!document.querySelector('.modal-overlay'));
+  const staged=await probe(f),cancelled=await disk(f);
+  assert.equal(cancelled.calls[0].result.absorbedIntoPrevious,true);
+  assert.equal(staged.undo,edit.undo);assert.notEqual(staged.revision,edit.revision);
+  assert.deepEqual(cancelled.source,[...ctx.bytes]);assert.equal(cancelled.writes,0);
+  await assert.rejects(f.evaluate(receipt=>window.jueonyEditor.undoRequest(receipt),receipt),/버전|변경/u);
+  assert.deepEqual(await probe(f),staged);
+  await installTarget(ctx);await uiSaveAs(ctx);
+  await f.waitForFunction(()=>window.__heightWrites===1&&!window.jueonyEditor.state().dirty&&window.jueonyEditor.fileHandle()===window.__heightTarget);
+  const completed=await disk(f);assert.deepEqual(completed.source,[...ctx.bytes]);
+  checkRoundtrip(staged.bytes,completed.target,format);
+  await f.evaluate(receipt=>window.jueonyEditor.undoRequest(receipt),receipt);
+  const undone=await probe(f);assert.equal(undone.undo,before.undo);assert.deepEqual(undone.bytes,before.bytes);
+  assert.equal((await f.evaluate(()=>window.jueonyEditor.executeCommand('edit:redo'))).ok,true);
+  assert.deepEqual((await probe(f)).bytes,staged.bytes);
+  observations.push({name:'verified-request-save-boundary',format,sourceUnchanged:true,cancelledRequestUndoRefused:true,verifiedRetry:true,singleUndo:true,redoExact:true});
+ });
  await scenario('apply-then-throw fault rolls back entire live transaction before picker/writer',async()=>{
   const ctx=await open('large'),before=await probe(ctx.f);await installTarget(ctx);await ctx.f.evaluate(()=>{const d=window.__saveHeight.wasm.borrowDocumentHandle(),original=d.applyTableContentHeightPlan.bind(d);d.applyTableContentHeightPlan=(...args)=>{original(...args);throw Error('Injected save-frame post-mutation fault');};window.__restoreHeightFault=()=>{d.applyTableContentHeightPlan=original;};});const count=expectedErrors.length;expectedFailure=true;try{await uiSaveAs(ctx);for(let i=0;i<200&&expectedErrors.length===count;i++)await delay(50);assert.ok(expectedErrors.length>count,'fault must reach actual SaveAs error pipeline');assert.match(expectedErrors.at(-1),/Injected save-frame post-mutation fault/);await waitCall(ctx.f,1);}finally{expectedFailure=false;await ctx.f.evaluate(()=>window.__restoreHeightFault());}
   const after=await probe(ctx.f),saved=await disk(ctx.f);assert.deepEqual(after,before);assert.equal(saved.writes,0);assert.equal(saved.pickers,0);assert.deepEqual(saved.source,[...ctx.bytes]);assert.deepEqual(saved.target,[1,2,3]);await page.screenshot({path:join(out,'post-mutation-rollback.png')});
@@ -80,7 +109,7 @@ try{
    window.__restoreHeightFault=()=>{d[key]=original;};
   },kind);
   const count=expectedErrors.length;expectedFailure=true;
-  try{await uiSaveAs(ctx);for(let i=0;i<200&&expectedErrors.length===count;i++)await delay(50);assert.ok(expectedErrors.length>count,'fault must reach actual SaveAs error pipeline');assert.match(expectedErrors.at(-1),kind==='reader'?/Injected unexpected height-plan reader failure/:/표·본문 배치가 달라졌습니다/);await waitCall(ctx.f,1);}
+  try{await uiSaveAs(ctx);for(let i=0;i<200&&expectedErrors.length===count;i++)await delay(50);assert.ok(expectedErrors.length>count,'fault must reach actual SaveAs error pipeline');assert.match(expectedErrors.at(-1),kind==='reader'?/Injected unexpected height-plan reader failure/:/표·본문 배치가 달라졌습니다|whole-document-published-layout\/pages\/0\/controls\/controls\/0\/y/);await waitCall(ctx.f,1);}
   finally{expectedFailure=false;await ctx.f.evaluate(()=>window.__restoreHeightFault());}
   const after=await probe(ctx.f),saved=await disk(ctx.f);assert.deepEqual(after,before);assert.equal(saved.writes,0);assert.equal(saved.pickers,0);assert.deepEqual(saved.source,[...ctx.bytes]);assert.deepEqual(saved.target,[1,2,3]);
   observations.push({name:kind+'-failure',writes:0,pickers:0,liveExact:true,historyUnchanged:true,revisionUnchanged:true});

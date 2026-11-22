@@ -14,7 +14,7 @@ test('temporary attachments isolate chats/workspaces, deduplicate, remove and do
 });
 test('attachment validation rejects the entire batch for invalid format, oversize or too many files',()=>{
  const store=new TemporaryReferences(),file=new File(['a'],'a.txt');
- assert.throws(()=>store.add('w','c',[file,new File(['binary'],'b.pdf')]),/HWP/);
+ assert.throws(()=>store.add('w','c',[file,new File(['binary'],'b.exe')]),/HWP/);
  assert.equal(store.list('w','c').length,0);
  assert.throws(()=>store.add('w','c',[new File([new Uint8Array(16*1024*1024+1)],'large.hwpx')]),/16MB/);
  assert.throws(()=>store.add('w','c',Array.from({length:21},(_,i)=>new File(['a'],i+'.txt'))),/20개/);

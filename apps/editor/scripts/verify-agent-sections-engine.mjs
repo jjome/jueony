@@ -24,4 +24,32 @@ await scenario('unsupported HWP, table and multicol numbering requests leave liv
 await scenario('line disabling explicitly permits later multicolumn settings with saveable hidden numbering configuration',async()=>{const d=body();try{edit(d,'hwpx',[line()]);edit(d,'hwpx',[{...line(),enabled:false},{kind:'set_columns',section:0,count:2,spacingMm:5}]);const loaded=await saved(d,'hwpx','disable-before-columns');try{const s=snap(loaded).structure.sections[0];assert.equal(s.lineNumbers.enabled,false);assert.equal(s.columns.columnCount,2);}finally{loaded.free();}}finally{d.free();}});
 await scenario('late native failure is caught on scratch without altering live tabs, line settings or body',async()=>{const d=body();try{edit(d,'hwpx',[line()]);const before=d.exportHwpx(),s=snap(d),ops=validateEditOperations([{kind:'set_section_tabs',section:0,spacingPt:18},{...line(),startNumber:40}],s);assert.throws(()=>preflightDocumentEdit(wrapper(d,'hwpx'),copy=>{const original=copy.setLineNumberSettings.bind(copy);copy.setLineNumberSettings=(...args)=>{original(...args);throw new Error('합성 사본 실패');};executeDocumentOperations(copy,s,ops);}),/합성/);assert.deepEqual(d.exportHwpx(),before);}finally{d.free();}});
 await scenario('page margin and table changes cannot silently invalidate an enabled line-number section',async()=>{const d=body();try{edit(d,'hwpx',[line()]);const before=d.exportHwpx();for(const operations of [[{kind:'set_page_setup',section:0,properties:{marginLeftMm:4}}],[{kind:'create_table',after:'s0p1',resultId:'t',rows:[['셀']]}]])assert.throws(()=>edit(d,'hwpx',operations));assert.deepEqual(d.exportHwpx(),before);}finally{d.free();}});
+for(const format of ['hwp','hwpx'])await scenario(`${format}: selected and all existing sections retain individual page properties when only requested settings change`,async()=>{
+  const doc=body();
+  try{
+    doc.insertSectionBreak(0,1,0);
+    doc.insertSectionBreak(1,1,0);
+    for(const section of [0,1,2])doc.setPageDef(section,JSON.stringify({marginLeft:7800+section*420,marginTop:4100+section*220,landscape:false}));
+    const before=snap(doc,format),bytes=format==='hwp'?doc.exportHwp():doc.exportHwpx(),token=doc.saveSnapshot();
+    const landscape=section=>({kind:'set_page_setup',section,properties:{landscape:true}});
+    try{
+      assert.throws(()=>edit(doc,format,[landscape(0),{...landscape(2),properties:{marginLeftMm:300}}]));
+      assert.deepEqual(format==='hwp'?doc.exportHwp():doc.exportHwpx(),bytes);
+      edit(doc,format,[landscape(0),landscape(2)]);
+      const selected=snap(doc,format);
+      assert.deepEqual(selected.structure.sections[1],before.structure.sections[1]);
+      assert.deepEqual(selected.structure.sections.map(section=>section.page.landscape),[true,false,true]);
+      const all=[0,1,2].map(section=>({kind:'set_page_setup',section,properties:{marginBottomMm:22}}));
+      edit(doc,format,all);
+      const after=snap(doc,format);
+      assert.deepEqual(after.structure.sections.map(section=>section.page.marginBottom),Array(3).fill(Math.round(22*7200/25.4)));
+      assert.deepEqual(after.structure.sections.map(section=>section.page.marginLeft),before.structure.sections.map(section=>section.page.marginLeft));
+      assert.deepEqual(after.nodes,before.nodes);
+      const reopened=await saved(doc,format,'section-page-scope-'+format);
+      try{assert.deepEqual(snap(reopened,format).structure.sections,after.structure.sections);}finally{reopened.free();}
+      doc.restoreSnapshot(token);
+      assert.deepEqual(format==='hwp'?doc.exportHwp():doc.exportHwpx(),bytes);
+    }finally{doc.discardSnapshot(token);}
+  }finally{doc.free();}
+});
 await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,engine:JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),note:'Actual native engine, scoped Agent section commands and checked scratch save/reopen. HWPX numbering only; native Hancom and paid providers not used.'},null,2));if(failures.length)process.exitCode=1;

@@ -1,5 +1,7 @@
 import {assertTemplate} from '../../macros/commands.ts';
 import type { AppState } from './legacy-records.ts';
+import {validSourceLocations} from '../../modules/references/public/index.ts';
+import {parseScriptMacroB142} from '../../modules/script-macros/public/index.ts';
 
 type ObjectValue = Record<string, unknown>;
 export class WorkspaceStateError extends Error {
@@ -84,7 +86,9 @@ function structure(value: unknown, field: string): void {
       if (cell.paragraphProperties !== undefined) object(cell.paragraphProperties, field + '.tables.cells.paragraphProperties');
     });
   });
-  strings(s.unsupportedControls, field + '.unsupportedControls');
+  // Native receipts can contain an unsupported control with no readable ID.
+  const controlsField=field+'.unsupportedControls';
+  list(s.unsupportedControls,controlsField).forEach((id,index)=>text(id,`${controlsField}[${index}]`));
 }
 
 /**
@@ -104,12 +108,19 @@ export function validateAppState(value: unknown): AppState {
   const split = number(state.split, 'state.split'); if (split > 100) fail('state.split');
   if (state.agentWidth !== undefined) number(state.agentWidth, 'state.agentWidth');
   if (state.sidebarHidden !== undefined && typeof state.sidebarHidden !== 'boolean') fail('state.sidebarHidden');
-  for(const key of ['focusMode','retrieveSources','reviewBeforeApply']) if(state[key]!==undefined&&typeof state[key]!=='boolean')fail('state.'+key);
+  for(const key of ['focusMode','retrieveSources','rankedSearch','reviewBeforeApply','documentToolMode','pdfOcr']) if(state[key]!==undefined&&typeof state[key]!=='boolean')fail('state.'+key);
   const belongs = (item: ObjectValue, field: string): string => {
     const id = text(item.workspaceId, field + '.workspaceId', true);
     if (!workspaces.has(id)) fail(field + '.workspaceId'); return id;
   };
   if(state.macros!==undefined)for(const macro of records(state.macros,'macros').values()){belongs(macro,'macros');text(macro.name,'macros.name',true);number(macro.createdAt,'macros.createdAt');try{assertTemplate(macro.template);}catch{fail('macros.template');}}
+  if(state.alignmentMacros!==undefined)for(const record of records(state.alignmentMacros,'alignmentMacros').values()){
+    belongs(record,'alignmentMacros');number(record.createdAt,'alignmentMacros.createdAt');
+    try {
+      const macro=parseScriptMacroB142(text(record.json,'alignmentMacros.json'));
+      if(!/^sha256:[a-f0-9]{64}$/u.test(macro.recordedFrom.documentIdentity))fail('alignmentMacros.source');
+    }catch{fail('alignmentMacros.json');}
+  }
   let index = 0;
   for (const workspace of workspaces.values()) {
     const field = 'workspaces[' + index++ + ']';
@@ -150,26 +161,43 @@ export function validateAppState(value: unknown): AppState {
     if (run.model !== undefined) model(run.model, field + '.model');
     const sources = records(run.sources, field + '.sources');
     for (const source of sources.values()) {
-      text(source.name, field + '.sources.name'); integer(source.characters, field + '.sources.characters');
+      text(source.name, field + '.sources.name'); const characters=integer(source.characters, field + '.sources.characters');
       text(source.sha256, field + '.sources.sha256'); optionalText(source, 'limitation', field + '.sources');
+      optionalText(source,'originSourceId',field+'.sources');
+      if(source.locations!==undefined&&!validSourceLocations(source.locations,characters))fail(field+'.sources.locations');
+      if(source.sourceVersion!==undefined){
+        const version=object(source.sourceVersion,field+'.sources.sourceVersion');
+        if(version.kind!=='open-document')fail(field+'.sources.sourceVersion.kind');
+        text(version.revision,field+'.sources.sourceVersion.revision',true);
+      }
     }
     if (run.usedSourceIds !== undefined) strings(run.usedSourceIds, field + '.usedSourceIds');
     if(run.retrieval!==undefined){
-      const r=object(run.retrieval,field+'.retrieval');if(r.mode!=='lexical')fail(field+'.retrieval.mode');
+      const r=object(run.retrieval,field+'.retrieval');if(!['lexical','bm25'].includes(String(r.mode)))fail(field+'.retrieval.mode');
       for(const key of ['selectedSourceCount','indexedChunkCount','matchedChunkCount','sentCharacters','totalSourceCharacters'])integer(r[key],field+'.retrieval.'+key);
       strings(r.warnings,field+'.retrieval.warnings');
-      for(const raw of list(r.hits,field+'.retrieval.hits')){const hit=object(raw,field+'.retrieval.hits');for(const key of ['id','sourceId','name','sourceSha256','contentSha256'])text(hit[key],field+'.retrieval.hits.'+key,true);for(const key of ['start','end','startLine','endLine'])integer(hit[key],field+'.retrieval.hits.'+key);number(hit.score,field+'.retrieval.hits.score');}
+      for(const raw of list(r.hits,field+'.retrieval.hits')){const hit=object(raw,field+'.retrieval.hits');for(const key of ['id','sourceId','name','sourceSha256','contentSha256'])text(hit[key],field+'.retrieval.hits.'+key,true);const start=integer(hit.start,field+'.retrieval.hits.start'),end=integer(hit.end,field+'.retrieval.hits.end');for(const key of ['startLine','endLine'])integer(hit[key],field+'.retrieval.hits.'+key);number(hit.score,field+'.retrieval.hits.score');if(hit.locations!==undefined&&!validSourceLocations(hit.locations,end-start))fail(field+'.retrieval.hits.locations');}
     }
     if(run.events!==undefined){
       const events=list(run.events,field+'.events');if(events.length>40)fail(field+'.events');
       for(const raw of events){const event=object(raw,field+'.events');if(!['generating','reviewing','validated','ready','applying','completed','stopped'].includes(text(event.phase,field+'.events.phase')))fail(field+'.events.phase');for(const key of ['call','maxCalls','elapsedMs'])number(event[key],field+'.events.'+key);}
     }
     if(run.macroTemplate!==undefined){try{assertTemplate(run.macroTemplate);}catch{fail(field+'.macroTemplate');}}
+    if(run.undoneAt!==undefined)number(run.undoneAt,field+'.undoneAt');
     if (run.receipt !== undefined) {
       const receipt = object(run.receipt, field + '.receipt');
       if (receipt.runId !== run.id) fail(field + '.receipt.runId');
       for (const key of ['beforeRevision', 'afterRevision', 'before', 'after']) text(receipt[key], field + '.receipt.' + key);
       integer(receipt.operationCount, field + '.receipt.operationCount');
+      if(receipt.sectionSplit!==undefined){
+        const split=object(receipt.sectionSplit,field+'.receipt.sectionSplit');
+        integer(split.sourceSection,field+'.receipt.sectionSplit.sourceSection');
+      }
+      if(receipt.sectionRemoval!==undefined){
+        const removal=object(receipt.sectionRemoval,field+'.receipt.sectionRemoval');
+        integer(removal.removedSection,field+'.receipt.sectionRemoval.removedSection');
+        if(removal.reason!=='merge'&&removal.reason!=='empty')fail(field+'.receipt.sectionRemoval.reason');
+      }
       if (receipt.beforeStructure !== undefined) structure(receipt.beforeStructure, field + '.receipt.beforeStructure');
       if (receipt.afterStructure !== undefined) structure(receipt.afterStructure, field + '.receipt.afterStructure');
     }

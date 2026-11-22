@@ -1,0 +1,12 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2634,6 +2634,9 @@
+         if merged && (updated.common.width, updated.common.height) != expected { return Err(invalid()); }
+         *self.resolve_table_mut_by_cell_path(section, root_para, path)? = updated;
+         self.document.sections[section].raw_stream = None;
++        // A child grid change can shrink the owning row. Its previous height
++        // is a text-edit floor, rather than a constraint for this operation.
++        self.invalidate_table_geometry_measurement(section, root_para, path[0].0);
+         self.recompose_section(section);
+         self.paginate_if_needed();
+         Ok(r#"{"ok":true}"#.into())

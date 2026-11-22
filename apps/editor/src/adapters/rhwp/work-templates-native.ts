@@ -1,4 +1,4 @@
-import { readWorkTemplate, type WorkTemplateId } from '../../modules/document/public/work-templates.ts';
+import { readWorkTemplate, type WorkTemplateId, type WorkTemplateValues } from '../../modules/document/public/work-templates.ts';
 import { verifyPreservedExport } from './preservation.ts';
 const parsed = (value: any): any => typeof value === 'string' ? JSON.parse(value) : value;
 const raw = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
@@ -8,8 +8,8 @@ export function canApplyWorkTemplate(wasm: any): boolean {
   return doc.getSectionCount() === 1 && doc.getParagraphCount(0) === 1 && doc.getParagraphLength(0, 0) === 0 && parsed(doc.getControls()).every((control: any) => ['secd', 'cold'].includes(control.ctrlId));
 }
 /** Writes only into a verified empty live document through the caller's snapshot router. */
-export function applyWorkTemplate(wasm: any, id: WorkTemplateId): void {
-  const doc = raw(wasm), template = readWorkTemplate(id); if (!canApplyWorkTemplate(doc)) throw new Error('새 빈 문서를 연 뒤 업무 양식을 넣으세요. 기존 내용은 덮어쓰지 않았습니다.');
+export function applyWorkTemplate(wasm: any, id: WorkTemplateId, values?: WorkTemplateValues): void {
+  const doc = raw(wasm), template = readWorkTemplate(id, values); if (!canApplyWorkTemplate(doc)) throw new Error('새 빈 문서를 연 뒤 업무 양식을 넣으세요. 기존 내용은 덮어쓰지 않았습니다.');
   const styles = parsed(doc.getStyleList()), base = parsed(doc.getStyleAt(0, 0)).id, baseStyle = styles.find((style: any) => style.id === base);
   const add = (name: string, size: number, alignment: string) => {
     let unique = name, count = 1; while (parsed(doc.getStyleList()).some((style: any) => style.name === unique)) unique = name + ' ' + count++;
@@ -23,8 +23,27 @@ export function applyWorkTemplate(wasm: any, id: WorkTemplateId): void {
     template.table.forEach((row, r) => row.forEach((text, c) => { const cell = r * row.length + c; checked(doc.insertTextInCell(0, table.paraIdx, table.controlIdx, cell, 0, 0, text)); if (r === 0) checked(doc.applyCharFormatInCell(0, table.paraIdx, table.controlIdx, cell, 0, 0, Array.from(text).length, JSON.stringify({ bold: true }))); }));
   }
 }
-export function preflightWorkTemplate(wasm: any, id: WorkTemplateId): void {
+export function preflightWorkTemplate(wasm: any, id: WorkTemplateId, values?: WorkTemplateValues): void {
   const { HwpDocument } = wasm.getWasmModuleExports(), format = /\.hwpx$/iu.test(wasm.fileName) ? 'hwpx' : 'hwp', open = (bytes: Uint8Array) => new HwpDocument(bytes);
-  const save = (doc: any) => { const artifact = doc[format === 'hwpx' ? 'exportHwpxWithReport' : 'exportHwpWithReport'](); try { const loss = artifact.contentLoss(), bytes = artifact.takeBytes(); verifyPreservedExport(doc, bytes, format, loss, open); return bytes; } finally { artifact.free(); } };
-  let scratch: any; try { scratch = open(save(raw(wasm))); applyWorkTemplate(scratch, id); save(scratch); } finally { scratch?.free(); }
+  const scratch = open(exportTemplate(raw(wasm),format,open));
+  try { applyWorkTemplate(scratch,id,values); exportTemplate(scratch,format,open); }
+  finally { scratch.free(); }
+}
+
+function exportTemplate(doc: any, format: 'hwp' | 'hwpx', open: (bytes: Uint8Array) => any): Uint8Array {
+  const artifact = format === 'hwpx' ? doc.exportHwpxWithReport() : doc.exportHwpWithReport();
+  try {
+    const bytes = artifact.takeBytes();
+    verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),open);
+    return bytes;
+  } finally { artifact.free(); }
+}
+
+export function createWorkTemplateCopy(HwpDocument: any, id: WorkTemplateId, values: WorkTemplateValues): Uint8Array {
+  const scratch = HwpDocument.createEmpty();
+  try {
+    scratch.createBlankDocument();
+    applyWorkTemplate(scratch,id,values);
+    return exportTemplate(scratch,'hwpx',bytes=>new HwpDocument(bytes));
+  } finally { scratch.free(); }
 }

@@ -6,21 +6,21 @@
 
 ## 진행 요약
 
-실행 작업 **10개**, 상위 범위 **0개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **11개**, 상위 범위 **0개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 5/10 · 부분 2 · 미구현 3 | — 상위 범위 없음 |
-| 검증 | 완료 4/10 · 부분 1 · 미검증 5 | — 상위 범위 없음 |
-| Agent 연결 | 연결 1/6 · 부분 0 · 미연결 5 · 해당 없음 4 | — 상위 범위 없음 |
+| 구현 | 완료 7/11 · 부분 4 | — 상위 범위 없음 |
+| 검증 | 완료 6/11 · 부분 5 | — 상위 범위 없음 |
+| Agent 연결 | 연결 5/7 · 부분 2 · 해당 없음 4 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
 ## 먼저 할 일
 
-- **구현** [N033](<03-references-and-rag.md#n033>) **검색 순위·구본 우선 문제와 무답 판별** — IU02-A: 고정21파일·22질문에서 한국어 토큰화·현재/구본 권위·무답 판별 비교; top1·MRR 개선·recall8 비하락·무답 오탐 감소 후 채택
-- **구현** [N034](<03-references-and-rag.md#n034>) **표 숫자·셀/문단 좌표 기반 출처** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N037](<03-references-and-rag.md#n037>) **실제 모델의 근거·인용·prompt injection 평가** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N033](<03-references-and-rag.md#n033>) **검색 순위·구본 우선 문제와 무답 판별** — 합성 21파일·22질문에서 BM25 첫 출처 적중 18/18, 무답 오탐 0/4를 확인했다. Chrome에서 현행 예산·착수일·회의록의 첫 출처와 선택 밖 사업의 빈 결과를 확인했다. 실제 읽기 전용 조회 도구에서 로컬 Qwen이 2차 예산 48,000,000원을 올바른 출처로 답했고 선택 밖 사업에는 근거가 없다고 답했다. 운영 모델과 더 넓은 코퍼스는 남았다.
+- **구현** [N034](<03-references-and-rag.md#n034>) **표 숫자·셀/문단 좌표 기반 출처** — Chrome에서 HWP·HWPX의 중첩 표 중복 금액을 정확한 인용 셀로 열고 원본 바이트를 대조했다. 로컬 Qwen은 이름으로 지정한 Excel 시트의 C2, PDF 쪽 및 Word 본문 문단을 조회했고 Jueony는 주소와 추출값을 표시했다. 복합 제어와 운영 모델 인용 평가는 남았다.
+- **구현** [N037](<03-references-and-rag.md#n037>) **실제 모델의 근거·인용·prompt injection 평가** — 문서 조회는 기본 읽기 전용이고 출처가 있는 편집은 변경 검토를 거친다. Chrome에서 로컬 Qwen이 본문의 사업비와 첨부 자료 한 건의 번호를 확인했다. 자료 조회 도구를 명시한 질문에서는 두 합성 첨부의 승인번호와 출처를 각각 반환했다. 실행 묶음에서 같은 질문을 반복하자 번호와 출처는 맞았지만 자료의 무관한 문구를 함께 답했다. 편집 중인 문서와 첨부 원본은 유지됐다. 답변 재현성과 운영 모델의 답변·편집 제안 평가가 남았다.
 
 ## 기능별 작업표
 
@@ -37,7 +37,7 @@
 | --- | --- | --- | --- | --- |
 | [G009](<03-references-and-rag.md#g009>) · 작업 | 폴더 없이 참고 파일 첨부 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G010](<03-references-and-rag.md#g010>) · 작업 | 임시 자료의 업무·채팅 격리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G011](<03-references-and-rag.md#g011>) · 작업 | 자료 원본을 모델 시스템 명령과 분리 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G011](<03-references-and-rag.md#g011>) · 작업 | 자료 원본을 모델 시스템 명령과 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-2"></a>
 
@@ -47,11 +47,12 @@
 | --- | --- | --- | --- | --- |
 | [G084](<03-references-and-rag.md#g084>) · 작업 | 명시한 자료의 메모리 문자열 검색 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G085](<03-references-and-rag.md#g085>) · 작업 | 검색 코퍼스 21파일·정답 질문 22개 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [N033](<03-references-and-rag.md#n033>) · 작업 | 검색 순위·구본 우선 문제와 무답 판별 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [N034](<03-references-and-rag.md#n034>) · 작업 | 표 숫자·셀/문단 좌표 기반 출처 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N035](<03-references-and-rag.md#n035>) · 작업 | 로컬 상시 증분 자료 색인 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N036](<03-references-and-rag.md#n036>) · 작업 | BM25·임베딩·hybrid 검색 비교 실험 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N037](<03-references-and-rag.md#n037>) · 작업 | 실제 모델의 근거·인용·prompt injection 평가 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [N033](<03-references-and-rag.md#n033>) · 작업 | 검색 순위·구본 우선 문제와 무답 판별 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [N034](<03-references-and-rag.md#n034>) · 작업 | 표 숫자·셀/문단 좌표 기반 출처 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [N035](<03-references-and-rag.md#n035>) · 작업 | 로컬 상시 증분 자료 색인 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
+| [N036](<03-references-and-rag.md#n036>) · 작업 | BM25·임베딩·hybrid 검색 비교 실험 | ☑ 완료 | ◐ 부분 | ◐ 부분 |
+| [N037](<03-references-and-rag.md#n037>) · 작업 | 실제 모델의 근거·인용·prompt injection 평가 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [G126](<03-references-and-rag.md#g126>) · 작업 | PDF·Word·Excel 참고 자료 추출 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 
 ## 항목별 완료조건·근거
 
@@ -87,12 +88,12 @@
 <summary>G011 · 자료 원본을 모델 시스템 명령과 분리</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
-- 완료 범위: 명시적 자료 입력 경계; 공격 모델 평가 별도
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [context.ts](<../../apps/editor/src/modules/agent/application/context.ts>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 다섯 연결 방식의 자료 본문·파일 이름·조회 결과를 시스템 메시지와 분리; 모델 답변 품질은 N037에서 검증
+- 다음 작업: 공급자 변경 시 전체 자료 전달과 조회 결과의 메시지 형식 회귀 검사
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [context.ts](<../../apps/editor/src/modules/agent/application/context.ts>) · [expanded-model-tools.test.mjs](<../../apps/launcher/tests/expanded-model-tools.test.mjs>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `PROVIDER_WIRE_REFERENCE_DATA_BOUNDARY_PASS_2026_11_22`
 
 </details>
 
@@ -126,12 +127,12 @@
 <summary>N033 · 검색 순위·구본 우선 문제와 무답 판별</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 정답 근거 top1·최신 개정·no-answer 지표와 회귀
-- 다음 작업: IU02-A: 고정21파일·22질문에서 한국어 토큰화·현재/구본 권위·무답 판별 비교; top1·MRR 개선·recall8 비하락·무답 오탐 감소 후 채택
-- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 합성 21파일·22질문에서 BM25 첫 출처 적중 18/18, 무답 오탐 0/4를 확인했다. Chrome에서 현행 예산·착수일·회의록의 첫 출처와 선택 밖 사업의 빈 결과를 확인했다. 실제 읽기 전용 조회 도구에서 로컬 Qwen이 2차 예산 48,000,000원을 올바른 출처로 답했고 선택 밖 사업에는 근거가 없다고 답했다. 운영 모델과 더 넓은 코퍼스는 남았다.
+- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>) · [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_IEUM_IMPLEMENTATION_2026_11_21`
 
 </details>
 
@@ -139,12 +140,12 @@
 <summary>N034 · 표 숫자·셀/문단 좌표 기반 출처</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 합계·날짜·단위·근거 위치와 원본 열기 검증
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 일반 HWP/HWPX 본문·평면 표와 XLSX의 실제 근거 주소, 날짜·금액·단위와 원본 열기 보호.
+- 다음 작업: Chrome에서 HWP·HWPX의 중첩 표 중복 금액을 정확한 인용 셀로 열고 원본 바이트를 대조했다. 로컬 Qwen은 이름으로 지정한 Excel 시트의 C2, PDF 쪽 및 Word 본문 문단을 조회했고 Jueony는 주소와 추출값을 표시했다. 복합 제어와 운영 모델 인용 평가는 남았다.
+- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [reference-locations.test.ts](<../../apps/editor/tests/reference-locations.test.ts>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [reference-locations.ts](<../../apps/editor/src/adapters/rhwp/reference-locations.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -152,12 +153,12 @@
 <summary>N035 · 로컬 상시 증분 자료 색인</summary>
 
 - 종류: 실행 작업 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 폴더 변경/삭제·권한·업무 범위·hash·취소·비활성 정책
-- 다음 작업: IU02-B: IU02-A 비교 후 호스트 저장 Port·SQLite FTS5 증분 색인 연결; 실제 런타임·재시작·변경/삭제·권한 해제·취소·업무/채팅 격리 검증
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 앱에서 파일 지문을 단위로 증분 갱신한다. Windows에서 파일 이동·삭제·폴더 권한 차단 시 영향을 받은 자료만 색인에서 빼고 나머지 선택 자료는 유지했다. 파일 크기와 수정 시간이 같은 변경 및 권한 복구를 반영했다. 실행기 재시작 후 SQLite 기록을 재사용하고 채팅에 최신 선택 자료만 전달했다. 운영체제 수준 백그라운드 색인이 남았다.
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>) · [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [reference-locations.test.ts](<../../apps/editor/tests/reference-locations.test.ts>) · [reference-index-refresh.test.ts](<../../apps/editor/tests/reference-index-refresh.test.ts>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [verify-windows-reference-index.mjs](<../../apps/editor/scripts/verify-windows-reference-index.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21;WINDOWS_IN_APP_SELECTIVE_FTS_REFRESH_VERIFIED_2026_11_22`
 
 </details>
 
@@ -165,12 +166,12 @@
 <summary>N036 · BM25·임베딩·hybrid 검색 비교 실험</summary>
 
 - 종류: 실행 작업 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 현재 baseline 대비 품질·속도·폐쇄망 모델 자산 검증 후 채택
-- 다음 작업: IU02-A: 기존 lexical과 이음 한국어 토큰화·BM25를 같은 추출·scope에서 비교; 순위·무답·지연·자원 지표 기록, 임베딩/hybrid는 별도 실험
-- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 같은 자료로 BM25·다국어 E5·결합 검색을 비교했다. 정답 출처 1위 12/18·11/18·14/18, 무답 오탐 1/4·4/4·1/4를 기록했다. 앱 기본 검색은 BM25를 유지하며 기관 자료·장비와 배포 검증이 남았다.
+- 근거: [22-agent-retrieval-execution-design.md](<../22-agent-retrieval-execution-design.md>) · [144-ieumoffice-reuse-plan.md](<../144-ieumoffice-reuse-plan.md>) · [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [evaluate-rag-embeddings.py](<../../scripts/evaluate-rag-embeddings.py>) · [embedding-comparison.json](<../evidence/checklist-completion-2026-11-21/embedding-comparison.json>)
+- 원래 기록: `SCOPED_IEUM_IMPLEMENTATION_2026_11_21;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -178,12 +179,25 @@
 <summary>N037 · 실제 모델의 근거·인용·prompt injection 평가</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 문서 지시문을 권한으로 취급하지 않음·업무 경계·무답
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 다음 작업: 문서 조회는 기본 읽기 전용이고 출처가 있는 편집은 변경 검토를 거친다. Chrome에서 로컬 Qwen이 본문의 사업비와 첨부 자료 한 건의 번호를 확인했다. 자료 조회 도구를 명시한 질문에서는 두 합성 첨부의 승인번호와 출처를 각각 반환했다. 실행 묶음에서 같은 질문을 반복하자 번호와 출처는 맞았지만 자료의 무관한 문구를 함께 답했다. 편집 중인 문서와 첨부 원본은 유지됐다. 답변 재현성과 운영 모델의 답변·편집 제안 평가가 남았다.
+- 근거: [45-rag-evaluation-corpus.md](<../45-rag-evaluation-corpus.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [verify-local-model.mjs](<../../apps/editor/scripts/verify-local-model.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [reference-change-review.ts](<../../apps/editor/src/ui/reference-change-review.ts>) · [agent-flow.test.ts](<../../apps/editor/tests/agent-flow.test.ts>) · [agent-file-save.test.ts](<../../apps/editor/tests/agent-file-save.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_CHECKLIST_COMPLETION_2026_11_21;LOCAL_TWO_REFERENCE_CITATIONS_VERIFIED_RESPONSE_FILTERING_INCONSISTENT_2026_11_22`
+
+</details>
+
+<details id="g126">
+<summary>G126 · PDF·Word·Excel 참고 자료 추출</summary>
+
+- 종류: 실행 작업 · 우선순위: P2.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 디지털 PDF 텍스트 및 선택형 로컬 OCR, DOCX 본문·표, XLSX 보이는 시트의 셀 주소·저장 값.
+- 다음 작업: Chrome에서 PDF·Word·Excel 추출과 작은 스캔의 로컬 OCR을 확인했다. 로컬 Qwen이 디지털 PDF의 쪽, Word 본문의 문단, Excel 시트의 셀을 조회했다. 출처를 열어 같은 내용과 변경되지 않은 원본을 확인했다. 복합 문서 인식 품질과 운영 모델 평가는 별도다.
+- 근거: [145-ieumoffice-implementation.md](<../145-ieumoffice-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

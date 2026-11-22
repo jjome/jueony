@@ -59,6 +59,24 @@ function normalized(value:Json):Json {
 const signature=(value:Json)=>JSON.stringify(normalized(value));
 const bytesHash=(bytes:Uint8Array)=>Array.from(sha256(bytes),v=>v.toString(16).padStart(2,'0')).join('');
 
+function captureMemoExportEvidence(doc:NativeDocument,evidence:PreservationEvidence):void {
+ try {
+  const raw=invoke(doc,'getCommentListV1');
+  if(typeof raw==='string'&&raw.length>1_000_000)throw new Error('Memo evidence limit');
+  const comments=array((typeof raw==='string'?JSON.parse(raw):raw) as Json).map(record);
+  if(comments.length>10_000)throw new Error('Memo count limit');
+  const ids=new Set<number>();
+  for(const memo of comments){
+   const id=integer(memo.fieldId),location=record(memo.location);
+   if(ids.has(id)||typeof memo.text!=='string'||typeof memo.author!=='string')throw new Error('Invalid memo evidence');
+   ids.add(id);
+   integer(location.sectionIndex);integer(location.paraIndex);integer(memo.memoIndex);
+   integer(memo.startCharIdx);integer(memo.endCharIdx);
+  }
+  evidence.values['document-memos']=comments.sort((a,b)=>integer(a.fieldId)-integer(b.fieldId));
+ }catch{evidence.issues.push({code:'unreadable',path:'document-memos',message:'저장 전후의 메모 본문과 앵커를 확인하지 못했습니다'});}
+}
+
 export function capturePreservationEvidence(value:NativeDocument):PreservationEvidence {
  const doc=native(value),values:Record<string,Json>={},issues:PreservationIssue[]=[],unverified=[...UNVERIFIED];
  let paragraphs=0,runs=0,assetBytes=0;
@@ -250,12 +268,19 @@ export function comparePreservationEvidence(before:PreservationEvidence,after:Pr
 /** Call before any disk/download/recovery commit, and for each AI edited clone before applying it. */
 export function verifyPreservedExport(source:NativeDocument,bytes:Uint8Array,format:Format,contentLoss:unknown,open:(bytes:Uint8Array)=>NativeDocument & {free():void}):PreservationReport {
  const sourceHandle=native(source),before=capturePreservationEvidence(sourceHandle);
+ const hasMemoApi=typeof (sourceHandle as Record<string,unknown>).getCommentListV1==='function';
+ if(hasMemoApi)captureMemoExportEvidence(sourceHandle,before);
  // Every proof stage shares the same ownership check. An injected factory may
  // return a different handle each time; no stage may receive/free the live one.
  const guardedOpen:typeof open=bytes=>{const result=open(bytes);if(result===source||result===sourceHandle||native(result)===sourceHandle)throw new Error('source alias');return result;};
  let reopened:ReturnType<typeof open>|undefined,safeToFree=false;
  let after:PreservationEvidence;
- try{if(!bytes.length)throw new Error('empty');reopened=guardedOpen(bytes);const reopenedHandle=native(reopened);safeToFree=true;after=capturePreservationEvidence(reopenedHandle);}
+ try{
+  if(!bytes.length)throw new Error('empty');
+  reopened=guardedOpen(bytes);const reopenedHandle=native(reopened);safeToFree=true;
+  after=capturePreservationEvidence(reopenedHandle);
+  if(hasMemoApi)captureMemoExportEvidence(reopenedHandle,after);
+ }
  catch{after={values:{},unverified:[],issues:[{code:'unreadable',path:'reopen',message:'저장 사본을 다시 열지 못했습니다'}]};}
  finally{if(safeToFree)reopened?.free();}
  const report=comparePreservationEvidence(before,after,format,contentLoss);

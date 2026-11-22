@@ -11,16 +11,10 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **4/4** · 부분 0 | — 상위 범위 없음 |
-| 검증 | 완료 0/4 · 부분 4 | — 상위 범위 없음 |
+| 검증 | 완료 🟢 **4/4** · 부분 0 | — 상위 범위 없음 |
 | Agent 연결 | 해당 없음 4 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
-
-## 먼저 할 일
-
-- **검증** [G005](<01-workspaces.md#g005>) **업무 생성·전환·이름 변경** — 기록된 범위 유지·관련 변경 시 회귀 검사
-- **검증** [G006](<01-workspaces.md#g006>) **업무별 독립 채팅 생성·전환·이름 변경** — 기록된 범위 유지·관련 변경 시 회귀 검사
-- **검증** [G007](<01-workspaces.md#g007>) **여러 로컬 폴더 연결과 계층 트리** — 기록된 범위 유지·관련 변경 시 회귀 검사
 
 ## 기능별 작업표
 
@@ -34,10 +28,10 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [G005](<01-workspaces.md#g005>) · 작업 | 업무 생성·전환·이름 변경 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [G006](<01-workspaces.md#g006>) · 작업 | 업무별 독립 채팅 생성·전환·이름 변경 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [G007](<01-workspaces.md#g007>) · 작업 | 여러 로컬 폴더 연결과 계층 트리 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [G008](<01-workspaces.md#g008>) · 작업 | 폴더 연결 해제 시 원본 유지 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G005](<01-workspaces.md#g005>) · 작업 | 업무 생성·전환·이름 변경 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G006](<01-workspaces.md#g006>) · 작업 | 업무별 독립 채팅 생성·전환·이름 변경 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G007](<01-workspaces.md#g007>) · 작업 | 여러 로컬 폴더 연결과 계층 트리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G008](<01-workspaces.md#g008>) · 작업 | 폴더 연결 해제 시 원본 유지 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 
@@ -47,12 +41,12 @@
 <summary>G005 · 업무 생성·전환·이름 변경</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
-- 완료 범위: 업무별 독립 데이터와 선택 UI; 최초 통합 표본 범위
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 업무별 독립 데이터와 선택 UI; Chrome에서 전환·재열기와 이전 업무 저장 실패 후 보존을 확인
+- 다음 작업: 관련 변경 시 업무 전환·저장 실패 회귀 검사
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `CHROME_WORKSPACE_SWITCH_RENAME_AND_FAILED_CHECKPOINT_PASS_2026_11_22`
 
 </details>
 
@@ -60,12 +54,12 @@
 <summary>G006 · 업무별 독립 채팅 생성·전환·이름 변경</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
-- 완료 범위: 채팅별 메시지·실행 이력 분리
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 채팅별 메시지·실행 이력 분리; Chrome에서 비활성 채팅을 두 번 눌러 이름을 바꾸고 재열기 확인
+- 다음 작업: 관련 변경 시 채팅 전환과 실행 이력 회귀 검사
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `CHROME_CHAT_RENAME_HISTORY_AND_RELOAD_PASS_2026_11_22`
 
 </details>
 
@@ -73,12 +67,12 @@
 <summary>G007 · 여러 로컬 폴더 연결과 계층 트리</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
-- 완료 범위: 원본 복사/이동 없는 연결 방식
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 원본 복사·이동 없는 읽기 전용 연결; Chrome 검수용 폴더 두 개·하위 폴더·중복 차단·업무별 분리 확인
+- 다음 작업: 관련 변경 시 폴더 연결과 계층 표시 회귀 검사
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `CHROME_READ_ONLY_MULTI_FOLDER_TREE_AND_WORKSPACE_ISOLATION_PASS_2026_11_22`
 
 </details>
 
@@ -86,12 +80,12 @@
 <summary>G008 · 폴더 연결 해제 시 원본 유지</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
-- 완료 범위: 해제 처리 구현; OS 권한·이동 종합 검증 추가
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 실제 Windows 검수 폴더의 이동과 읽기 권한 차단 후 연결 해제·원본 바이트 보존·재실행 확인. 설정 저장 실패 시 연결 상태 유지
+- 다음 작업: 관련 변경 시 Windows 폴더 이동·권한 차단·연결 상태 저장·원본 보존 검사
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-windows-folder-unlink.mjs](<../../apps/editor/scripts/verify-windows-folder-unlink.mjs>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `WINDOWS_DIRECTORY_MOVE_ACL_AND_UNLINK_PERSISTENCE_PASS_2026_11_22`
 
 </details>
 

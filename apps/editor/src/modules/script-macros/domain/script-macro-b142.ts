@@ -1,5 +1,6 @@
 export const SCRIPT_MACRO_B142_SCHEMA = 'jueony.script-macro' as const;
 export const SCRIPT_MACRO_B142_VERSION = 1 as const;
+export const SCRIPT_MACRO_BODY_TEXT_COMMAND = 'edit:body-text' as const;
 
 export const SCRIPT_MACRO_B142_LIMITS = Object.freeze({
   maximumSteps: 64,

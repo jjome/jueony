@@ -22,6 +22,17 @@ export type RestorableObjectType = 'shape' | 'group' | 'image' | 'equation';
 export type RestorableObjectRef = {section:number;paragraph:number;control:number;type:RestorableObjectType};
 export type ObjectSelectionEntry = RestorableObjectRef & {objectFingerprint:string};
 export type ObjectSelectionBookmark = {version:1;kind:'object-selection';objects:ObjectSelectionEntry[];active:number;documentFingerprint:string};
+export type EquationRefN015=Readonly<RestorableObjectRef&{type:'equation'}>;
+export type MixedRootObjectRefN015=Readonly<RestorableObjectRef&{type:'equation'|'image'}>;
+export type MixedRootSelectionEntryN015=Readonly<MixedRootObjectRefN015&{objectFingerprint:string}>;
+export type SingleEquationSelectionBookmarkN015=Readonly<{
+  version:1;kind:'single-root-equation-selection';target:EquationRefN015;
+  documentFingerprint:string;objectFingerprint:string;integrity:string;
+}>;
+export type MixedRootSelectionBookmarkN015=Readonly<{
+  version:1;kind:'mixed-root-object-selection';objects:readonly MixedRootSelectionEntryN015[];
+  active:number;documentFingerprint:string;integrity:string;
+}>;
 export type RootClickHereFieldSelectionBookmarkN016 =
   | {version:1;kind:'root-clickhere-field-selection';fieldId:number;section:number;paragraph:number;start:number;end:number;direction:'forward'|'backward';fieldFingerprint:string;paragraphFingerprint:string;selectionFingerprint:string}
   | {version:1;kind:'root-clickhere-field-selection';owner:'cell';fieldId:number;section:number;parentParagraph:number;listId:number;path:SessionCellPath;start:number;end:number;direction:'forward'|'backward';ownerFingerprint:string;fieldFingerprint:string;paragraphFingerprint:string;geometryFingerprint:string;selectionFingerprint:string};
@@ -29,7 +40,8 @@ export type SessionCursor = { kind: 'text'; focus: SessionPoint; anchor?: Sessio
   | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark }
   | { kind: 'table-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; tableFingerprint: string }
   | { kind: 'picture-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; pictureFingerprint: string }
-  | HeaderFooterBookmark | FootnoteBookmark | TextBoxBookmark | EndnoteSelectionBookmark | ObjectSelectionBookmark | RootClickHereFieldSelectionBookmarkN016;
+  | HeaderFooterBookmark | FootnoteBookmark | TextBoxBookmark | EndnoteSelectionBookmark | ObjectSelectionBookmark
+  | RootClickHereFieldSelectionBookmarkN016 | SingleEquationSelectionBookmarkN015 | MixedRootSelectionBookmarkN015;
 export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret; cursor?: SessionCursor };
 
 export type PreferenceErrorCode = 'read' | 'write' | 'corrupt' | 'version';

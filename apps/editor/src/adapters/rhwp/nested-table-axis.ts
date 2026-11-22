@@ -1,5 +1,5 @@
-import type {ControlOp,NestedTable,Snapshot} from '../../modules/document/public/types.ts';
-import {projectTableAxis,validateControlOperations,witnessedTrackEdges} from '../../modules/document/public/engine-integration.ts';
+import type {AgentTableMergeOp,AgentTableSplitOp,ControlOp,NestedTable,Snapshot} from '../../modules/document/public/types.ts';
+import {nestedRowReshapePlan,projectTableAxis,validateControlOperations,witnessedTrackEdges} from '../../modules/document/public/engine-integration.ts';
 import {capturePreservationEvidence,verifyPreservedExport} from './preservation.ts';
 import {resourceFingerprint} from './cell-paragraph.ts';
 import {rootBodyTexts} from './table-topology-evidence.ts';
@@ -127,4 +127,74 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
   return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,...cellPath[0],cellPath,charOffset:0};
  }catch(error){checked(doc.restoreSnapshot(checkpoint));throw error;}
  finally{doc.discardSnapshot(checkpoint);}
+}
+
+export function executeNestedRowReshape(doc:any,base:Snapshot,op:AgentTableMergeOp|AgentTableSplitOp){
+ const plan=nestedRowReshapePlan(op,base), original=readStructure(doc);
+ if(!plan||!same(base.structure,original)||typeof doc.reshapeNestedTableCells!=='function') {
+  throw Error('중첩 표의 경로·내용 또는 보호 상태가 바뀌었습니다.');
+ }
+ const {table,row,column,endColumn,primary,targets,merge}=plan;
+ const format=doc.getSourceFormat();
+ if(!['hwp','hwpx'].includes(format)||!base.name.toLowerCase().endsWith('.'+format))throw Error('중첩 표의 저장 형식을 확인할 수 없습니다.');
+ const before=evidence(doc,table,original);
+ const logical={...table,cells:table.cells.map((cell,index)=>({...cell,properties:before.target[index].properties}))};
+ const edges=witnessedTrackEdges(logical,false);
+ if(!edges)throw Error('중첩 셀의 기존 열 너비를 확인할 수 없습니다.');
+ const targetIds=new Set(targets.map(cell=>cell.index));
+ const oldCells=new Map(table.cells.map(cell=>[`${cell.row}/${cell.column}`,cell]));
+ const targetWitness=before.target[primary.index];
+ const knownText=merge?[primary.text,...targets.slice(1).filter(cell=>cell.text).map(cell=>cell.text)].join('\n'):primary.text;
+ const expectedParagraphs=merge?[...targetWitness.paragraphs,...targets.slice(1).flatMap(cell=>
+  cell.text||before.target[cell.index].paragraphs.length!==1?before.target[cell.index].paragraphs:[])]:targetWitness.paragraphs;
+ const snapshot=doc.saveSnapshot();
+ try{
+  checked(doc.reshapeNestedTableCells(table.section,table.paragraph,JSON.stringify(path(table,0)),row,column,merge?endColumn:undefined));
+  const structure=readStructure(doc),updated=structure.nestedTables?.find(item=>item.id===table.id);
+  const expectedCount=table.cells.length+(merge?1-targets.length:endColumn-column);
+  if(!updated||updated.rows!==table.rows||updated.columns!==table.columns||updated.cells.length!==expectedCount) {
+   throw Error('중첩 셀의 병합·분할 결과가 예상한 격자와 다릅니다.');
+  }
+  const after=evidence(doc,updated,structure);
+  const neighbor=(source:typeof structure)=>({...source,nestedTables:source.nestedTables?.filter(other=>other.id!==table.id)});
+  if(!same(neighbor(original),neighbor(structure))||!same(before.document,after.document)||!same(before.others,after.others)||
+      !same(before.anchoredControls,after.anchoredControls)||!same(before.extent,after.extent)||before.fieldCount!==after.fieldCount||
+      before.resources!==after.resources||!sameNestedCaptionPlacement(before.captions,after.captions)) {
+   throw Error('중첩 셀을 변경한 뒤 부모나 이웃 표의 내용·서식이 달라졌습니다.');
+  }
+  for(const cell of updated.cells){
+   const current=after.target[cell.index];
+   const old=oldCells.get(`${cell.row}/${cell.column}`);
+   if(cell.row!==row||cell.column<column||cell.column>endColumn){
+    if(!old||targetIds.has(old.index)||!same(current,before.target[old.index])||
+       !same({...cell,index:old.index},old))throw Error('같은 표의 이웃 셀이 변경되었습니다.');
+    continue;
+   }
+   const span=merge?endColumn-column+1:1, width=edges[cell.column+span]-edges[cell.column];
+   const retained=cell.column===column;
+   if(cell.rowSpan!==1||cell.columnSpan!==span||(merge&&!retained)||cell.text!==(retained?knownText:'')||
+      !same(current.properties,{...targetWitness.properties,width})||
+      (retained&&!same(current.paragraphs,expectedParagraphs))||
+      (!retained&&(current.paragraphs.length!==1||!same(current.first,targetWitness.first)))) {
+    throw Error('변경한 셀의 내용·서식·너비가 확인한 범위와 다릅니다.');
+   }
+  }
+  const anchor=updated.cells.find(cell=>cell.row===row&&cell.column===column);
+  if(!anchor)throw Error('병합·분할 결과의 주 셀 위치를 확인할 수 없습니다.');
+  const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
+  try{
+   const bytes=artifact.takeBytes(), open=(data:Uint8Array)=>new doc.constructor(data);
+   verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),open);
+   const reopened=open(bytes);
+   try{
+    const saved=readStructure(reopened), child=saved.nestedTables?.find(cell=>cell.id===table.id);
+    if(!child||!same(structure,saved))throw Error('저장 후 중첩 표 셀 또는 인접한 내용이 달라졌습니다.');
+    const {captions:stored,...storedEvidence}=evidence(reopened,child,saved),{captions,...liveEvidence}=after;
+    if(!same(storedEvidence,liveEvidence)||!sameNestedCaptionRoundtrip(captions,stored))throw Error('저장 후 중첩 표의 서식과 위치를 확인하지 못했습니다.');
+   }finally{reopened.free();}
+  }finally{artifact.free();}
+  const cellPath=path(table,anchor.index);
+  return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,...cellPath[0],cellPath,charOffset:0};
+ }catch(error){checked(doc.restoreSnapshot(snapshot));throw error;}
+ finally{doc.discardSnapshot(snapshot);}
 }

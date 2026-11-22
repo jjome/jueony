@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { lstat, readFile, readdir } from 'node:fs/promises';
 import { basename, extname, relative, resolve, sep } from 'node:path';
+export {compileInstitutionEndpoints as compileN045EndpointAllowlist} from '../../../launcher/providers/endpoint-policy.mjs';
 
 const ROOT_KEYS = ['schemaVersion', 'policyId', 'runtimeFiles', 'wasmAssets', 'fonts', 'noticeFiles', 'webView2FixedRuntimeManifest', 'scanExtensions'];
 const FILE_KEYS = ['path', 'minBytes'];
@@ -23,8 +24,34 @@ const INERT_NAMESPACE_IDENTIFIERS = new Set([
   'http://www.w3.org/2001/XMLSchema',
   'http://www.w3.org/2000/xmlns/',
   'http://www.mozilla.org/newlayout/xml/parsererror.xml',
+  'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
+  'http://schemas.openxmlformats.org/package/2006/relationships',
+  'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
+  'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+  'http://purl.oclc.org/ooxml/officeDocument/relationships',
+  'http://purl.oclc.org/ooxml/spreadsheetml/main',
+  'http://purl.oclc.org/ooxml/wordprocessingml/main',
+  'http://www.w3.org/1999/XSL/Transform',
+  'http://www.w3.org/1999/xhtml',
+  'http://www.w3.org/2000/09/xmldsig#',
+  'http://ns.adobe.com/xdp/',
+  'http://ns.adobe.com/xdp/pdf/',
+  'http://ns.adobe.com/xfdf/',
+  'http://ns.adobe.com/xmpmeta/',
+  ...['xfa-connection-set','xfa-data','xfa-data/1.0','xfa-form','xfa-locale-set','xfa-source-set','xfa-template','xci','xdc']
+    .map(namespace=>`http://www.xfa.org/schema/${namespace}/`),
 ]);
 const INERT_HELP_LITERALS = new Set(['https://example.com', 'https://로']);
+const PDF_PARSER_LITERALS=new Set(['http://${e}','http://example.com','https://foo.bar','http://www.apache.org/licenses/LICENSE-2.0']);
+const OCR_METADATA_LITERALS=new Set([
+  'http://localhost:3000/dist/tesseract.min.js','https://github.com/naptha/tesseract.js.git',
+  'https://github.com/naptha/tesseract.js/issues','https://github.com/naptha/tesseract.js','https://opencollective.com/tesseractjs',
+]);
+function isDependencyReference(path,value){
+  if(path==='pdfjs/pdf.worker.min.mjs'||/^assets\/pdf-[\w-]+\.js$/u.test(path))return PDF_PARSER_LITERALS.has(value);
+  if(/^assets\/src-[\w-]+\.js$/u.test(path))return OCR_METADATA_LITERALS.has(value);
+  return /^assets\/rolldown-runtime-[\w-]+\.js$/u.test(path)&&value==='https://rolldown.rs/in-depth/bundling-cjs#require-external-modules';
+}
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const exact = (value, keys) => Object.keys(value).sort().join(',') === [...keys].sort().join(',');
 const text = (value, max = 200) => typeof value === 'string' && value.length > 0 && value.length <= max && !/[\u0000-\u001f]/u.test(value);
@@ -127,6 +154,28 @@ async function filesBelow(root) {
   return result.sort((left, right) => left.path.localeCompare(right.path));
 }
 
+async function scanNetworkLiterals(files, extensions) {
+  const externalNetworkLiterals = [];
+  const inertNamespaceLiterals = [];
+  const inertHelpLiterals = [];
+  for (const file of files) {
+    if (!extensions.includes(extname(file.path).toLowerCase())) continue;
+    const source = await readFile(file.absolute, 'utf8');
+    for (const match of source.matchAll(NETWORK_LITERAL)) {
+      const found = { path: file.path, value: match[0].slice(0, 500) };
+      if (INERT_NAMESPACE_IDENTIFIERS.has(found.value)) inertNamespaceLiterals.push(found);
+      else if (INERT_HELP_LITERALS.has(found.value)||isDependencyReference(found.path,found.value)) inertHelpLiterals.push(found);
+      else externalNetworkLiterals.push(found);
+    }
+  }
+  return { externalNetworkLiterals, inertNamespaceLiterals, inertHelpLiterals };
+}
+
+export async function inventoryN045NetworkLiterals(directory, rawPolicy) {
+  const fields = validateN045OfflinePolicy(rawPolicy);
+  return scanNetworkLiterals(await filesBelow(resolve(directory)), fields.scanExtensions);
+}
+
 export async function auditN045OfflineBundle(directory, rawPolicy) {
   const root = resolve(directory);
   const policy = validateN045OfflinePolicy(rawPolicy);
@@ -185,19 +234,7 @@ export async function auditN045OfflineBundle(directory, rawPolicy) {
     }
     wasm.push({ kind: expected.kind, path: matches[0].path, bytes: matches[0].bytes, sha256: digest, evidenceMatched: expected.evidenceSha256Key !== null });
   }
-  const externalNetworkLiterals = [];
-  const inertNamespaceLiterals = [];
-  const inertHelpLiterals = [];
-  for (const file of files) {
-    if (!policy.scanExtensions.includes(extname(file.path).toLowerCase())) continue;
-    const source = await readFile(file.absolute, 'utf8');
-    for (const match of source.matchAll(NETWORK_LITERAL)) {
-      const found = { path: file.path, value: match[0].slice(0, 500) };
-      if (INERT_NAMESPACE_IDENTIFIERS.has(found.value)) inertNamespaceLiterals.push(found);
-      else if (INERT_HELP_LITERALS.has(found.value)) inertHelpLiterals.push(found);
-      else externalNetworkLiterals.push(found);
-    }
-  }
+  const { externalNetworkLiterals, inertNamespaceLiterals, inertHelpLiterals } = await scanNetworkLiterals(files, policy.scanExtensions);
   if (externalNetworkLiterals.length) throw Error(`external network literal rejected (${externalNetworkLiterals.length}): ${externalNetworkLiterals[0].path} ${externalNetworkLiterals[0].value}`);
   return { schemaVersion: 1, policyId: policy.policyId, status: 'PASS_OFFLINE_BUNDLE', filesScanned: files.length, runtimeFiles, wasm, fonts, notices, webView2FixedRuntime, externalNetworkLiterals, inertNamespaceLiterals, inertHelpLiterals };
 }
@@ -210,23 +247,4 @@ export function classifyN045OfflineFailure(error) {
       : message.startsWith('required ') ? 'REQUIRED_LOCAL_ASSET_MISSING'
         : message.startsWith('symbolic link rejected') ? 'SYMLINK_REJECTED' : 'OFFLINE_AUDIT_FAILED';
   return { code, message };
-}
-
-export function compileN045EndpointAllowlist(rawEntries) {
-  if (!Array.isArray(rawEntries) || rawEntries.length > 32) throw Error('N045 endpoint allowlist mismatch');
-  const entries = rawEntries.map(entry => {
-    if (!record(entry) || !exact(entry, ['origin', 'pathPrefix']) || !text(entry.origin, 240) || !safePath(entry.pathPrefix.replace(/^\//u, 'x/'))) throw Error('N045 endpoint entry mismatch');
-    const url = new URL(entry.origin);
-    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || url.pathname !== '/' || entry.origin.includes('*')) throw Error('N045 endpoint origin rejected');
-    if (!entry.pathPrefix.startsWith('/') || entry.pathPrefix.includes('..') || entry.pathPrefix.includes('?') || entry.pathPrefix.includes('#')) throw Error('N045 endpoint path rejected');
-    return { origin: url.origin, pathPrefix: entry.pathPrefix.replace(/\/+$/u, '') || '/' };
-  });
-  const unique = new Set(entries.map(entry => `${entry.origin}${entry.pathPrefix}`));
-  if (unique.size !== entries.length) throw Error('N045 duplicate endpoint entry');
-  return request => {
-    let url;
-    try { url = new URL(request); } catch { return false; }
-    if (url.protocol !== 'https:' || url.username || url.password || url.hash) return false;
-    return entries.some(entry => url.origin === entry.origin && (entry.pathPrefix === '/' || url.pathname === entry.pathPrefix || url.pathname.startsWith(`${entry.pathPrefix}/`)));
-  };
 }

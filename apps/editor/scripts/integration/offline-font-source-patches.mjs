@@ -9,6 +9,7 @@ const GENERATED_FONT_RULES = Object.freeze([
 const NETWORK_LITERAL = /\b(?:https?|wss?):\/\/[^\s"'`<>\\)]+/giu;
 const FONT_URL = /\.(?:woff2?|ttf|otf|ttc)(?:$|[?#])/iu;
 const EXPECTED_NETWORK_LITERALS = 256;
+const DISABLED_FONT_PREFIX = 'fonts/__external-disabled__/';
 
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 
@@ -25,7 +26,7 @@ export function disableGeneratedExternalFontSources(source, label = 'generated f
   }
   const replacements = new Map(urls.map(value => {
     const extension = /\.(woff2?|ttf|otf|ttc)(?:$|[?#])/iu.exec(new URL(value).pathname)?.[1]?.toLowerCase();
-    return [value, `fonts/__external-disabled__/${sha256(value).slice(0, 24)}.${extension}`];
+    return [value, `${DISABLED_FONT_PREFIX}${sha256(value).slice(0, 24)}.${extension}`];
   }));
   let output = source;
   for (const [before, after] of replacements) output = output.replaceAll(before, after);
@@ -37,6 +38,19 @@ export function disableGeneratedExternalFontSources(source, label = 'generated f
     inputSha256: sha256(source),
     outputSha256: sha256(output),
   });
+}
+
+export function skipDisabledFontSources(source, file) {
+  const prefix = JSON.stringify(DISABLED_FONT_PREFIX);
+  const [before, after] = file === 'font-loader.ts' ? [
+    'const FONT_LIST: readonly FontEntry[] = FONT_RULE_WEBFONT_ENTRIES;',
+    `const FONT_LIST: readonly FontEntry[] = FONT_RULE_WEBFONT_ENTRIES.filter(entry => !entry.file.startsWith(${prefix}));`,
+  ] : [
+    'const snapshot = options.disableExternalWebFonts === true ? supply.offline : supply.online;',
+    `const snapshot = options.disableExternalWebFonts === true || supply.online.sources.some(source => source.url.startsWith(${prefix})) ? supply.offline : supply.online;`,
+  ];
+  if (source.split(before).length !== 2) throw new Error(`${file}: offline font selection marker mismatch`);
+  return source.replace(before, after);
 }
 
 export async function applyOfflineFontSourcePatches({ root }) {
@@ -56,6 +70,10 @@ export async function applyOfflineFontSourcePatches({ root }) {
   const literalCount = files.reduce((sum, item) => sum + item.literalCount, 0);
   if (literalCount !== EXPECTED_NETWORK_LITERALS) {
     throw new Error(`offline font rule source count mismatch: ${literalCount}`);
+  }
+  for (const file of ['font-loader.ts', 'font-rule-runtime.ts']) {
+    const path = join(root, 'src/core', file);
+    await writeFile(path, skipDisabledFontSources(await readFile(path, 'utf8'), file));
   }
   const evidence = Object.freeze({
     schemaVersion: 1,

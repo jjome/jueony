@@ -101,7 +101,7 @@ const removeWithRetry = async (path: string) => {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {await rm(path, {recursive: true, force: true}); return;}
     catch (error: any) {
-      if (!['EBUSY', 'EPERM'].includes(error?.code) || attempt === 4) throw error;
+      if (!['EBUSY', 'ENOTEMPTY', 'EPERM'].includes(error?.code) || attempt === 4) throw error;
       await new Promise(resolveDelay => setTimeout(resolveDelay, 100 * (attempt + 1)));
     }
   }

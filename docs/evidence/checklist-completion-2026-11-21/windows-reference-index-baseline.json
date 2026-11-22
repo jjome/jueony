@@ -1,0 +1,33 @@
+{
+  "build": {
+    "customSourceSha256": "fbe51dd5ebcb9c66cceece434586d4c0438786430b7201ff808d2563510269b1",
+    "engineWasmSha256": "5c0f97d1e606f730c85b7dd007feccb505c8a02ffa2b8b2df0e55feff17f87c0"
+  },
+  "verified": [
+    "the real persistent FTS index reused unchanged files and omitted an unselected fourth folder"
+  ],
+  "requests": [
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 3,
+      "deleted": 0
+    },
+    {
+      "path": "/api/reference-index/search",
+      "httpStatus": 200,
+      "hits": [],
+      "inserted": 0,
+      "deleted": 0
+    },
+    {
+      "path": "/api/reference-index/clear",
+      "httpStatus": 200,
+      "cleared": true
+    }
+  ],
+  "externalRequests": [],
+  "errors": [],
+  "failure": "AssertionError [ERR_ASSERTION]: A refresh discarded the entire chat index\n+ actual - expected\n\n+ '/api/reference-index/clear'\n- '/api/reference-index/search'\n                        ^\n"
+}

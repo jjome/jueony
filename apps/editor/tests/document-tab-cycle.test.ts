@@ -54,7 +54,7 @@ test('generated table Ctrl+Tab mapping keeps literal insertion separate from han
  const tempBase=resolve(base),root=await mkdtemp(join(tempBase,'jueony-document-tabs-'));
  try{
   const folder=join(root,'src/jueony/shortcuts');await mkdir(folder,{recursive:true});await writeFile(join(root,'package.json'),' {"type":"module"}');
-  for(const name of ['keymap.ts','install.ts','style-slots.ts'])await writeFile(join(folder,name),await readFile(new URL('../src/shortcuts/'+name,import.meta.url)));
+  for(const name of ['keymap.ts','install.ts','style-slots.ts','special-story-command-scope-n021.ts'])await writeFile(join(folder,name),await readFile(new URL('../src/shortcuts/'+name,import.meta.url)));
   await applyDocumentTabCyclePatches({root});
   const {HangulKeyResolver}=await import(pathToFileURL(join(folder,'keymap.ts')).href),r=new HangulKeyResolver();
   assert.equal(r.resolve(key(),{table:true,cells:false,object:false}).binding?.command,'ext:jueony-literal-table-tab');

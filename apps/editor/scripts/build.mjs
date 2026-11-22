@@ -28,6 +28,9 @@ import {applyPasteFailurePatches} from './integration/paste-failure-patches.mjs'
 import {applyFormatDialogTargetPatches} from './integration/format-dialog-target-patches.mjs';
 import {applyFormulaFormatPatches} from './integration/formula-format-patches.mjs';
 import {applyTableSizeTargetPatches} from './integration/table-size-target-patches.mjs';
+import {applyPageNumberPositionPatchesN021} from './integration/page-number-position-n021-patches.mjs';
+import {applyInsertPlaceholderCommandPatchesN019} from './integration/insert-placeholder-command-patches-n019.mjs';
+import {offlineOcrDefaults,patchOcrWorker} from './integration/offline-ocr-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -68,6 +71,7 @@ const sourceChanges = execFileSync('git', ['-C', upstream, 'status', '--porcelai
 if (sourceChanges) throw new Error('참조 소스에 변경이 있습니다. 기준 커밋과 같은 소스로 빌드해 주세요.');
 const profile = process.env.JUEONY_BUILD_PROFILE ?? '';
 if (profile && !/^[a-z][a-z0-9-]{0,30}$/.test(profile)) throw new Error('Invalid build profile');
+const institutionOffline=profile==='institution-offline';
 const root = join(app, '.build', profile ? `studio-${profile}` : 'studio');
 const outputDir = profile ? join(app, 'evidence', `dist-${profile}`) : join(app, 'dist');
 await mkdir(root, { recursive: true });
@@ -91,19 +95,48 @@ await cp(join(app, 'src/boot.js'), join(root, 'public/jueony-boot.js'));
 await cp(join(upstream, 'LICENSE'), join(root, 'public/LICENSE.rhwp.txt'));
 await cp(join(upstream, 'THIRD_PARTY_LICENSES.md'), join(root, 'public/THIRD_PARTY_LICENSES.rhwp.md'));
 await mkdir(join(root, 'public/licenses'), { recursive: true });
-for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LICENSE'], ['@rhwp/core', 'LICENSE']]) {
+for (const file of ['IeumOffice-Apache-2.0.txt', 'IeumOffice-NOTICE.txt']) {
+  await cp(join(app, 'licenses', file), join(root, 'public/licenses', file));
+}
+for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LICENSE'], ['@rhwp/core', 'LICENSE'], ['pdfjs-dist', 'LICENSE'], ['fflate', 'LICENSE'], ['tesseract.js', 'LICENSE.md'], ['tesseract.js-core', 'LICENSE']]) {
   await cp(join(app, 'node_modules', name, file), join(root, 'public/licenses', name.replaceAll('/', '-') + '.txt'));
+}
+const pdfAssets = join(root, 'public/pdfjs');
+await mkdir(pdfAssets, { recursive: true });
+const pdfPackage = join(app, 'node_modules/pdfjs-dist');
+await cp(join(pdfPackage, 'build/pdf.worker.min.mjs'), join(pdfAssets, 'pdf.worker.min.mjs'));
+for (const folder of ['cmaps', 'standard_fonts']) await cp(join(pdfPackage, folder), join(pdfAssets, folder), { recursive:true });
+const pdfImageWasm = join(pdfAssets, 'wasm');
+await mkdir(pdfImageWasm, {recursive:true});
+for (const name of ['jbig2.wasm','jbig2_nowasm_fallback.js','openjpeg.wasm','openjpeg_nowasm_fallback.js','qcms_bg.wasm',
+  'LICENSE_JBIG2','LICENSE_OPENJPEG','LICENSE_QCMS','LICENSE_PDFJS_JBIG2','LICENSE_PDFJS_OPENJPEG','LICENSE_PDFJS_QCMS']) {
+  await cp(join(pdfPackage, 'wasm', name), join(pdfImageWasm, name));
+}
+const ocrAssets = join(root, 'public/ocr');
+await mkdir(join(ocrAssets,'core'), {recursive:true});
+await mkdir(join(ocrAssets,'lang'), {recursive:true});
+await writeFile(join(ocrAssets,'worker.min.js'),patchOcrWorker(await readFile(join(app,'node_modules/tesseract.js/dist/worker.min.js'),'utf8')));
+for (const variant of ['lstm','simd-lstm','relaxedsimd-lstm']) {
+  const file=`tesseract-core-${variant}.wasm.js`;
+  await cp(join(app,'node_modules/tesseract.js-core',file),join(ocrAssets,'core',file));
+}
+for (const language of ['eng','kor']) {
+  const data=join(app,'node_modules/@tesseract.js-data',language);
+  await cp(join(data,'4.0.0_best_int',`${language}.traineddata.gz`),join(ocrAssets,'lang',`${language}.traineddata.gz`));
+  await cp(join(data,'README.md'),join(root,'public/licenses',`tesseract-language-${language}.md`));
 }
 
 await applyStudioPatches({root,upstream,app});
 await applyAgentBoundSavePatches({root});
 await writeFile(join(root,'src/core/export-content-loss.ts'),patchExportMetadataLoss(await readFile(join(root,'src/core/export-content-loss.ts'),'utf8')));
 await applyManualFeaturePatches({root});
+await applyInsertPlaceholderCommandPatchesN019({root});
 await applyPageBorderPatches({root});
 await applyRecoveryPatches({root});
 // These dialogs require the patched engine's section-aware tab layout.
 if (engineEvidence) await applyTabFeaturePatches({root});
 if (engineEvidence) await applySectionBoundaryPatches({root});
+if (engineEvidence?.patches.some(p => p.name === 'zzzzzzzzzzzzzzzzzzz-page-number-position.patch')) await applyPageNumberPositionPatchesN021({root});
 if (engineEvidence?.patches.some(p => p.name === 'document-insertion.patch')) await applyDocumentInsertionPatches({root});
 if (engineEvidence?.patches.some(p => p.name === 'style-reference-deletion.patch')) await applyStyleManagementPatches({root,orderEnabled:engineEvidence.patches.some(p=>p.name==='style-reference-order.patch')});
 await applyStyleFlowPatches({root});
@@ -128,7 +161,8 @@ await applyPasteFailurePatches({root});
 await applyDocumentCreatedInformationPatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
-  define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
+  plugins:[offlineOcrDefaults()],
+  define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false', __JUEONY_INSTITUTION_OFFLINE__:JSON.stringify(institutionOffline) },
   resolve: { alias: {
     '@': join(root, 'src'),
     '@wasm/rhwp.js': join(engineRoot, 'rhwp.js'),
@@ -150,6 +184,7 @@ async function collectSource(directory, prefix = '') {
 await collectSource(join(app, 'src'));
 const evidence = {
   applicationId: 'jueony-editor',
+  institutionOffline,
   sourceCommit: commit, enginePackage: engineEvidence ? '@jueony/rhwp-engine-review@0.8.7' : '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
   engineWasmSha256: sha256(await readFile(join(engineRoot, 'rhwp_bg.wasm'))),
   engineBuild: engineEvidence ?? null,
@@ -181,6 +216,8 @@ const evidence = {
   clipboardEventPatchSha256: sha256(await readFile(join(app,'scripts/integration/clipboard-event-patches.mjs'))),
   cellWordDeletionPatchSha256: sha256(await readFile(join(app,'scripts/integration/cell-word-deletion-patches.mjs'))),
   pasteFailurePatchSha256: sha256(await readFile(join(app,'scripts/integration/paste-failure-patches.mjs'))),
+  pageNumberPositionPatchSha256: sha256(await readFile(join(app,'scripts/integration/page-number-position-n021-patches.mjs'))),
+  insertPlaceholderPatchSha256:sha256(await readFile(join(app,'scripts/integration/insert-placeholder-command-patches-n019.mjs'))),
   formatDialogTargetPatchSha256: sha256(await readFile(join(app,'scripts/integration/format-dialog-target-patches.mjs'))),
   formulaformatPatchSha256: sha256(await readFile(join(app,'scripts/integration/formula-format-patches.mjs'))),
   tablesizetargetPatchSha256: sha256(await readFile(join(app,'scripts/integration/table-size-target-patches.mjs'))),

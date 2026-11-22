@@ -253,6 +253,7 @@ export function inspectRootClickHereFieldSelectionN016(input:FieldSelectionSessi
   if(!selection||!document)return {status:'not-field-selection'};
   const fields=parse(document.getFieldList());
   if(!Array.isArray(fields))return {status:'unsupported-field-selection'};
+  if(!fields.length)return {status:'not-field-selection'};
   const anchorCell=cellPosition(selection.anchor),focusCell=cellPosition(selection.focus),currentCell=cellPosition(current);
   if(anchorCell||focusCell||currentCell){
    if(!anchorCell||!focusCell||!currentCell||!samePosition(current,selection.focus)

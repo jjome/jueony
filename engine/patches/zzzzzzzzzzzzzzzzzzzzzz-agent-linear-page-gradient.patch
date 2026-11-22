@@ -1,0 +1,121 @@
+diff --git a/src/document_core/commands/agent_page_background.rs b/src/document_core/commands/agent_page_background.rs
+--- a/src/document_core/commands/agent_page_background.rs
++++ b/src/document_core/commands/agent_page_background.rs
+@@ -1,11 +1,32 @@
+ //! Agent-only background edits. Preserve every non-fill field and parity slot.
+ use crate::document_core::DocumentCore;
+ use crate::error::HwpError;
+-use crate::model::{control::Control,style::{BorderFill,CenterLine,Fill,FillType,SolidFill}};
++use crate::model::{control::Control,style::{BorderFill,CenterLine,Fill,FillType,GradientFill,SolidFill}};
++use serde_json::Value;
+ fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
+ fn slot(kind:&str)->Result<Option<usize>,HwpError>{match kind{"both"=>Ok(None),"even"=>Ok(Some(0)),"odd"=>Ok(Some(1)),_=>Err(fail("Invalid page background kind"))}}
++
++fn read_color(value:&Value)->Result<u32,HwpError>{
++    let text=value.as_str().filter(|s|s.len()==7&&s.starts_with('#')&&s.as_bytes()[1..].iter().all(u8::is_ascii_hexdigit))
++        .ok_or_else(||fail("배경 색은 #RRGGBB입니다."))?;
++    let rgb=u32::from_str_radix(&text[1..],16).map_err(|_|fail("Invalid color"))?;
++    Ok(((rgb>>16)&255)|(rgb&0x00ff00)|((rgb&255)<<16))
++}
++
++fn plain_background(fill:&Fill)->bool{
++    fill.gradient.is_none()&&matches!((&fill.fill_type,fill.solid),
++        (FillType::None,None)|(FillType::Solid,Some(SolidFill{pattern_type:..=0,..})))
++}
++
++fn linear_gradient(fill:&Fill)->bool{
++    fill.fill_type==FillType::Gradient&&fill.solid.is_none()&&fill.gradient.as_ref().is_some_and(|gradient|{
++        gradient.gradient_type==1&&(0..=360).contains(&gradient.angle)
++            &&gradient.colors.len()==2&&gradient.positions.is_empty()
++    })
++}
++
+ impl DocumentCore {
+-    fn agent_background_rows(&self,section:usize,kind:&str)->Result<Vec<(Option<usize>,BorderFill)>,HwpError>{
++    fn agent_background_rows(&self,section:usize,kind:&str,allow_gradient:bool)->Result<Vec<(Option<usize>,BorderFill)>,HwpError>{
+         let sd=&self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?.section_def;
+         let requested=slot(kind)?;
+         if sd.extra_page_border_fills.len()>2{return Err(fail("추가 쪽 배경 항목은 읽기 전용입니다."));}
+@@ -15,36 +36,69 @@
+             let bf=if pbf.border_fill_id==0{BorderFill::default()}else{self.document.doc_info.border_fills.get(pbf.border_fill_id as usize-1).cloned().ok_or_else(||fail("쪽 배경 자산 참조가 잘못되었습니다."))?};
+             // Generic JSON getters omit alpha, mixed fills and some original effects.
+             // Refuse these in the actual IR before touching resource lists or sections.
+-            if self.document.provenance.hwp3_lineage||bf.attr!=0||bf.three_d||bf.center_line!=CenterLine::None||bf.fill.alpha!=0||bf.fill.gradient.is_some()||bf.fill.image.is_some()||bf.fill.solid.is_some_and(|s|s.pattern_type>0)||!matches!((&bf.fill.fill_type,bf.fill.solid), (FillType::None,None)|(FillType::Solid,Some(_))){return Err(fail("AI 쪽 배경은 배경 없음·무늬 없는 단색 원본만 지원합니다. 그림·그러데이션·투명도·혼합/고급 효과는 유지합니다."));}
++            if self.document.provenance.hwp3_lineage||bf.attr!=0||bf.three_d||bf.center_line!=CenterLine::None
++                ||bf.fill.alpha!=0||bf.fill.image.is_some()
++                ||!(plain_background(&bf.fill)||allow_gradient&&linear_gradient(&bf.fill)){
++                return Err(fail("지원하지 않는 쪽 배경 원본이 있습니다. 그림·투명도·혼합 및 고급 그러데이션은 유지합니다."));
++            }
+             Ok((index,bf))
+         }).collect()
+     }
+-    fn agent_background_token(&self,section:usize,kind:&str)->Result<String,HwpError>{
+-        let rows=self.agent_background_rows(section,kind)?;
++    fn agent_background_token(&self,section:usize,kind:&str,allow_gradient:bool)->Result<String,HwpError>{
++        let rows=self.agent_background_rows(section,kind,allow_gradient)?;
+         let value=serde_json::json!({"section":self.document.sections[section].section_def,"rows":rows,"kind":kind});
+         Ok(blake3::hash(value.to_string().as_bytes()).to_hex().to_string())
+     }
+     pub fn get_agent_page_background_native(&self,section:usize,kind:&str)->Result<String,HwpError>{
+         slot(kind)?;
+         let value:serde_json::Value=serde_json::from_str(&self.get_page_border_fill_entry_native(section,kind)?).map_err(|_|fail("Invalid background settings"))?;
+-        let supported=self.agent_background_token(section,kind);
+-        Ok(serde_json::json!({"kind":kind,"fillType":value["fillType"],"color":if value["fillType"]=="solid"{value["fillColor"].clone()}else{serde_json::Value::Null},"applyPage":value["applyPage"],"editable":supported.is_ok(),"reason":supported.as_ref().err().map(ToString::to_string),"token":supported.ok()}).to_string())
++        let supported=self.agent_background_token(section,kind,false);
++        let gradient=self.agent_background_token(section,kind,true);
++        Ok(serde_json::json!({
++            "kind":kind,"fillType":value["fillType"],
++            "color":if value["fillType"]=="solid"{value["fillColor"].clone()}else{Value::Null},
++            "applyPage":value["applyPage"],"editable":supported.is_ok(),
++            "reason":supported.as_ref().err().map(ToString::to_string),"token":supported.ok(),
++            "gradientEditable":gradient.is_ok(),"gradientToken":gradient.ok(),"gradient":value["gradient"],
++        }).to_string())
+     }
+     pub fn set_agent_page_background_native(&mut self,section:usize,kind:&str,json:&str)->Result<String,HwpError>{
+         let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid background command"))?;
+-        if !v.as_object().is_some_and(|o|o.len()==3&&o.keys().all(|k|["fillType","color","token"].contains(&k.as_str()))){return Err(fail("Invalid background command fields"));}
+-        let color=v["color"].as_str().filter(|s|s.len()==7&&s.starts_with('#')&&s.as_bytes()[1..].iter().all(u8::is_ascii_hexdigit)).ok_or_else(||fail("배경 색은 #RRGGBB입니다."))?;
+-        let rgb=u32::from_str_radix(&color[1..],16).map_err(|_|fail("Invalid color"))?;
+-        let bgr=((rgb>>16)&255)|(rgb&0x00ff00)|((rgb&255)<<16);
+-        let fill_type=v["fillType"].as_str().filter(|s|["none","solid"].contains(s)).ok_or_else(||fail("AI 배경은 없음·단색만 지원합니다."))?;
+-        let token=self.agent_background_token(section,kind)?;
++        let fill_type=v["fillType"].as_str().filter(|s|["none","solid","gradient"].contains(s))
++            .ok_or_else(||fail("지원하지 않는 AI 쪽 배경입니다."))?;
++        let allow_gradient=fill_type=="gradient";
++        let keys:&[&str]=if allow_gradient{&["fillType","color","endColor","angle","token"]}else{&["fillType","color","token"]};
++        if !v.as_object().is_some_and(|o|o.len()==keys.len()&&o.keys().all(|key|keys.contains(&key.as_str()))){
++            return Err(fail("Invalid background command fields"));
++        }
++        let bgr=read_color(&v["color"])?;
++        let requested_gradient=if allow_gradient{
++            let end=read_color(&v["endColor"])?;
++            let angle=v["angle"].as_i64().filter(|angle|(0..=360).contains(angle)).ok_or_else(||fail("그러데이션 각도는 0~360도입니다."))?;
++            if bgr==end{return Err(fail("그러데이션의 시작 색과 끝 색을 다르게 지정해 주세요."));}
++            Some((end,angle as i16))
++        }else{None};
++        let token=self.agent_background_token(section,kind,allow_gradient)?;
+         if v["token"].as_str()!=Some(token.as_str()){return Err(fail("쪽 배경 설정이 바뀌었습니다."));}
+-        let rows=self.agent_background_rows(section,kind)?;
++        let rows=self.agent_background_rows(section,kind,allow_gradient)?;
+         let mut changed=Vec::new();
+         for (index,mut bf) in rows{
+             if fill_type=="none"&&bf.fill.fill_type==FillType::None||fill_type=="solid"&&bf.fill.solid.is_some_and(|s|s.background_color&0xffffff==bgr){continue;}
++            let next=if let Some((end,angle))=requested_gradient{
++                let mut gradient=bf.fill.gradient.clone().unwrap_or_else(||GradientFill{
++                    gradient_type:1,center_x:50,center_y:50,blur:100,step_center:50,..Default::default()
++                });
++                gradient.angle=angle;
++                gradient.colors=vec![bgr,end];
++                Fill{fill_type:FillType::Gradient,gradient:Some(gradient),..Default::default()}
++            }else if fill_type=="none"{
++                Fill::default()
++            }else{
++                Fill{fill_type:FillType::Solid,solid:Some(SolidFill{background_color:bgr,pattern_color:bf.fill.solid.map_or(0,|s|s.pattern_color),pattern_type:bf.fill.solid.map_or(-1,|s|s.pattern_type)}),..Default::default()}
++            };
++            if bf.fill==next{continue;}
+             bf.raw_data=None;
+-            bf.fill=if fill_type=="none"{Fill::default()}else{Fill{fill_type:FillType::Solid,solid:Some(SolidFill{background_color:bgr,pattern_color:bf.fill.solid.map_or(0,|s|s.pattern_color),pattern_type:bf.fill.solid.map_or(-1,|s|s.pattern_type)}),..Default::default()}};
++            bf.fill=next;
+             changed.push((index,bf));
+         }
+         if self.document.doc_info.border_fills.len()+changed.len()>65534{return Err(fail("쪽 배경 자산 개수 한도를 넘습니다."));}

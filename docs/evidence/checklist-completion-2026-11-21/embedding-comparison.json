@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 1,
+  "corpus": {
+    "files": 21,
+    "queries": 22,
+    "answerable": 18,
+    "contracts": {
+      "passed": 69,
+      "failed": 0
+    },
+    "externalRequests": 0
+  },
+  "provenance": {
+    "wasmSha256": "b4edf57e46557ec4e75e927325f737a4481ce8f8b88fbbcf694599adcdb58af4",
+    "engineJsSha256": "f6bec6991462bcf8b985407bf13a87db99e5516f73ce90c5e674889c01e2abae",
+    "manifestSha256": "45a29149ef3620674588e018868319df61caa4a9b202cb7922f3ecde01c94fb0",
+    "casesSha256": "2628da58dacb575977f5820dddf7ed090a06b1adb7a6bebb4894434098f85468",
+    "evaluationScriptSha256": "9355e6a356b01250dfe491f7c4a2644e414e5a7bb3443183caa6a43020a0a804",
+    "evaluate-rag-embeddings.mjs": "56816665162f7d57f28cd8a180558e00f475b6729a5cffa942ab6983b45e10ad",
+    "evaluate-rag-embeddings.py": "98109d316003bbd090833a6f3c1fa53c395991aa4d6e330d1caf14510721482b"
+  },
+  "evaluation": {
+    "model": {
+      "model": "intfloat/multilingual-e5-small",
+      "revision": "6a0d452a575215f80b8f66276dd4ee5d504942c6",
+      "license": "MIT",
+      "assets": {
+        "model_qint8_avx512_vnni.onnx": {
+          "sha256": "dd476dd0c2514e9b9be83aeb3853fac0763e0bdf4a71645407587d77c48a2d88",
+          "bytes": 118346824
+        },
+        "tokenizer.json": {
+          "sha256": "0b44a9d7b51c3c62626640cda0e2c2f70fdacdc25bbbd68038369d14ebdf4c39",
+          "bytes": 17082730
+        }
+      },
+      "runtime": {
+        "onnxruntime": "1.23.2",
+        "tokenizers": "0.22.1",
+        "numpy": "2.5.5",
+        "provider": "CPUExecutionProvider",
+        "threads": 2
+      },
+      "dimensions": 384,
+      "embeddedPassages": 26,
+      "assetVerificationMilliseconds": 99.8091000074055,
+      "loadMilliseconds": 990.9917000040878,
+      "indexMilliseconds": 3621.6991000110283,
+      "peakWorkingSetBytes": 656564224
+    },
+    "summary": {
+      "bm25": {
+        "sourceHitAt1": 0.6666666666666666,
+        "sourceHitAt8": 1,
+        "meanReciprocalRank": 0.8074074074074074,
+        "answerSpanRecall": 1,
+        "unanswerableFalsePositiveQueries": 1,
+        "meanSearchMilliseconds": 1.6231454545454396
+      },
+      "embedding": {
+        "sourceHitAt1": 0.6111111111111112,
+        "sourceHitAt8": 1,
+        "meanReciprocalRank": 0.7962962962962963,
+        "answerSpanRecall": 1,
+        "unanswerableFalsePositiveQueries": 4,
+        "meanSearchMilliseconds": 7.28581818508577
+      },
+      "hybrid": {
+        "sourceHitAt1": 0.7777777777777778,
+        "sourceHitAt8": 1,
+        "meanReciprocalRank": 0.8611111111111112,
+        "answerSpanRecall": 1,
+        "unanswerableFalsePositiveQueries": 1,
+        "meanSearchMilliseconds": 9.314677275994795
+      }
+    },
+    "results": [
+      {
+        "id": "current-budget",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-schedule-2026",
+          "rank": 4,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.35489999999993
+        },
+        "embedding": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": 1,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 10.019800014561042
+        },
+        "hybrid": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": 2,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 16.509200014561088
+        }
+      },
+      {
+        "id": "old-budget",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 2.0067000000000235
+        },
+        "embedding": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 9.674500004621223
+        },
+        "hybrid": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 11.696800004621878
+        }
+      },
+      {
+        "id": "current-equipment",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-budget-2026-v2",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 2.149699999999939
+        },
+        "embedding": {
+          "firstSource": "service-budget-2026-v2",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.960300001082942
+        },
+        "hybrid": {
+          "firstSource": "service-budget-2026-v2",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 9.121300001083
+        }
+      },
+      {
+        "id": "plan-training",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.7327999999999975
+        },
+        "embedding": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": 1,
+          "sourceCount": 7,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.675599986920133
+        },
+        "hybrid": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.41969998692025
+        }
+      },
+      {
+        "id": "plan-performance",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.8099999999999454
+        },
+        "embedding": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 7,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.294300012290478
+        },
+        "hybrid": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 9.115000012290238
+        }
+      },
+      {
+        "id": "late-appendix",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.380200000000059
+        },
+        "embedding": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.286099997349083
+        },
+        "hybrid": {
+          "firstSource": "service-plan-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 9.678699997348758
+        }
+      },
+      {
+        "id": "current-start",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-schedule-2026-v1",
+          "rank": 1,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.2471000000000458
+        },
+        "embedding": {
+          "firstSource": "service-schedule-2026-v1",
+          "rank": 2,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.8749999918509275
+        },
+        "hybrid": {
+          "firstSource": "service-schedule-2026-v1",
+          "rank": 2,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 16.718299991850927
+        }
+      },
+      {
+        "id": "current-end",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-plan-2026",
+          "rank": 1,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.3631999999998925
+        },
+        "embedding": {
+          "firstSource": "service-schedule-2026",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.56650000018999
+        },
+        "hybrid": {
+          "firstSource": "service-schedule-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.945500000190009
+        }
+      },
+      {
+        "id": "old-end",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-schedule-2026-v1",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.858699999999999
+        },
+        "embedding": {
+          "firstSource": "service-schedule-2026-v1",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.490300002042204
+        },
+        "hybrid": {
+          "firstSource": "service-schedule-2026-v1",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.358200002042622
+        }
+      },
+      {
+        "id": "current-retention",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "shared-record-rule-2025",
+          "rank": 1,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.891300000000001
+        },
+        "embedding": {
+          "firstSource": "shared-record-rule-2026",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.735300004947931
+        },
+        "hybrid": {
+          "firstSource": "shared-record-rule-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.635600004947037
+        }
+      },
+      {
+        "id": "old-retention",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "shared-record-rule-2025",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.1286000000000058
+        },
+        "embedding": {
+          "firstSource": "shared-record-rule-2025",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.301400018855929
+        },
+        "hybrid": {
+          "firstSource": "shared-record-rule-2025",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.43690001885534
+        }
+      },
+      {
+        "id": "training-limit",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "shared-expense-guide-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.1577000000000908
+        },
+        "embedding": {
+          "firstSource": "shared-expense-guide-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.745200022123754
+        },
+        "hybrid": {
+          "firstSource": "shared-expense-guide-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.909900022123452
+        }
+      },
+      {
+        "id": "approval-flow",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "shared-office-rule-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.2407000000000608
+        },
+        "embedding": {
+          "firstSource": "service-plan-2026",
+          "rank": 1,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.1890999970491976
+        },
+        "hybrid": {
+          "firstSource": "service-plan-2026",
+          "rank": 1,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.436499997049168
+        }
+      },
+      {
+        "id": "compatibility-risk",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-risks-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.3039999999999736
+        },
+        "embedding": {
+          "firstSource": "service-risks-2026",
+          "rank": 0,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.602300000144169
+        },
+        "hybrid": {
+          "firstSource": "service-risks-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.913100000144254
+        }
+      },
+      {
+        "id": "roles",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-roles-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.9711999999999534
+        },
+        "embedding": {
+          "firstSource": "service-glossary-2026",
+          "rank": 1,
+          "sourceCount": 8,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.778899976983666
+        },
+        "hybrid": {
+          "firstSource": "service-roles-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 9.756599976984035
+        }
+      },
+      {
+        "id": "semantic-alias",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-glossary-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.1765000000000327
+        },
+        "embedding": {
+          "firstSource": "service-glossary-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 6.2824999913573265
+        },
+        "hybrid": {
+          "firstSource": "service-glossary-2026",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.465499991357774
+        }
+      },
+      {
+        "id": "temporary-confirmation",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "service-schedule-2026",
+          "rank": 1,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 1.391399999999976
+        },
+        "embedding": {
+          "firstSource": "service-budget-2026-v2",
+          "rank": 1,
+          "sourceCount": 7,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.483900000806898
+        },
+        "hybrid": {
+          "firstSource": "temporary-service-meeting-20261012",
+          "rank": 0,
+          "sourceCount": 6,
+          "answerSpanRecall": 1,
+          "milliseconds": 8.884100000806484
+        }
+      },
+      {
+        "id": "other-budget",
+        "noAnswer": false,
+        "bm25": {
+          "firstSource": "other-meeting-2026",
+          "rank": 2,
+          "sourceCount": 7,
+          "answerSpanRecall": 1,
+          "milliseconds": 0.42210000000000036
+        },
+        "embedding": {
+          "firstSource": "other-plan-2026",
+          "rank": 1,
+          "sourceCount": 7,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.068400009302422
+        },
+        "hybrid": {
+          "firstSource": "other-plan-2026",
+          "rank": 2,
+          "sourceCount": 7,
+          "answerSpanRecall": 1,
+          "milliseconds": 7.494900009302228
+        }
+      },
+      {
+        "id": "unknown-word",
+        "noAnswer": true,
+        "bm25": {
+          "firstSource": null,
+          "rank": -1,
+          "sourceCount": 0,
+          "answerSpanRecall": null,
+          "milliseconds": 1.5955999999998767
+        },
+        "embedding": {
+          "firstSource": "service-plan-2026",
+          "rank": -1,
+          "sourceCount": 6,
+          "answerSpanRecall": null,
+          "milliseconds": 6.885900016641244
+        },
+        "hybrid": {
+          "firstSource": null,
+          "rank": -1,
+          "sourceCount": 0,
+          "answerSpanRecall": null,
+          "milliseconds": 8.483500016641528
+        }
+      },
+      {
+        "id": "unknown-overlap",
+        "noAnswer": true,
+        "bm25": {
+          "firstSource": null,
+          "rank": -1,
+          "sourceCount": 0,
+          "answerSpanRecall": null,
+          "milliseconds": 0.7951000000000477
+        },
+        "embedding": {
+          "firstSource": "service-roles-2026",
+          "rank": -1,
+          "sourceCount": 7,
+          "answerSpanRecall": null,
+          "milliseconds": 8.253300009528175
+        },
+        "hybrid": {
+          "firstSource": null,
+          "rank": -1,
+          "sourceCount": 0,
+          "answerSpanRecall": null,
+          "milliseconds": 9.048800009528122
+        }
+      },
+      {
+        "id": "foreign-unselected",
+        "noAnswer": true,
+        "bm25": {
+          "firstSource": "service-plan-2026",
+          "rank": -1,
+          "sourceCount": 7,
+          "answerSpanRecall": null,
+          "milliseconds": 1.144900000000007
+        },
+        "embedding": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": -1,
+          "sourceCount": 8,
+          "answerSpanRecall": null,
+          "milliseconds": 6.493000022601336
+        },
+        "hybrid": {
+          "firstSource": "service-budget-2026-v1",
+          "rank": -1,
+          "sourceCount": 7,
+          "answerSpanRecall": null,
+          "milliseconds": 7.681300022600908
+        }
+      },
+      {
+        "id": "unknown-key",
+        "noAnswer": true,
+        "bm25": {
+          "firstSource": null,
+          "rank": -1,
+          "sourceCount": 0,
+          "answerSpanRecall": null,
+          "milliseconds": 0.5867999999998119
+        },
+        "embedding": {
+          "firstSource": "temporary-service-meeting-20261012",
+          "rank": -1,
+          "sourceCount": 6,
+          "answerSpanRecall": null,
+          "milliseconds": 6.626399990636855
+        },
+        "hybrid": {
+          "firstSource": null,
+          "rank": -1,
+          "sourceCount": 0,
+          "answerSpanRecall": null,
+          "milliseconds": 7.213499990636365
+        }
+      }
+    ],
+    "selection": "Same selected chunks. Fusion uses reciprocal ranks (constant 60) and requires at least one BM25 hit. Embedding-only has no abstention threshold."
+  }
+}

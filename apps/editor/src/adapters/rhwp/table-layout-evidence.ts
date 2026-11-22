@@ -1,5 +1,28 @@
 import type {Table} from '../../modules/document/public/index.ts';
+import {verifyPreservedExport} from './preservation.ts';
 import {parsed} from './structure.ts';
+
+export function tableSizeFormat(d:any,name:string):'hwp'|'hwpx'|undefined {
+ if(/\.hwpx$/iu.test(name)&&typeof d.exportHwpx==='function')return 'hwpx';
+ if(/\.hwp$/iu.test(name)&&d.getSourceFormat?.()==='hwp'&&typeof d.exportHwpWithReport==='function')return 'hwp';
+}
+
+export function assertTableSizeRoundTrip(d:any,table:Table,name:string,dimension:string):void {
+ const format=tableSizeFormat(d,name);
+ if(!format)throw new Error('표 크기를 검증할 HWP·HWPX 저장 형식을 확인하지 못했습니다.');
+ const live=tableLayoutEvidence(d,table);
+ const open=(bytes:Uint8Array)=>new d.constructor(bytes);
+ const artifact=format==='hwp'?d.exportHwpWithReport():undefined;
+ let reopened:any;
+ try{
+  const bytes=artifact?artifact.takeBytes():d.exportHwpx();
+  if(artifact)verifyPreservedExport(d,bytes,format,artifact.contentLoss(),open);
+  reopened=open(bytes);
+  if(!sameTableLayout(live,tableLayoutEvidence(reopened,table)))
+   throw new Error(dimension+' 변경 후 저장 재열기의 실제 셀과 글줄 배치가 다릅니다. 적용하지 않습니다.');
+ }finally{reopened?.free();artifact?.free();}
+}
+
 export function tableLayoutEvidence(d:any,t:Table):unknown[] {
  const result:unknown[]=[];const count=d.pageCount();if(!Number.isSafeInteger(count)||count<1)throw new Error('셀 안 여백의 실제 배치를 확인하지 못했습니다.');
  for(let page=0;page<count;page++){

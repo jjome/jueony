@@ -19,7 +19,7 @@
       "file": "02-agent-and-models.md",
       "title": "AI 연결·Agent 실행",
       "description": "제공자·모델·인증, 현재 문서 문맥, 진행·취소, 변경 확인과 Agent loop.",
-      "ids": "G074-G083 G086 N024-N032",
+      "ids": "G074-G083 G086 G131 N024-N032",
       "related": [
         "references",
         "macros",
@@ -31,7 +31,7 @@
       "file": "03-references-and-rag.md",
       "title": "참고 자료·검색·RAG",
       "description": "즉시 첨부, 자료 격리, 추출·색인·검색·근거와 검색 품질 평가.",
-      "ids": "G009-G011 G084-G085 N033-N037",
+      "ids": "G009-G011 G084-G085 G126 N033-N037",
       "related": [
         "workspaces",
         "agent",
@@ -43,7 +43,7 @@
       "file": "04-macros-and-business.md",
       "title": "반복 작업·공무원 업무 양식",
       "description": "문서마당·상용구·기관 양식, 반복 명령, 매크로 기록·재생과 메일 머지.",
-      "ids": "B003-B004 B081 B141-B142 G087-G089 N038-N040",
+      "ids": "B003-B004 B081 B141-B142 G087-G089 G133 N038-N040",
       "related": [
         "agent",
         "references",
@@ -55,7 +55,7 @@
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
       "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 형식 보존.\n\n세부 구현은 25/25, 세부 검증은 23/25이다. N046은 LTR·RTL을 HWP로, 명시 AUTO를 HWPX 사본으로 보존한다. N001의 복합 배치와 N002의 공개 문서 변환은 한글 직접 검수가 남아 있다. [N046 한글 검수](../file-table-verification-2026-11-08.md) · [N001 합본 근거](../138-n001-storage-current-closure.md)",
-      "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
+      "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 G129 N001-N002",
       "related": [
         "session",
         "tables",
@@ -92,7 +92,7 @@
       "file": "08-tables.md",
       "title": "표·셀·크기·계산",
       "description": "표 생성·변환·제목 반복·여백·크기·병합·분할·행열·중첩과 계산.",
-      "ids": "B067-B069 B084 B153-B169 B171-B173 G040-G052 N003-N010",
+      "ids": "B067-B069 B084 B153-B169 B171-B173 G040-G052 G125 G132 N003-N010",
       "related": [
         "files",
         "stories",
@@ -164,7 +164,7 @@
       "file": "14-security-and-review.md",
       "title": "보안·개인정보·검토·메모",
       "description": "암호·배포용·개인정보, 변경 추적·이력·문서 비교·메모의 전체 범위.",
-      "ids": "B092 B128-B136 B146",
+      "ids": "B092 B128-B136 B146 G128",
       "related": [
         "files",
         "agent",
@@ -176,7 +176,7 @@
       "file": "15-output-and-tools.md",
       "title": "출력·변환·교정·외부 도구",
       "description": "인쇄·PDF·접근성 변환·외부 연동, 사전·교정·차례·색인·문서 도구.",
-      "ids": "B007-B008 B012-B013 B015-B020 B083 B091 B137-B140 B143-B145 B147 B149 B187-B188",
+      "ids": "B007-B008 B012-B013 B015-B020 B083 B091 B137-B140 B143-B145 B147 B149 B187-B188 G124 G127 G130",
       "related": [
         "files",
         "macros",

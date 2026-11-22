@@ -18,6 +18,11 @@ export function describeTemplate(template:CommandTemplate):string {
    label='용지/여백 · '+Object.entries(op.properties).map(([k,v])=>`${names[k]??'지원 검사 대상'} ${k==='landscape'?(v?'켜기':'끄기'):v+'mm'}`).join(' · ');
   }else if(op.kind==='create_document')label='새 문서 · '+op.paragraphs.length+'문단';
   else if(op.kind==='create_table')label='새 표 · '+op.rows.length+'행 × '+op.rows[0]?.length+'열';
+  else if(op.kind==='set_table_cell')label=`대상 표의 ${op.row+1}행 ${op.column+1}열 내용 바꾸기\n${preview(op.text)}`;
+  else if(op.kind==='set_shape_fill')label=`대상 도형의 단색 채우기를 ${op.color}로 바꾸기`;
+  else if(op.kind==='format_table_cells')label=`대상 표의 ${op.startRow+1}행 ${op.startColumn+1}열부터 ${op.rowCount}행 × ${op.columnCount}열 서식 변경`;
+  else if(op.kind==='insert_table_row'||op.kind==='insert_table_column')label=`대상 표의 ${op.index+1}번째 ${op.kind==='insert_table_row'?'행':'열'} 위치에 추가`;
+  else if(op.kind==='delete_table_row'||op.kind==='delete_table_column')label=`대상 표의 ${op.index+1}번째 ${op.kind==='delete_table_row'?'행':'열'} 삭제`;
   else if(op.kind==='insert_body_paragraphs')label='원문 대조 후 본문 '+op.paragraphs.length+'문단 삽입';
   else if(op.kind==='replace_body_text')label='원문 대조 후 본문 수정\n'+preview(op.text);
   else if(op.kind==='delete_body_text')label='원문 대조 후 본문 삭제';

@@ -29,6 +29,7 @@ export function createBoundSaveForServices(services: CommandServices) {
     prepare: (target, authority) => api().prepareFileSave(target, authority),
     payload: target => createSavePayload(services, target).blob,
     write: writeSnapshot,
+    acknowledgeVerifiedSave: (revision, sha256) => api().acknowledgeVerifiedSave?.(revision, sha256),
     complete: (target, handle) => {
       const current = services.wasm.currentFileHandle;
       if (!current || current !== handle) throw new Error('파일 기록 후 원본 연결이 바뀌었습니다.');

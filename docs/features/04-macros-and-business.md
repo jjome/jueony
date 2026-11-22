@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **6개**, 상위 범위 **5개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **7개**, 상위 범위 **5개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 5 |
-| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 5 |
-| Agent 연결 | 연결 3/6 · 부분 0 · 미연결 3 | 연결 0/5 · 부분 0 · 미연결 5 |
+| 구현 | 완료 4/7 · 부분 3 | 완료 0/5 · 부분 5 |
+| 검증 | 완료 3/7 · 부분 4 | 완료 0/5 · 부분 5 |
+| Agent 연결 | 연결 4/6 · 부분 2 · 해당 없음 1 | 연결 0/5 · 부분 1 · 미연결 4 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N038](<04-macros-and-business.md#n038>) **반복 작업의 표·개체 명령 확장** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N040](<04-macros-and-business.md#n040>) **기관별 공식 양식·공문 업무 흐름** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N039](<04-macros-and-business.md#n039>) **수동 편집 동작의 매크로 기록·재생** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N038](<04-macros-and-business.md#n038>) **반복 작업의 표·개체 명령 확장** — 로컬 Qwen으로 HWP·HWPX의 중첩 표 셀·단순 도형의 색을 바꾸고 중첩 행·열을 추가하거나 삭제했다. 바깥 셀에 문장이 있는 HWP에서 행 삭제 후 바깥 높이를 다시 계산하도록 수정했다. 정밀 검사에서 두 형식의 첫 행과 끝 행 삭제 뒤 바깥 높이가 저장 전후 일치했다. 로컬 Qwen의 행·열 편집 9건을 반복 작업으로 저장하고 모델 재호출 없이 적용·저장·재열기했다. 한 번 되돌린 바이트가 원본과 일치했다. 병합·보호 표와 복합 개체 및 독립 한글 비교가 남았다.
+- **구현** [N040](<04-macros-and-business.md#n040>) **기관별 공식 양식·공문 업무 흐름** — 기관 제공 HWP/HWPX 양식의 일반 본문과 단순 셀을 별도 사본에서 채운다. 표시한 본문 항목의 AI 초안과 실제 ZIP 다운로드에서 본문·붙임 보존을 확인했다. 실제 기관 결재와 장기 보존소 통합이 남았다.
+- **구현** [N039](<04-macros-and-business.md#n039>) **수동 편집 동작의 매크로 기록·재생** — Chrome의 HWP·HWPX에서 키 입력·삭제, 같은 문단의 선택 교체, 한글 조합 확정, 정렬을 기록했다. JSON 가져오기와 업무 다시 열기, 로컬 Qwen에서 입력값 표식만 보내는 AI 재생, 저장·재열기와 한 번 되돌리기를 확인했다. 여러 문단의 삭제는 기록을 취소한다. 특수 영역·개체·문단 구조, 운영 모델과 독립 한글 비교는 남았다.
 
 ## 기능별 작업표
 
@@ -42,7 +42,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B003](<04-macros-and-business.md#b003>) · 범위 | 문서마당 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N040](<04-macros-and-business.md#n040>) · 작업 | 기관별 공식 양식·공문 업무 흐름 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [N040](<04-macros-and-business.md#n040>) · 작업 | 기관별 공식 양식·공문 업무 흐름 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 
 <a id="work-2"></a>
 
@@ -74,8 +74,8 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B142](<04-macros-and-business.md#b142>) · 범위 | 스크립트 매크로 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N039](<04-macros-and-business.md#n039>) · 작업 | 수동 편집 동작의 매크로 기록·재생 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B142](<04-macros-and-business.md#b142>) · 범위 | 스크립트 매크로 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
+| [N039](<04-macros-and-business.md#n039>) · 작업 | 수동 편집 동작의 매크로 기록·재생 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 
 <a id="work-6"></a>
 
@@ -86,7 +86,8 @@
 | [G087](<04-macros-and-business.md#g087>) · 작업 | 업무별 반복 명령 저장·변수·재실행 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G088](<04-macros-and-business.md#g088>) · 작업 | 구역·쪽·바탕쪽 반복 recipe 확장 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G089](<04-macros-and-business.md#g089>) · 작업 | 공문·계획·결과 보고 기본 초안 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
-| [N038](<04-macros-and-business.md#n038>) · 작업 | 반복 작업의 표·개체 명령 확장 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [N038](<04-macros-and-business.md#n038>) · 작업 | 반복 작업의 표·개체 명령 확장 | ◐ 부분 | ◐ 부분 | ☑ 연결 |
+| [G133](<04-macros-and-business.md#g133>) · 작업 | 변수를 채운 기본 업무 양식 사본 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 
@@ -150,13 +151,12 @@
 <summary>B142 · 스크립트 매크로</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 안전 명령 카탈로그·기록/직렬화·원자적 재생 코어만 구현됐으며 실제 Studio 디스패처 이벤트·UI·저장 수명은 완료 범위가 아님.
-- 다음 작업: 성공한 등록 명령만 기록하고 IME/선택/raw 키/실패 명령을 차단한다. bounded canonical JSON과 document identity/revision preflight를 적용하고 재생 전체를 단일 snapshot undo 거래로 요구하며 실패·중지·취소 시 전체 rollback을 검증함. Studio CommandDispatcher 성공 이벤트와 외부 snapshot raw-step 실행 seam·녹화 UI·영구 저장 연결은 남음.
-- UI 명령: `pending:macro-record`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [script-macro-b142.ts](<../../apps/editor/src/modules/script-macros/domain/script-macro-b142.ts>) · [script-macro-runtime-b142.ts](<../../apps/editor/src/adapters/rhwp/script-macro-runtime-b142.ts>) · [script-macro-runtime-b142.test.ts](<../../apps/editor/tests/script-macro-runtime-b142.test.ts>)
-- 원래 기록: `PARTIAL;SCOPED_SAFE_RECORD_REPLAY_CORE_PASS_2026_11_09`
+- 완료 범위: 한글 2024의 스크립트 매크로 상위 항목. 일반 본문의 입력·삭제·선택 글자 교체와 정렬의 기록·재생을 연결했다.
+- 다음 작업: Chrome의 HWP·HWPX에서 키 입력·삭제, 같은 문단의 선택 교체, 한글 조합 확정, 정렬을 기록했다. JSON 가져오기와 업무 다시 열기, 로컬 Qwen에서 입력값 표식만 보내는 AI 재생, 저장·재열기와 한 번 되돌리기를 확인했다. 여러 문단의 삭제는 기록을 취소한다. 특수 영역·개체·문단 구조, 운영 모델과 독립 한글 비교는 남았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [script-macro-b142.ts](<../../apps/editor/src/modules/script-macros/domain/script-macro-b142.ts>) · [script-macro-runtime-b142.ts](<../../apps/editor/src/adapters/rhwp/script-macro-runtime-b142.ts>) · [script-macro-runtime-b142.test.ts](<../../apps/editor/tests/script-macro-runtime-b142.test.ts>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [alignment-macros.ts](<../../apps/editor/src/ui/alignment-macros.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [verify-manual-edit-macro.mjs](<../../apps/editor/scripts/verify-manual-edit-macro.mjs>)
+- 원래 기록: `PARTIAL;SCOPED_SAFE_RECORD_REPLAY_CORE_PASS_2026_11_09;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -193,9 +193,9 @@
 - 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent ☑ 연결.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 입력한 사실 기반 합성 양식; 공식 기관 인증 제외
-- 다음 작업: 기록된 범위 유지·관련 변경 시 회귀 검사
-- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: 공문 초안 등 기본 양식의 필수값과 미리보기·일괄 서식을 추가했다. 원본 기관 서식 연동은 기관 파일과 적용 규칙이 필요하다.
+- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 
@@ -203,12 +203,12 @@
 <summary>N038 · 반복 작업의 표·개체 명령 확장</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 범위/상태/ID/변수·dry-run·batch·한 번 undo·저장 검사
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- 근거: [64-section-repeat-work.md](<../64-section-repeat-work.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 기존 평면 표의 셀·서식, 행·열 추가·삭제를 AI 실행 뒤 반복 작업으로 저장한다. 표 직접 선택과 원문·격자·서식 대조, 변수와 한 번 되돌리기를 제공한다.
+- 다음 작업: 로컬 Qwen으로 HWP·HWPX의 중첩 표 셀·단순 도형의 색을 바꾸고 중첩 행·열을 추가하거나 삭제했다. 바깥 셀에 문장이 있는 HWP에서 행 삭제 후 바깥 높이를 다시 계산하도록 수정했다. 정밀 검사에서 두 형식의 첫 행과 끝 행 삭제 뒤 바깥 높이가 저장 전후 일치했다. 로컬 Qwen의 행·열 편집 9건을 반복 작업으로 저장하고 모델 재호출 없이 적용·저장·재열기했다. 한 번 되돌린 바이트가 원본과 일치했다. 병합·보호 표와 복합 개체 및 독립 한글 비교가 남았다.
+- 근거: [64-section-repeat-work.md](<../64-section-repeat-work.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [table-macros.test.ts](<../../apps/editor/tests/table-macros.test.ts>) · [shape-fill-macros.test.ts](<../../apps/editor/tests/shape-fill-macros.test.ts>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>)
+- 원래 기록: `SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -216,13 +216,13 @@
 <summary>N039 · 수동 편집 동작의 매크로 기록·재생</summary>
 
 - 종류: 실행 작업 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 지원 동작만·민감 정보·중단·재실행/내보내기
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 일반 본문의 입력·삭제·선택 글자 교체와 다섯 정렬을 기록하고 같은 원문의 재생과 JSON 내보내기, AI 요청을 제공한다.
+- 다음 작업: Chrome의 HWP·HWPX에서 키 입력·삭제, 같은 문단의 선택 교체, 한글 조합 확정, 정렬을 기록했다. JSON 가져오기와 업무 다시 열기, 로컬 Qwen에서 입력값 표식만 보내는 AI 재생, 저장·재열기와 한 번 되돌리기를 확인했다. 여러 문단의 삭제는 기록을 취소한다. 특수 영역·개체·문단 구조, 운영 모델과 독립 한글 비교는 남았다.
 - 상위 항목: [B142](<04-macros-and-business.md#b142>) 스크립트 매크로
-- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [alignment-macros.ts](<../../apps/editor/src/ui/alignment-macros.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [verify-manual-edit-macro.mjs](<../../apps/editor/scripts/verify-manual-edit-macro.mjs>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -230,13 +230,26 @@
 <summary>N040 · 기관별 공식 양식·공문 업무 흐름</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 초안/결재/붙임/보존·기관 사실 입력·문서 유출 방지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 기관 제공 HWP/HWPX 양식의 일반 본문과 단순 셀을 별도 사본에서 채운다. 표시한 본문 항목의 AI 초안과 실제 ZIP 다운로드에서 본문·붙임 보존을 확인했다. 실제 기관 결재와 장기 보존소 통합이 남았다.
 - 상위 항목: [B003](<04-macros-and-business.md#b003>) 문서마당
-- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [28-continuation-implementation.md](<../28-continuation-implementation.md>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [manifest.json](<../evidence/ieum-followup-2026-11-21/manifest.json>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-ieum-first-slice.mjs](<../../apps/editor/scripts/verify-ieum-first-slice.mjs>) · [institution-template-copy.test.ts](<../../apps/editor/tests/institution-template-copy.test.ts>) · [institution-review-bundle.test.ts](<../../apps/editor/tests/institution-review-bundle.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_IEUM_FOLLOWUP_2026_11_21;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
+
+</details>
+
+<details id="g133">
+<summary>G133 · 변수를 채운 기본 업무 양식 사본</summary>
+
+- 종류: 실행 작업 · 우선순위: P2.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 양식별 필수값과 미리보기, 확인된 HWPX 새 탭과 반복 실행, 기존 문서와 기본 정의 보존.
+- 다음 작업: 기관 서식 파일과 한글에서의 서식 대조는 남았다.
+- 근거: [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>)
+- 원래 기록: `SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

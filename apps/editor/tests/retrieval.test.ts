@@ -53,6 +53,56 @@ test('검색 결과는 최대 8개/8000자/원본별3개이며 예산 때문에 
  assert.equal(missing.references.length,0);assert.match(missing.retrieval.warnings[0],/찾지 못했습니다/);
 });
 
+test('현행 검색은 같은 문서군의 명시된 시행일을 비교하고 과거 요청에는 그대로 답한다',async()=>{
+ const edition=(id:string,version:number,date:string,body='교통비 상한 금액 8만원')=>source(id,`출장비 기준\n시행일: ${date}\n${body}`,`내규/출장비 기준 v${version}.hwpx`);
+ const old=edition('first',1,'2022-01-01'),current=edition('current',2,'2024-07-01','교통비 상한 금액 10만원');
+ const future=edition('future',3,'2099-06-12'),invalid=edition('invalid',4,'2025-02-31');
+ const index=await indexSelectedSources(scope,[old,current,future,invalid]);
+ const currentQuery='현행 출장비 기준 교통비 상한 금액';
+ assert.equal(searchSelectedSources(index,scope,currentQuery,undefined,'bm25').references[0].originSourceId,'current');
+ assert.equal(searchSelectedSources(index,scope,'2022년 구본 출장비 기준 교통비 상한 금액',undefined,'bm25').references[0].originSourceId,'first');
+ const unrelated=source('unrelated',future.text,'타 부서/출장비 기준 v3.hwpx');
+ const crossed=await indexSelectedSources(scope,[old,current,unrelated]);
+ assert.equal(searchSelectedSources(crossed,scope,currentQuery,undefined,'bm25').references[0].originSourceId,'current');
+});
+
+test('명시적으로 폐기되거나 초안인 출처는 현행 질문에서만 낮추고 이전판·초안 요청은 우선한다',async()=>{
+ const archived=source('archive','버전: 1 | 상태: superseded\n출장비 교통비 상한 8만원');
+ const draft=source('draft','상태: draft\n출장비 교통비 상한 12만원');
+ const current=source('current','상태: current\n출장비 교통비 상한 10만원');
+ const index=await indexSelectedSources(scope,[archived,draft,current]);
+ const first=(query:string)=>searchSelectedSources(index,scope,query+' 출장비 교통비 상한',undefined,'bm25').references[0]?.originSourceId;
+ assert.equal(first('현행'),'current');
+ assert.equal(first('이전 적용 기준'),'archive');
+ assert.equal(first('9월까지 적용했던 초안'),'archive');
+ assert.equal(first('초안'),'draft');
+});
+
+test('한국어 검색은 요청한 사업을 확인하고 표의 날짜나 총액을 뒷받침하는 자료를 먼저 올린다',async()=>{
+ const heading='산업 안전 현장 점검 사업';
+ const index=await indexSelectedSources(scope,[
+  source('plan',`${heading} 계획\n내년도 일정과 예산 총액을 검토한다.\n점검 완료 예정일을 협의한다.`,'계획.hwpx'),
+  source('budget',`${heading} 예산\n항목\n금액(원)\n총사업비\n10,200,000원`,'예산.hwpx'),
+  source('schedule',`${heading} 일정\n적용: 2024-04-01 ~ 현재 | 상태: current\n완료\n2024-12-20`,'일정.hwpx'),
+  source('archived',`${heading} 일정\n적용: 2023-08-01 ~ 2024-03-31 | 상태: superseded\n완료 예정일은 2024-12-11이다.`,'일정-v1.txt'),
+ ]);
+ const find=(query:string)=>searchSelectedSources(index,scope,query,undefined,'bm25').references;
+ assert.equal(find(`${heading}의 확정 총예산은 얼마인가요?`)[0]?.originSourceId,'budget');
+ assert.equal(find(`현재 확정된 ${heading}의 완료 예정일은 언제인가요?`)[0]?.originSourceId,'schedule');
+ assert.equal(find(`이전 초안에서 ${heading}의 완료 예정일은 언제였나요?`)[0]?.originSourceId,'archived');
+ assert.deepEqual(find('농촌 용수 개선 사업의 총예산은 얼마인가요?'),[]);
+});
+
+test('날짜를 지정한 회의 검색은 헤더의 연도·월·일을 함께 비교한다',async()=>{
+ const index=await indexSelectedSources(scope,[
+  source('old','2023-06-20 유지보수 협의 회의록\n유지보수 일정과 작업량은 안건이다.','회의록 2023-06-20.md'),
+  source('exact','2024-06-20 유지보수 회의록\n작업량 25건을 확정했다.','회의록 2024-06-20.md'),
+  source('recent','2024-06-21 유지보수 협의 회의록\n유지보수 일정과 작업량은 안건이다.','회의록 2024-06-21.md'),
+ ]);
+ const found=searchSelectedSources(index,scope,'2024년 6월 20일 유지보수 회의에서 확정한 작업량을 알려 주세요.',undefined,'bm25');
+ assert.equal(found.references[0]?.originSourceId,'exact');
+});
+
 test('색인과 검색은 취소·중복 자료·잘못된 버전·탐색 예산을 거부한다',async()=>{
  const controller=new AbortController();controller.abort();
  await assert.rejects(indexSelectedSources(scope,[source('a','본문')],controller.signal),{name:'AbortError'});

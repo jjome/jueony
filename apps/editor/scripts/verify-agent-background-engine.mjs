@@ -31,5 +31,73 @@ await scenario('a single existing parity entry keeps the absent odd fallback dur
 await scenario('native stale tokens and invalid scopes, colors, fields or fill types reject before resource/section mutation',async()=>{const d=body();try{const native=json(d.getAgentPageBackground(0,'both')),command={fillType:'solid',color:'#112233',token:native.token};d.setSectionDef(0,JSON.stringify({defaultTabSpacing:6000}));const before=d.exportHwpx();assert.throws(()=>d.setAgentPageBackground(0,'both',JSON.stringify(command)));const current={...command,token:json(d.getAgentPageBackground(0,'both')).token};for(const v of [{...current,color:'#fff'},{...current,color:'url(x)'},{...current,fillType:'image'},{...current,unknown:1},{...current,color:123}])assert.throws(()=>d.setAgentPageBackground(0,'both',JSON.stringify(v)));assert.throws(()=>d.setAgentPageBackground(0,'current',JSON.stringify(current)));assert.deepEqual(d.exportHwpx(),before);}finally{d.free();}});
 await scenario('gradient or hatch originals cannot be cleared or flattened, while a simple opposite parity stays editable',async()=>{for(const mode of ['gradient','hatch']){const d=body();try{writePageBorderSettings(d,0,'odd',{...readPageBorderSettings(d,0,'odd'),fillType:mode==='gradient'?'gradient':'solid',fillColor:'#ff0000',patternType:mode==='hatch'?2:-1,gradient:defaultPageGradient()});const before=d.exportHwpx();assert.equal(json(d.getAgentPageBackground(0,'both')).editable,false);assert.equal(json(d.getAgentPageBackground(0,'odd')).editable,false);assert.equal(json(d.getAgentPageBackground(0,'even')).editable,true);for(const kind of ['both','odd'])assert.throws(()=>edit(d,'hwpx',[background(kind,'none','#ffffff')]));assert.deepEqual(d.exportHwpx(),before);edit(d,'hwpx',[background('even')]);assert.equal(readPageBorderSettings(d,0,'odd').fillType,mode==='gradient'?'gradient':'solid');assert.equal(readPageBorderSettings(d,0,'even').fillColor,'#fff2cc');}finally{d.free();}}});
 for(const mode of ['threeD','shadow','diagonal','alpha'])await scenario(`opaque ${mode}: query and native setter refuse source before applying earlier batch operations`,async()=>{const raw=body();let d;try{writePageBorderSettings(raw,0,'both',{...readPageBorderSettings(raw,0),fillType:'solid',fillColor:'#fff2cc'});const source=resolve(out,'opaque-source-'+mode+'.hwpx'),target=resolve(out,'opaque-'+mode+'.hwpx');await writeFile(source,raw.exportHwpx());execFileSync(process.env.JUEONY_TEST_PYTHON??'C:/Python314/python.exe',[resolve(repo,'apps/editor/scripts/page-style-fixture.py'),source,target,mode,String(readPageBorderSettings(raw,0).borderFillId)],{windowsHide:true});d=new HwpDocument(await readFile(target));const gate=json(d.getAgentPageBackground(0,'both')),before=d.exportHwpx();assert.equal(gate.editable,false);assert.ok(gate.reason);assert.throws(()=>d.setAgentPageBackground(0,'both',JSON.stringify({fillType:'none',color:'#ffffff',token:'invented'})));assert.throws(()=>edit(d,'hwpx',[{kind:'set_section_tabs',section:0,spacingPt:18},background()]));assert.deepEqual(d.exportHwpx(),before);}finally{d?.free();raw.free();}});
-await scenario('page-only fill uses copied resources and retains shared table cell properties and background',async()=>{const d=body();try{const t=json(d.createTable(0,1,0,1,1)),cell=json(d.getCellProperties(0,t.paraIdx,t.controlIdx,0));edit(d,'hwpx',[background()]);assert.deepEqual(json(d.getCellProperties(0,t.paraIdx,t.controlIdx,0)),cell);const loaded=await saved(d,'hwpx','page-background-table');try{assert.deepEqual(json(loaded.getCellProperties(0,t.paraIdx,t.controlIdx,0)),cell);assert.equal(json(loaded.getAgentPageBackground(0,'both')).color,'#fff2cc');}finally{loaded.free();}}finally{d.free();}});
+await scenario('page-only fill uses copied resources and retains the stored table cell properties and background',async()=>{
+ const created=body(),table=json(created.createTable(0,1,0,1,1));
+ // Newly created tables go through their first layout normalization on HWPX export.
+ // Test the stored document without weakening the preflight layout comparison.
+ const doc=new HwpDocument(created.exportHwpx());created.free();
+ try{
+  const read=source=>json(source.getCellProperties(0,table.paraIdx,table.controlIdx,0));
+  const cell=read(doc);
+  edit(doc,'hwpx',[background()]);
+  assert.deepEqual(read(doc),cell);
+  const loaded=await saved(doc,'hwpx','page-background-table');
+  try{
+   assert.deepEqual(read(loaded),cell);
+   assert.equal(json(loaded.getAgentPageBackground(0,'both')).color,'#fff2cc');
+  }finally{loaded.free();}
+ }finally{doc.free();}
+});
+if(process.env.JUEONY_TEST_AGENT_GRADIENT==='1'){
+ const gradient=(pageKind='both',angle=45)=>({...background(pageKind,'gradient','#112233'),endColor:'#ddeeff',angle});
+ for(const format of ['hwp','hwpx'])await scenario(`${format}: linear gradients preserve parity geometry, round-trip and restore exact original bytes`,async()=>{
+  const exportFormat=doc=>doc[format==='hwp'?'exportHwp':'exportHwpx']();
+  const fixture=decorated(),doc=new HwpDocument(exportFormat(fixture));fixture.free();
+  try{
+   const original=exportFormat(doc),snapshot=doc.saveSnapshot(),before=snap(doc,format),geometry=entries(doc).map(nonFill);
+   edit(doc,format,[gradient()]);
+   for(const kind of ['both','even','odd']){
+    const setting=readPageBorderSettings(doc,0,kind);
+    assert.deepEqual(setting.gradient.colors,['#112233','#ddeeff']);
+    assert.equal(setting.gradient.angle,45);
+   }
+   const beforeOdd=entries(doc);
+   edit(doc,format,[gradient('odd',120)]);
+   assert.deepEqual(entries(doc).slice(0,2),beforeOdd.slice(0,2));
+   assert.equal(readPageBorderSettings(doc,0,'odd').gradient.angle,120);
+   assert.deepEqual(entries(doc).map(nonFill),geometry);
+   const after=snap(doc,format);
+   assert.deepEqual(after.structure.sections[1],before.structure.sections[1]);
+   assert.deepEqual(after.nodes,before.nodes);
+   const loaded=await saved(doc,format,'linear-gradient');
+   try{
+    assert.equal(loaded.getSourceFormat(),format);
+    assert.deepEqual(entries(loaded).map(nonFill),geometry);
+    assert.deepEqual(snap(loaded,format).structure,after.structure);
+   }finally{loaded.free();}
+   doc.restoreSnapshot(snapshot);
+   assert.deepEqual(exportFormat(doc),original);
+   doc.discardSnapshot(snapshot);
+  }finally{doc.free();}
+ });
+ await scenario('non-linear source, stale gradient token and altered payload refuse before native mutation',async()=>{
+  const doc=body();
+  try{
+   const first=json(doc.getAgentPageBackground(0,'both'));
+   writePageBorderSettings(doc,0,'odd',{...readPageBorderSettings(doc,0,'odd'),fillType:'gradient',gradient:{...defaultPageGradient(),type:2}});
+   const before=doc.exportHwpx();
+   assert.equal(json(doc.getAgentPageBackground(0,'both')).gradientEditable,false);
+   assert.equal(json(doc.getAgentPageBackground(0,'odd')).gradientEditable,false);
+   const scope=json(doc.getAgentPageBackground(0,'even'));
+   assert.equal(scope.gradientEditable,true);
+   const payload={fillType:'gradient',color:'#112233',endColor:'#ddeeff',angle:45,token:scope.gradientToken};
+   for(const invalid of [{...payload,token:first.gradientToken},{...payload,angle:361},{...payload,endColor:'#112233'},{...payload,positions:[0,100]}]){
+    assert.throws(()=>doc.setAgentPageBackground(0,'even',JSON.stringify(invalid)));
+   }
+   assert.throws(()=>edit(doc,'hwpx',[gradient('both')]));
+   assert.deepEqual(doc.exportHwpx(),before);
+  }finally{doc.free();}
+ });
+}
+
 await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,engine:JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),note:'Guarded native Agent background edits; source opaque effects refused. Actual engine/save/reopen and snapshot undo. Hancom comparison deferred.'},null,2));if(failures.length)process.exitCode=1;

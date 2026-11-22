@@ -1,7 +1,7 @@
 {
   "organizedDate": "2026-10-16",
-  "rowCount": 457,
-  "taskCount": 236,
+  "rowCount": 467,
+  "taskCount": 246,
   "groups": [
     {
       "key": "workspaces",
@@ -19,7 +19,7 @@
         "DONE": 4
       },
       "verification": {
-        "PARTIAL": 4
+        "DONE": 4
       },
       "agent": {
         "NA": 4
@@ -49,24 +49,26 @@
         "N029",
         "N030",
         "N031",
-        "N032"
+        "N032",
+        "G131"
       ],
-      "taskCount": 20,
+      "taskCount": 21,
       "rollupCount": 0,
       "implementation": {
-        "DONE": 14,
-        "MISSING": 4,
-        "PARTIAL": 2
+        "DONE": 15,
+        "PARTIAL": 5,
+        "MISSING": 1
       },
       "verification": {
         "DONE": 9,
-        "PARTIAL": 3,
-        "NOT_RUN": 8
+        "PARTIAL": 9,
+        "NOT_RUN": 3
       },
       "agent": {
-        "CONNECTED": 13,
+        "CONNECTED": 16,
         "NA": 1,
-        "NOT_CONNECTED": 6
+        "PARTIAL": 3,
+        "NOT_CONNECTED": 1
       }
     },
     {
@@ -83,24 +85,23 @@
         "N034",
         "N035",
         "N036",
-        "N037"
+        "N037",
+        "G126"
       ],
-      "taskCount": 10,
+      "taskCount": 11,
       "rollupCount": 0,
       "implementation": {
-        "DONE": 5,
-        "PARTIAL": 2,
-        "MISSING": 3
+        "DONE": 7,
+        "PARTIAL": 4
       },
       "verification": {
-        "DONE": 4,
-        "PARTIAL": 1,
-        "NOT_RUN": 5
+        "DONE": 6,
+        "PARTIAL": 5
       },
       "agent": {
         "NA": 4,
-        "CONNECTED": 1,
-        "NOT_CONNECTED": 5
+        "CONNECTED": 5,
+        "PARTIAL": 2
       }
     },
     {
@@ -118,22 +119,23 @@
         "G089",
         "N038",
         "N039",
-        "N040"
+        "N040",
+        "G133"
       ],
-      "taskCount": 6,
+      "taskCount": 7,
       "rollupCount": 5,
       "implementation": {
-        "DONE": 3,
-        "MISSING": 2,
-        "PARTIAL": 1
+        "DONE": 4,
+        "PARTIAL": 3
       },
       "verification": {
         "DONE": 3,
-        "NOT_RUN": 3
+        "PARTIAL": 4
       },
       "agent": {
-        "CONNECTED": 3,
-        "NOT_CONNECTED": 3
+        "CONNECTED": 4,
+        "PARTIAL": 2,
+        "NA": 1
       }
     },
     {
@@ -175,20 +177,21 @@
         "G105",
         "G106",
         "G107",
-        "N046"
+        "N046",
+        "G129"
       ],
-      "taskCount": 25,
+      "taskCount": 26,
       "rollupCount": 10,
       "implementation": {
-        "DONE": 25
+        "DONE": 26
       },
       "verification": {
         "DONE": 23,
-        "PARTIAL": 2
+        "PARTIAL": 3
       },
       "agent": {
         "CONNECTED": 6,
-        "NA": 19
+        "NA": 20
       }
     },
     {
@@ -304,9 +307,9 @@
         "PARTIAL": 25
       },
       "agent": {
-        "CONNECTED": 13,
+        "CONNECTED": 14,
         "NA": 9,
-        "NOT_CONNECTED": 3
+        "PARTIAL": 2
       }
     },
     {
@@ -378,22 +381,24 @@
         "G098",
         "G121",
         "G122",
-        "G123"
+        "G123",
+        "G125",
+        "G132"
       ],
-      "taskCount": 41,
+      "taskCount": 43,
       "rollupCount": 24,
       "implementation": {
-        "DONE": 37,
-        "PARTIAL": 4
+        "DONE": 38,
+        "PARTIAL": 5
       },
       "verification": {
-        "PARTIAL": 38,
+        "PARTIAL": 40,
         "DONE": 3
       },
       "agent": {
-        "CONNECTED": 28,
+        "CONNECTED": 31,
         "NA": 8,
-        "PARTIAL": 5
+        "PARTIAL": 4
       }
     },
     {
@@ -452,8 +457,7 @@
         "PARTIAL": 23
       },
       "agent": {
-        "CONNECTED": 12,
-        "PARTIAL": 5,
+        "CONNECTED": 17,
         "NA": 6
       }
     },
@@ -587,8 +591,8 @@
         "PARTIAL": 4
       },
       "verification": {
-        "PARTIAL": 7,
-        "DONE": 4
+        "PARTIAL": 6,
+        "DONE": 5
       },
       "agent": {
         "NA": 10,
@@ -684,13 +688,20 @@
         "B134",
         "B135",
         "B136",
-        "B146"
+        "B146",
+        "G128"
       ],
-      "taskCount": 0,
+      "taskCount": 1,
       "rollupCount": 11,
-      "implementation": {},
-      "verification": {},
-      "agent": {}
+      "implementation": {
+        "DONE": 1
+      },
+      "verification": {
+        "PARTIAL": 1
+      },
+      "agent": {
+        "NA": 1
+      }
     },
     {
       "key": "tools",
@@ -719,13 +730,23 @@
         "B147",
         "B149",
         "B187",
-        "B188"
+        "B188",
+        "G124",
+        "G127",
+        "G130"
       ],
-      "taskCount": 0,
+      "taskCount": 3,
       "rollupCount": 23,
-      "implementation": {},
-      "verification": {},
-      "agent": {}
+      "implementation": {
+        "DONE": 3
+      },
+      "verification": {
+        "DONE": 1,
+        "PARTIAL": 2
+      },
+      "agent": {
+        "NA": 3
+      }
     },
     {
       "key": "architecture",
@@ -761,12 +782,12 @@
       "taskCount": 25,
       "rollupCount": 0,
       "implementation": {
-        "DONE": 7,
-        "PARTIAL": 18
+        "DONE": 8,
+        "PARTIAL": 17
       },
       "verification": {
-        "DONE": 7,
-        "PARTIAL": 18
+        "DONE": 8,
+        "PARTIAL": 17
       },
       "agent": {
         "NA": 25

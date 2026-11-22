@@ -7,6 +7,7 @@ import type {Receipt} from '../../modules/document/public/index.ts';
 import type {ModelConfig} from '../../modules/connections/public/index.ts';
 import type {Workspace,Chat} from '../../modules/workspace/public/index.ts';
 import type {StoredFileConnection} from '../files/file-connection.ts';
+import type {SavedAlignmentMacro} from '../../modules/script-macros/public/index.ts';
 import type {RecoveryRecord} from '../../modules/document-files/public/index.ts';
 import {addWorkspace as add,addChat as newChat,interruptRuns as interrupt} from '../../modules/workspace/public/index.ts';
 export type {BodyNode,Snapshot,BodyOp,EditOp,Receipt} from '../../modules/document/public/index.ts';
@@ -16,10 +17,10 @@ export type {Source} from '../../modules/references/public/index.ts';
 export type {ModelConfig} from '../../modules/connections/public/index.ts';
 export type {Message,Chat,Workspace} from '../../modules/workspace/public/index.ts';
 export {workspaceOf,chatOf,appendMessage} from '../../modules/workspace/public/index.ts';
-export type Run = { id: string; workspaceId: string; chatId: string; documentId: string; status: RunStatus; model?: Omit<ModelConfig,'id'>; sources: Omit<Source,'text'>[]; receipt?: Receipt; macroTemplate?:CommandTemplate; retrieval?:RetrievalSummary; events?:AgentEvent[]; usedSourceIds?: string[]; error?: string; createdAt: number };
+export type Run = { id: string; workspaceId: string; chatId: string; documentId: string; status: RunStatus; model?: Omit<ModelConfig,'id'>; sources: Omit<Source,'text'>[]; receipt?: Receipt; undoneAt?:number; macroTemplate?:CommandTemplate; retrieval?:RetrievalSummary; events?:AgentEvent[]; usedSourceIds?: string[]; error?: string; createdAt: number };
 export type Folder = { id: string; workspaceId: string; name: string; handle: FileSystemDirectoryHandle };
-export type SavedDocument = RecoveryRecord & { viewUpdatedAt?:number; view?:DocumentViewState; fileConnection?: StoredFileConnection };
-export type AppState = { version: 1; activeWorkspaceId: string; workspaces: Workspace[]; chats: Chat[]; folders: Folder[]; runs: Run[]; models: ModelConfig[]; split: number; agentWidth?: number; sidebarHidden?: boolean; focusMode?:boolean; retrieveSources?:boolean; reviewBeforeApply?:boolean; macros?:CommandMacro[] };
+export type SavedDocument = RecoveryRecord & { checkpointToken?:string; viewUpdatedAt?:number; view?:DocumentViewState; fileConnection?: StoredFileConnection };
+export type AppState = { version: 1; activeWorkspaceId: string; workspaces: Workspace[]; chats: Chat[]; folders: Folder[]; runs: Run[]; models: ModelConfig[]; split: number; agentWidth?: number; sidebarHidden?: boolean; focusMode?:boolean; retrieveSources?:boolean; rankedSearch?:boolean; reviewBeforeApply?:boolean; documentToolMode?:boolean; pdfOcr?:boolean; macros?:CommandMacro[]; alignmentMacros?:SavedAlignmentMacro[] };
 
 export const uid=()=>crypto.randomUUID();
 export function initialState():AppState{return {version:1,activeWorkspaceId:'',workspaces:[],chats:[],folders:[],runs:[],models:[],split:42};}

@@ -6,9 +6,9 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..'),repo=resolve(app,'../..'),dist=resolve(app,process.env.JUEONY_TEST_DIST),pkg=resolve(repo,process.env.JUEONY_ENGINE_PACKAGE),out=resolve(repo,process.env.JUEONY_TEST_OUTPUT??'docs/evidence/agent-split-2026-10-14/split-browser');await mkdir(out,{recursive:true});
-const port=4261,origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms)),png=resolve(app,'fixtures/page-background/background-bands.png'),jpg=resolve(app,'fixtures/page-background/background-bands.jpg');
+const port=Number(process.env.JUEONY_TEST_PORT??4261),origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms)),png=resolve(app,'fixtures/page-background/background-bands.png'),jpg=resolve(app,'fixtures/page-background/background-bands.jpg');
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});if(await fetch(origin+'/api/health').then(()=>true,()=>false))throw new Error('Test port occupied');
-const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}}),results=[],failures=[],pageErrors=[],consoleErrors=[],externalRequests=[];let browser,page;
+const server=spawn(process.execPath,[process.env.JUEONY_TEST_SERVER??'apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}}),results=[],failures=[],pageErrors=[],consoleErrors=[],externalRequests=[];let browser,page;
 const active=async()=>(await page.$('.editor-frame:not([hidden])')).contentFrame();
 async function services(){const f=await active();await f.evaluate(()=>{if(window.__pageServices)return;const a=window.rhwpStudio.automation;a.registerCommand({id:'ext:master-inspect',label:'검수',canExecute:()=>true,execute:s=>window.__pageServices=s});a.execute('ext:master-inspect');a.unregisterCommand('ext:master-inspect');});return f;}
 async function execute(id){const r=await(await active()).evaluate(id=>window.jueonyEditor.executeCommand(id),id);assert.equal(r.ok,true,JSON.stringify(r));}
@@ -18,11 +18,16 @@ const state=async()=>(await services()).evaluate(()=>({revision:window.jueonyEdi
 async function save(f,name,ext){const result=await f.evaluate(async()=>{const api=window.jueonyEditor,status=await api.save();return {status,bytes:[...new Uint8Array(await(await api.fileHandle().getFile()).arrayBuffer())]};});assert.equal(result.status,'saved');await writeFile(resolve(out,name+'.'+ext),new Uint8Array(result.bytes));return new HwpDocument(new Uint8Array(result.bytes));}
 async function scenario(name,run){try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
 function body(){const d=HwpDocument.createEmpty();d.createBlankDocument();for(const [i,text] of ['제목 😀','첫 본문','둘째 본문'].entries()){if(i)d.splitParagraph(0,i-1,d.getParagraphLength(0,i-1));d.insertText(0,i,0,text);}return d;}
-const calls=[],providerPort=4263;
+const calls=[],providerPort=Number(process.env.JUEONY_TEST_PROVIDER_PORT??4263);
 if(await fetch('http://127.0.0.1:'+providerPort).then(()=>true,()=>false))throw new Error('Mock provider port occupied');
 const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const chunk of req)raw+=chunk;const request=JSON.parse(raw),id=req.url.endsWith('/responses')?'openai-responses':req.url.endsWith('/messages')?'anthropic':req.url.includes(':generateContent')?'gemini':'openai-compatible';const input=JSON.parse(id==='gemini'?request.contents[0].parts[0].text:id==='anthropic'?request.messages[0].content:id==='openai-responses'?request.input[1].content:request.messages[1].content);calls.push({id,model:request.model??req.url.split('/models/')[1]?.split(':')[0],input});
 
- const node=input.document.nodes.find(n=>n.id==='s0p1'),operations=input.instruction.includes('후속')?[{kind:'set_section_tabs',section:1,spacingPt:18},{kind:'set_page_setup',section:1,properties:{marginTopMm:22}}]:[{kind:'split_section',target:input.instruction.includes('첫')?input.document.nodes[0].id:input.instruction.includes('시작')?node.id:input.instruction.includes('끝')?input.document.nodes.at(-1).id:input.document.nodes[0].id,offset:input.instruction.includes('첫')||input.instruction.includes('시작')?0:input.instruction.includes('끝')?Array.from(input.document.nodes.at(-1).text).length:3}];
+ const node=input.document.nodes.find(n=>n.id==='s0p1');
+ let operations=input.instruction.includes('후속')?[{kind:'set_section_tabs',section:1,spacingPt:18},{kind:'set_page_setup',section:1,properties:{marginTopMm:22}}]:[{kind:'split_section',target:input.instruction.includes('첫')?input.document.nodes[0].id:input.instruction.includes('시작')?node.id:input.instruction.includes('끝')?input.document.nodes.at(-1).id:input.document.nodes[0].id,offset:input.instruction.includes('첫')||input.instruction.includes('시작')?0:input.instruction.includes('끝')?Array.from(input.document.nodes.at(-1).text).length:3}];
+ if(input.instruction.startsWith('새 구역과 쪽 설정')){
+  operations=[{kind:'split_section',target:node.id,offset:0,
+   newPageSetup:{landscape:true,marginTopMm:input.instruction.includes('잘못')?300:22},newPageBorder:{headerInside:true,footerInside:false}}];
+ }
  if(input.instruction.includes('묶음'))operations.push({kind:'set_section_tabs',section:0,spacingPt:18});
  if(input.instruction.includes('지연'))await new Promise(r=>setTimeout(r,2000));
  const generation={message:'합성 모델의 구역 나누기 제안입니다.',sourceIds:[],operations};if(id==='anthropic')generation.operations=operations.map(({kind,...args})=>({kind,arguments:JSON.stringify(args)}));const text=JSON.stringify(generation);
@@ -39,11 +44,74 @@ const apply=async operations=>(await active()).evaluate(async operations=>{const
 const ready=()=>page.waitForFunction(()=>document.getElementById('app-status')?.textContent.includes('준비 완료'),{timeout:90000});
 try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
- browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',dialog=>dialog.dismiss());page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
+ browser=await puppeteer.launch({executablePath:process.env.JUEONY_TEST_BROWSER??'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',dialog=>dialog.dismiss());page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(`${id}: model-selected chat splits actual Unicode body, shows structural diff, undoes/redoes and safely saves`,async()=>{await configure(id);const f=await open('hwpx',body()),before=await snap(),start=calls.length;await send('제목의 이모지 앞에서 구역을 나눠줘');assert.equal(calls.length,start+1);assert.equal(calls.at(-1).id,id);assert.equal(calls.at(-1).input.document.structure.sectionSplitAvailable,true);assert.equal(await page.$eval('#request-error',e=>e.hidden),true);const after=await snap();assert.equal(after.structure.sections.length,2);assert.deepEqual(after.nodes.map(n=>n.text),['제목 ','😀','첫 본문','둘째 본문']);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);assert.match(await page.$eval('#change-dialog',e=>e.textContent),/구역 2/);await page.click('#change-dialog button');const actions=await page.$$eval('#messages .message-actions',els=>els.at(-1)?.textContent??'');assert.ok(!actions.includes('반복 작업으로 저장'));await undo();assert.deepEqual((await snap()).structure,before.structure);assert.deepEqual((await snap()).nodes,before.nodes);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);const loaded=await save(f,'split-provider-'+id,'hwpx');assert.equal(loaded.getSectionCount(),2);assert.equal(loaded.getTextRange(1,0,0,loaded.getParagraphLength(1,0)),'😀');loaded.free();});
  for(const where of ['시작','끝'])await scenario(`HWP paragraph ${where}: isolated native split saves and one request undo restores original`,async()=>{const f=await open('hwp',body()),before=await snap();await send(where+'에서 구역 나누기');assert.equal(await page.$eval('#request-error',e=>e.hidden),true);const after=await snap();assert.equal(after.structure.sections.length,2);assert.deepEqual(after.nodes.map(n=>n.text),where==='시작'?['제목 😀','첫 본문','둘째 본문']:['제목 😀','첫 본문','둘째 본문','']);const loaded=await save(f,'split-boundary-'+where,'hwp');assert.equal(loaded.getSectionCount(),2);loaded.free();await undo();assert.deepEqual((await snap()).structure,before.structure);});
  await scenario('first paragraph and new empty document start split through actual chat and request undo',async()=>{for(const empty of [false,true]){const d=empty?HwpDocument.createEmpty():body();if(empty)d.createBlankDocument();const f=await open('hwpx',d),before=await snap();assert.equal(before.nodes[0].editable,true);await send('첫 문단 시작에서 구역 나누기');assert.equal(await page.$eval('#request-error',e=>e.hidden),true);assert.equal((await snap()).structure.sections.length,2);assert.deepEqual((await snap()).nodes.map(n=>n.text),['',...before.nodes.map(n=>n.text)]);const loaded=await save(f,'split-first-empty-'+empty,'hwpx');assert.equal(loaded.getSectionCount(),2);loaded.free();await undo();assert.deepEqual((await snap()).structure,before.structure);assert.deepEqual((await snap()).nodes,before.nodes);}});
  await scenario('follow-up reads fresh section IDs and edits only the created section; reverse ordinary undo restores the whole sequence',async()=>{const f=await open('hwpx',body()),before=await snap();await send('구역 나누기');const splitState=await snap();await send('후속 새 구역의 탭과 여백 변경');assert.equal(calls.at(-1).input.document.structure.sections.length,2);const after=await snap();assert.equal(after.structure.sections[1].defaultTabSpacingPt,18);assert.equal(after.structure.sections[0].defaultTabSpacingPt,before.structure.sections[0].defaultTabSpacingPt);const loaded=await save(f,'split-followup','hwpx');assert.equal(JSON.parse(loaded.getSectionDef(1)).defaultTabSpacing,3600);loaded.free();await undo();assert.deepEqual((await snap()).structure,splitState.structure);await execute('edit:undo');assert.deepEqual((await snap()).structure,before.structure);assert.deepEqual((await snap()).nodes,before.nodes);});
+ for(const format of ['hwp','hwpx'])await scenario(`${format}: one chat configures and splits a new section, preserves neighbors and an embedded background, and undoes the whole change`,async()=>{
+   const doc=body();
+   doc.insertSectionBreak(0,2,0);
+   doc.setPageDef(1,JSON.stringify({width:41953,height:59528,marginTop:4100}));
+   const picture=await readFile(png),asset=JSON.parse(doc.registerPageBackgroundImage(picture,'png'));
+   assert.equal(asset.ok,true);
+   for(const [index,kind] of ['both','even','odd'].entries()){
+     const old=JSON.parse(doc.getPageBorderFillEntry(0,kind));
+     const background=kind==='even'?{fillType:'image',image:{binDataId:asset.binDataId,mode:'center',brightness:0,contrast:0,effect:0}}:
+       {fillType:'solid',fillColor:['#f2cf9f','#d8e7fd','#b8d0bf'][index]};
+     const applied=JSON.parse(doc.setPageBorderFillEntry(0,kind,JSON.stringify({...old,...background,basis:'page',headerInside:false,footerInside:true})));
+     assert.equal(applied.ok,true);
+   }
+   const frame=await open(format,doc),before=await snap(),originalBytes=(await state()).bytes;
+   await send('새 구역과 쪽 설정: 잘못된 위 여백으로 나누기');
+   assert.match(await page.$eval('#request-error',element=>element.textContent),/본문 영역/);
+   assert.deepEqual((await state()).bytes,originalBytes);
+   await send('새 구역과 쪽 설정: 첫 본문 앞에서 나누고 가로 용지와 위 여백, 테두리의 머리말만 적용');
+   assert.equal(await page.$eval('#request-error',element=>element.hidden),true);
+   const after=await snap();
+   assert.deepEqual(after.structure.sections[0],before.structure.sections[0]);
+   assert.deepEqual(after.structure.sections[2],{...before.structure.sections[1],index:2});
+   assert.equal(after.structure.sections[1].page.landscape,true);
+   assert.equal(after.structure.sections[1].page.marginTop,Math.round(22*7200/25.4));
+   assert.deepEqual(after.nodes.map(node=>[node.section,node.text]),[[0,'제목 😀'],[1,'첫 본문'],[2,'둘째 본문']]);
+   await lastAction('변경 확인');
+   const changes=await page.$eval('#structure-diff-text',element=>element.textContent);
+   assert.match(changes,/새 구역 2 추가 · 용지·여백, 쪽 테두리 머리말·꼬리말 포함 변경/);
+   assert.doesNotMatch(changes,/3구역 ·/);
+   await page.click('#change-dialog button');
+   const loaded=await save(frame,'split-with-page-settings',format);
+   try{
+     assert.deepEqual(JSON.parse(loaded.getPageDef(1)),after.structure.sections[1].page);
+     for(const [index,kind] of ['both','even','odd'].entries()){
+       const entry=JSON.parse(loaded.getPageBorderFillEntry(1,kind));
+       assert.deepEqual([entry.headerInside,entry.footerInside],[true,false]);
+       if(kind==='even'){
+         assert.deepEqual([entry.fillType,entry.image.mode],['image','center']);
+         assert.deepEqual(Buffer.from(loaded.getPageBackgroundImageBytes(0,kind)),picture);
+         assert.deepEqual(Buffer.from(loaded.getPageBackgroundImageBytes(1,kind)),picture);
+       }else assert.equal(entry.fillColor,['#f2cf9f','#d8e7fd','#b8d0bf'][index]);
+     }
+   }finally{loaded.free();}
+   await undo();
+   assert.deepEqual((await state()).bytes,originalBytes);
+ });
+ await scenario('late page setup failure after a native split restores the original document and undo journal',async()=>{
+   const frame=await open('hwpx',body()),before=await state();
+   await frame.evaluate(()=>{
+     const doc=window.__pageServices.wasm.borrowDocumentHandle(),setPage=doc.setPageDef.bind(doc);
+     doc.setPageDef=(section,settings)=>{
+       const result=setPage(section,settings);
+       if(section===1)throw new Error('합성 새 구역 용지 실패');
+       return result;
+     };
+   });
+   await send('새 구역과 쪽 설정: 적용 도중 용지 실패 검수');
+   assert.match(await page.$eval('#request-error',element=>element.textContent),/합성 새 구역 용지 실패/);
+   const after=await state();
+   assert.deepEqual(after.bytes,before.bytes);
+   assert.equal(after.history,before.history);
+   assert.equal(after.dirty,before.dirty);
+ });
  await scenario('tables, multicolumns, numbering, mixed body, page-hide and combined requests refuse before live change',async()=>{for(const mode of ['table','columns','lines','mixed','hide','combined']){const d=body();if(mode==='table')d.createTable(0,1,0,1,1);if(mode==='columns')d.setColumnDef(0,2,0,1,1134);if(mode==='lines')d.setLineNumberSettings(0,JSON.stringify({enabled:true,restartType:1,countBy:1,startNumber:1,distance:1134}));if(mode==='mixed')d.applyCharFormat(0,1,0,1,JSON.stringify({bold:true}));if(mode==='hide')d.setPageHide(0,1,true,false,false,false,false,false);await open('hwpx',d);const before=await state();await send(mode==='combined'?'묶음 구역 나누기':'구역 나누기');assert.equal(await page.$eval('#request-error',e=>e.hidden),false);assert.deepEqual((await state()).bytes,before.bytes);assert.equal((await state()).history,before.history);}});
  await scenario('late live native split failure restores exact bytes, sections, dirty flag and undo journal',async()=>{const f=await open('hwpx',body()),before=await state(),structure=(await snap()).structure;await f.evaluate(()=>{const d=window.__pageServices.wasm.borrowDocumentHandle(),original=d.insertSectionBreak.bind(d);d.insertSectionBreak=(...args)=>{original(...args);throw new Error('실문서 구역 나누기 실패');};});await send('구역 나누기');assert.match(await page.$eval('#request-error',e=>e.textContent),/실문서 구역/);assert.match(await page.$eval('#messages',e=>e.textContent),/실패 · 변경 복원됨/);const after=await state();assert.deepEqual(after.bytes,before.bytes);assert.equal(after.history,before.history);assert.equal(after.dirty,before.dirty);assert.deepEqual((await snap()).structure,structure);});
  await scenario('delayed model split cannot overwrite later user editing and latest unsaved state is preserved',async()=>{await open('hwpx',body());const start=calls.length;await fill('request-input','지연 구역 나누기');await page.click('#send-request');for(let i=0;i<100&&calls.length===start;i++)await delay(30);assert.equal(calls.length,start+1);await apply([{kind:'set_section_tabs',section:0,spacingPt:18}]);const before=await state();await waitIdle();assert.match(await page.$eval('#request-error',e=>e.textContent),/변경|최신/);assert.deepEqual((await state()).bytes,before.bytes);assert.equal((await snap()).structure.sections.length,1);});

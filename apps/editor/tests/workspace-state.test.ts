@@ -116,6 +116,15 @@ test('structural receipt malformed arrays are blocked before diff UI reads them'
   validateAppState(state);
   state.runs[0].receipt.beforeStructure.sections = null; rejected(state, /sections/);
 });
+test('a native receipt with an unnamed unsupported control survives workspace restart', () => {
+  const state = fixture();
+  state.runs[0].receipt = { runId: 'ra', beforeRevision: 'before', afterRevision: 'after', before: '', after: '내용', operationCount: 1,
+    beforeStructure: { sections: [], paragraphs: [], tables: [], unsupportedControls: ['','tbl'] } };
+  const reopened = structuredClone(state);
+  assert.deepEqual(validateAppState(reopened), state);
+  reopened.runs[0].receipt.beforeStructure.unsupportedControls = [null];
+  rejected(reopened, /unsupportedControls/);
+});
 test('corrupt optional retrieval and progress records are rejected before rendering',()=>{
  const state=fixture();state.runs[0].retrieval={mode:'lexical',hits:null};rejected(state,/retrieval/);
  delete state.runs[0].retrieval;state.runs[0].events={map:'not an array'};rejected(state,/events/);

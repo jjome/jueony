@@ -1,0 +1,13 @@
+diff --git a/src/document_core/queries/table_formula_field.rs b/src/document_core/queries/table_formula_field.rs
+--- a/src/document_core/queries/table_formula_field.rs
++++ b/src/document_core/queries/table_formula_field.rs
+@@ -491,6 +491,9 @@ impl DocumentCore {
+             }
+             self.document.sections[s].raw_stream = None;
+             self.recompose_section(s);
++            // Nested formula text can change the height of its outer table. Refresh
++            // the measured page fragments before the edited document is inspected.
++            self.paginate_if_needed();
+             Ok(())
+         })();
+         if let Err(error) = result {

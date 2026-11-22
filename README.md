@@ -1,34 +1,36 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-파일·저장·복구·형식 보존의 세부 구현은 25/25, 검증은 23/25다. N046에서 편집기가 저장한 LTR·RTL HWP를 한글 2024에서 다시 열어 확인했고, 명시 AUTO는 HWPX 사본에 보존했다. 남은 검증은 N001 복합 배치와 N002 공개 문서 변환이다. [파일·표 검수](docs/file-table-verification-2026-11-08.md) · [N001 합본 검수 기록](docs/138-n001-storage-current-closure.md)
+11월 8일 파일·표 검수에서 N046의 LTR·RTL HWP를 한글 2024로 다시 열었고, 명시 AUTO가 HWPX 사본에 보존됨을 확인했다. 이번 구현과 현재 남은 검증 항목은 아래 기능별 진행 현황에서 확인할 수 있다. [파일·표 검수](docs/file-table-verification-2026-11-08.md) · [N001 합본 검수 기록](docs/138-n001-storage-current-closure.md)
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
 **16개 기능별 문서의 구현 · 검증 · Agent 연결 상태와 다음 작업을 한눈에 확인합니다.**
 
-**현재 구현 계획(2026-11-21):** [이음오피스 비교·활용 계획](docs/144-ieumoffice-reuse-plan.md#implementation-start)을 main에 반영했다. 실행 환경·회귀 기준 복원 → 행정 문서 검사 → 자료 검색 → Agent 반복 실행 → 표·쪽 배치 진단 순서로 진행한다. 이번 변경은 계획 통합이며 기능 구현 완료 보고가 아니다.
+**이음오피스 선별 적용 계획(2026-11-21):** [비교와 단계별 완료조건](docs/144-ieumoffice-reuse-plan.md#implementation-start)은 실행 환경 복원, 행정 문서 검사, 자료 검색, Agent 반복 실행, 표·쪽 배치 진단의 순서로 구성했다.
+
+실행 환경을 복원한 폴더에서 `Start-Jueony.cmd`를 실행한다. 11월 21일에 구현하고 확인한 범위는 장문 조회·편집, 중첩 표 및 Excel 인용, 반복 작업, 작성 사본, 기관 오프라인 검증을 포함한다. [실행 스크립트](Start-Jueony.cmd) · [이번 구현과 검증 기록](docs/147-checklist-completion.md)
 
 <!-- jueony-progress:start -->
 
 | 기능 | 전체 범위 완료 | 세부 구현 | 세부 검증 | Agent 연결 | 다음 작업 |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| [업무·채팅·폴더 관리](<docs/features/01-workspaces.md>) | — | 🟢 **4/4** | 0/4 · 부분 4 | 해당 없음 | 검증 [G005](<docs/features/01-workspaces.md#g005>) 업무 생성·전환·이름 변경 |
-| [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | — | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
-| [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | — | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
-| [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>) | 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 🟢 **25/25** | 23/25 · 부분 2 | 🟢 **6/6** | 검증 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
+| [업무·채팅·폴더 관리](<docs/features/01-workspaces.md>) | — | 🟢 **4/4** | 🟢 **4/4** | 해당 없음 | 기록된 작업 완료 |
+| [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | — | 15/21 · 부분 5 | 9/21 · 부분 9 | 16/20 · 부분 3 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
+| [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | — | 7/11 · 부분 4 | 6/11 · 부분 5 | 5/7 · 부분 2 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
+| [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>) | 0/5 | 4/7 · 부분 3 | 3/7 · 부분 4 | 4/6 · 부분 2 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 🟢 **26/26** | 23/26 · 부분 3 | 🟢 **6/6** | 검증 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 🟢 **15/15** | 0/15 · 부분 15 | 🟢 **4/4** | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
-| [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 21/25 · 부분 4 | 0/25 · 부분 25 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
-| [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 37/41 · 부분 4 | 3/41 · 부분 38 | 28/33 · 부분 5 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
-| [쪽·구역·용지·배경](<docs/features/09-pages-and-sections.md>) | 0/18 | 🟢 **23/23** | 0/23 · 부분 23 | 12/17 · 부분 5 | Agent 연결 [G053](<docs/features/09-pages-and-sections.md#g053>) 수동 쪽 테두리의 적용 범위/포함 정책 |
+| [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 21/25 · 부분 4 | 0/25 · 부분 25 | 14/16 · 부분 2 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
+| [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 38/43 · 부분 5 | 3/43 · 부분 40 | 31/35 · 부분 4 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
+| [쪽·구역·용지·배경](<docs/features/09-pages-and-sections.md>) | 0/18 | 🟢 **23/23** | 0/23 · 부분 23 | 🟢 **17/17** | 검증 [A026](<docs/features/09-pages-and-sections.md#a026>) 검증된 일반 본문 구역 합치기 |
 | [머리말·각주·필드·책갈피](<docs/features/10-headers-notes-fields.md>) | 0/11 | 🟢 **9/9** | 0/9 · 부분 9 | 🟢 **8/8** | 검증 [A018](<docs/features/10-headers-notes-fields.md#a018>) 본문 점 책갈피 추가 |
 | [그림·도형·글상자·수식·개체](<docs/features/11-objects.md>) | 0/18 | 🟢 **1/1** | 0/1 · 부분 1 | 해당 없음 | 검증 [G022](<docs/features/11-objects.md#g022>) 선택 개체 속성 키 경로 |
-| [화면·메뉴·작업 창·단축키](<docs/features/12-ui-and-shortcuts.md>) | 0/30 | 7/11 · 부분 4 | 4/11 · 부분 7 | 🟢 **1/1** | 구현 [N019](<docs/features/12-ui-and-shortcuts.md#n019>) 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 |
+| [화면·메뉴·작업 창·단축키](<docs/features/12-ui-and-shortcuts.md>) | 0/30 | 7/11 · 부분 4 | 5/11 · 부분 6 | 🟢 **1/1** | 구현 [N019](<docs/features/12-ui-and-shortcuts.md#n019>) 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 |
 | [상태 저장·환경·선택 복원](<docs/features/13-state-and-preferences.md>) | 0/33 | 16/21 · 부분 5 | 0/21 · 부분 21 | 🟢 **1/1** | 구현 [N014](<docs/features/13-state-and-preferences.md#n014>) 글상자 내부 커서·선택 복원 |
-| [보안·개인정보·검토·메모](<docs/features/14-security-and-review.md>) | 0/11 | 상위 0/11 · 부분 9 | 상위 0/11 · 부분 9 | 상위 0/11 | 상세 작업 분해 필요 |
-| [출력·변환·교정·외부 도구](<docs/features/15-output-and-tools.md>) | 0/23 | 상위 0/23 · 부분 14 | 상위 0/23 · 부분 11 | 상위 0/23 | 상세 작업 분해 필요 |
-| [모듈·실행 기반·배포·최종 검수](<docs/features/16-architecture-and-validation.md>) | — | 7/25 · 부분 18 | 7/25 · 부분 18 | 해당 없음 | 구현 [N041](<docs/features/16-architecture-and-validation.md#n041>) 독립 한글에서 복합 코퍼스 일괄 검수 |
-| **전체 실행 작업** | — | **187/236** | **53/236** | **90/117** | 세 축 완료 **53개** |
+| [보안·개인정보·검토·메모](<docs/features/14-security-and-review.md>) | 0/11 | 🟢 **1/1** | 0/1 · 부분 1 | 해당 없음 | 검증 [G128](<docs/features/14-security-and-review.md#g128>) 본문 점 메모 조회·수정·삭제 |
+| [출력·변환·교정·외부 도구](<docs/features/15-output-and-tools.md>) | 0/23 | 🟢 **3/3** | 1/3 · 부분 2 | 해당 없음 | 검증 [G127](<docs/features/15-output-and-tools.md#g127>) 2쪽·4쪽 모아찍기 |
+| [모듈·실행 기반·배포·최종 검수](<docs/features/16-architecture-and-validation.md>) | — | 8/25 · 부분 17 | 8/25 · 부분 17 | 해당 없음 | 구현 [N041](<docs/features/16-architecture-and-validation.md#n041>) 독립 한글에서 복합 코퍼스 일괄 검수 |
+| **전체 실행 작업** | — | **198/246** | **62/246** | **107/121** | 세 축 완료 **62개** |
 
 🟢 표시는 **기록된 세부 작업**이 해당 열에서 N/N인 경우에만 붙인다. 기능 전체 완료 표시는 아니다. 부분 상태는 완료 수에 포함하지 않는다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘전체 범위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. 다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.
 

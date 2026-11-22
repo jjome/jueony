@@ -1,0 +1,156 @@
+{
+  "recordDate": "2026-11-21",
+  "jueony": {
+    "baselineCommit": "f550d472ccd9b5bb0199a2fd9bb4589192b0913c",
+    "applicationSourceSha256": "6b7f421cc3dd9cf2ef524264de275f6373d1a9738da30aefcadfd3c4f5817f75",
+    "trackedChangeAndUntrackedSourceSha256": "f36efb75de455ba7c1f0f862f60b2bafdb2dd74e53cf7fff116824a19a200048",
+    "proofDirectoryExcludedFromWorktreeDigest": "docs/evidence/ieum-followup-2026-11-21",
+    "applicationBuildEvidenceSha256": "e056ac2c8cdba7aa811ed7c203d3b7a29a977b1c937168244031cc7b86b29010",
+    "npmLockSha256": "3191c6c5955a2ac3e3b7bf0582b88d147364465283ccbecc2420cc2bcfda653f",
+    "node": "24.22.3"
+  },
+  "ieumOffice": {
+    "commit": "8602a39410adb86037f3008588b64efc75b08c60",
+    "fullRepositoryDownloaded": false,
+    "previousEvidence": "../ieum-implementation-2026-11-21/manifest.json",
+    "additionalFiles": [
+      {
+        "path": "apps/hwp/studio-plugin/hancom-keys.mjs",
+        "sha256": "67dcf4f04ad4f5f718bc2f49034b2bb979352840a9ec12282b21c4114b31258c"
+      },
+      {
+        "path": "apps/hwp/src/renderer/save-flow.ts",
+        "sha256": "af6144bcaff87168400d514671601c93ef492f0316a15f1c79741087757dfd4e"
+      },
+      {
+        "path": "packages/ai-provider/src/custom-endpoints.ts",
+        "sha256": "e174766dd66f92c8cc7d0bb5c60e66237aa21322c6e9e89636147297bf13f362"
+      }
+    ]
+  },
+  "engine": {
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "sourceId": "bb037edaac3e0507",
+    "patchCount": 217,
+    "patchChanges": [
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-memo-text-update.patch",
+        "sha256": "9284fe93bd52cea05dc93507657dd5fa58759fc1422f9dd198d41ca0ec3976b2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nested-row-merge-split.patch",
+        "sha256": "50cbec9270ee346fc97d08b210d828e9942c97e5556c8010fd43a9f7c8fcdc02"
+      }
+    ],
+    "buildManifestSha256": "b1374dd76e78cb3c691a8371640d6d04ce41e581e2cae7a42dc48817dec35a89",
+    "jsSha256": "f6bec6991462bcf8b985407bf13a87db99e5516f73ce90c5e674889c01e2abae",
+    "wasmSha256": "b4edf57e46557ec4e75e927325f737a4481ce8f8b88fbbcf694599adcdb58af4",
+    "optimized": false
+  },
+  "checks": {
+    "build": "PASS",
+    "typecheck": "PASS",
+    "moduleBoundaries": "PASS",
+    "workChecklist": {
+      "tests": 12,
+      "pass": 12
+    },
+    "windows": {
+      "latestTemplateEntry": true,
+      "engine": "bb037edaac3e0507",
+      "existingDefaultPortUntouched": true,
+      "modelOriginPolicy": "[]",
+      "startup": "PASS"
+    },
+    "editor": {
+      "tests": 2013,
+      "pass": 2012,
+      "fail": 0,
+      "skipped": 1
+    },
+    "launcher": {
+      "tests": 56,
+      "pass": 56,
+      "fail": 0,
+      "skipped": 0
+    },
+    "nestedHwpAndHwpx": {
+      "tests": 19,
+      "pass": 19,
+      "fail": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "audit": "HWPX controls and read-only location jump",
+      "layout": "explicit scope report",
+      "memo": "HWPX list and location jump, edit, save/reopen, delete and undo",
+      "agent": "two local mock calls, checked edit, bound file reopen, and visible request undo",
+      "office": [
+        "PDF text, DOCX body/table order, and XLSX sparse addresses, shared strings and stored results delivered",
+        "Textless PDF and damaged DOCX displayed specific errors without a model call"
+      ],
+      "index": "background tick inserted the selected file, reused unchanged chunks, replaced modified chunks and cleared the deselected scope",
+      "print": "five document pages in 2-up and 4-up preview; actual 4-up print markup generated a two-sheet Chromium PDF; source bytes unchanged",
+      "conversion": "PDF text, Korean and English local OCR and DOCX loss notices, verified HWPX body and table, unbound dirty tabs and unchanged source bytes",
+      "template": "missing required values refused; two independent HWPX template copies with different filled values and unchanged original tab",
+      "calls": [
+        "initial",
+        "tool-result"
+      ],
+      "errors": [],
+      "externalRequests": []
+    },
+    "cliAndMcp": {
+      "cli": "saved-reopened",
+      "mcp": "saved-reopened",
+      "sourcePreserved": true,
+      "unconfiguredWritesHidden": true
+    },
+    "institutionalPackage": {
+      "code": "REQUIRED_LOCAL_ASSET_MISSING",
+      "message": "required local asset missing or truncated: runtime/webview2/LICENSE.txt"
+    }
+  },
+  "rag": {
+    "files": 21,
+    "questions": 22,
+    "contracts": {
+      "passed": 69,
+      "failed": 0
+    },
+    "sourceRecallAt1": [
+      0.2777777777777778,
+      0.6666666666666666
+    ],
+    "sourceRecallAt8": [
+      1,
+      1
+    ],
+    "meanReciprocalRank": [
+      0.5666666666666668,
+      0.8074074074074074
+    ],
+    "noAnswerFalsePositives": [
+      3,
+      1
+    ],
+    "candidateMeanSearchMilliseconds": 2.3407500000000088,
+    "rankGatePassed": true,
+    "proofSha256": "d6da9802bd7f51f59c7c2f95942ae7a87d88b75a3a0d874115acae3ac64832ce"
+  },
+  "runtimeAssets": {
+    "ocr": {
+      "files": 6,
+      "bytes": 16338239
+    },
+    "pdf": {
+      "files": 197,
+      "bytes": 4148653
+    }
+  },
+  "unverified": [
+    "Independent Hancom 2024 exchange and physical printer",
+    "Real provider accounts and approved browser sign-in policy",
+    "Institutional forms, signed offline installer and approved endpoints"
+  ]
+}

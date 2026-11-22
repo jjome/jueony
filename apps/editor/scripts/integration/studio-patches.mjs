@@ -57,10 +57,10 @@ main = replaceOnce(main, 'documentState.installBeforeUnload(window);', 'if (wind
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
 main = "import { installHangulKeys } from './jueony/shortcuts/install';\nimport { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
-main = "import {installDocumentInformation} from './jueony/adapters/rhwp/document-info.ts';\nimport {installPageControls} from './jueony/adapters/rhwp/page-controls.ts';\nimport {readDocumentDefaults, applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
+main = "import {installDocumentInformation} from './jueony/adapters/rhwp/document-info.ts';\nimport {installPageControls} from './jueony/adapters/rhwp/page-controls.ts';\nimport {applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {readStartupDocumentDefaults} from './jueony/composition/preference-bootstrap-n017.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
 main = "import {captureBodyCaret, restoreBodyCaret} from './jueony/adapters/rhwp/body-caret.ts';\nlet jueonyComposing = false;\ndocument.addEventListener('compositionstart',()=>{jueonyComposing=true;},true);\ndocument.addEventListener('compositionend',()=>{jueonyComposing=false;},true);\n" + main;
 main = "import {captureSessionCursor, restoreSessionCursor} from './jueony/adapters/rhwp/session-cursor.ts';\nlet jueonyCursorInteraction = 0;\ndocument.addEventListener('keydown',()=>jueonyCursorInteraction++,true);\ndocument.addEventListener('pointerdown',()=>jueonyCursorInteraction++,true);\ndocument.addEventListener('pointermove',e=>{if(e.buttons)jueonyCursorInteraction++;},true);\ndocument.addEventListener('wheel',()=>jueonyCursorInteraction++,{capture:true,passive:true});\n" + main;
-main = replaceOnce(main, 'const docInfo = wasm.createNewDocument();', `const defaults = new URLSearchParams(location.search).get('skipDefaults') === '1' ? undefined : readDocumentDefaults(localStorage);
+main = replaceOnce(main, 'const docInfo = wasm.createNewDocument();', `const defaults = new URLSearchParams(location.search).get('skipDefaults') === '1' ? undefined : readStartupDocumentDefaults(location.origin,key=>localStorage.getItem(key));
       const docInfo = wasm.createNewDocument();
       if(defaults && applyNewDocumentDefaults(wasm.borrowDocumentHandle()!, defaults)) docInfo.fontsUsed.push(defaults.font.family);`, 'new document defaults');
 main = replaceOnce(main, "console.error('[main] 새 문서 생성 실패:', error);", "(window as any).__jueonyInitializationError = String(error); console.error('[main] 새 문서 생성 실패:', error);", 'new document error detail');
@@ -70,7 +70,7 @@ installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
   save: () => saveCurrentDocument(commandServices),
   discard: async () => { await autosaveManager.discardCurrentDraft('tab-discard'); documentState.markClean('tab-discard'); },
 });
-installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, refreshMenus: async () => { recentSubmenuExpanded = true; await renderRecentSubmenu(); }, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
+installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, dispatcher, refreshMenus: async () => { recentSubmenuExpanded = true; await renderRecentSubmenu(); }, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
 void initPromise.then(() => { installHangulKeys({ automation, registry, input: () => inputHandler, eventBus }); installPageControls(registry, () => inputHandler); installDocumentInformation({registry, input: () => inputHandler}); installHangulChrome({ wasm, eventBus, documentState, automation }); });`, 'desktop host');
 main = replaceOnce(main, 'import { initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'import { applyTheme, syncThemeMenu, initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'remote preference theme');
 main += `
@@ -167,6 +167,37 @@ for (const name of ['para-shape-dialog.ts','char-shape-dialog.ts']) {
   await writeFile(join(root, 'src/ui', name), shape);
 }
 let caretInput = (await readFile(join(root, 'src/engine/input-handler.ts'), 'utf8')).replace(/\r\n/g, '\n');
+caretInput = "import { beginManualComposition, endManualComposition, observeManualTextEdit } from '../jueony/adapters/rhwp/manual-alignment-macro.ts';\n" + caretInput;
+caretInput = replaceOnce(caretInput, '    _text.onCompositionStart.call(this);',
+  '    beginManualComposition(this.wasm);\n    _text.onCompositionStart.call(this);', 'macro composition start');
+caretInput = replaceOnce(caretInput, '    _text.onCompositionEnd.call(this);',
+  '    _text.onCompositionEnd.call(this);\n    endManualComposition(this.wasm);', 'macro composition end');
+caretInput = replaceOnce(caretInput, '    _text.onInput.call(this, e as InputEvent);', `    const input = e as InputEvent;
+    const edit = () => _text.onInput.call(this, input);
+    if (input?.isTrusted && (input.inputType === 'insertText' || input.inputType === 'insertReplacementText')) {
+      observeManualTextEdit(this.wasm, edit);
+    } else edit();`, 'manual macro regular text input');
+const macroKeyboardPath=join(root,'src/engine/input-handler-keyboard.ts');
+let macroKeyboard=(await readFile(macroKeyboardPath,'utf8')).replace(/\r\n/g,'\n');
+macroKeyboard="import { observeManualTextEdit } from '../jueony/adapters/rhwp/manual-alignment-macro.ts';\n"+macroKeyboard;
+const deleteFromKeyboard=`      if (this.cursor.hasSelection()) {
+        this.deleteSelection();
+      } else if (e.altKey) {
+        // Alt/Option+Backspace/Delete: 단어 삭제 (macOS standard)
+        this.cursor.setAnchor();
+        this.cursor.moveToWordBoundary(e.key === 'Backspace' ? -1 : 1);
+        if (this.cursor.hasSelection()) this.deleteSelection();
+      } else if (e.key === 'Backspace') {
+        this.handleBackspace(pos, inCell);
+      } else {
+        this.handleDelete(pos, inCell);
+      }`;
+macroKeyboard=replaceOnce(macroKeyboard,deleteFromKeyboard,`      const edit = () => {
+${deleteFromKeyboard.split('\n').map(line=>'  '+line).join('\n')}
+      };
+      if (e.isTrusted) observeManualTextEdit(this.wasm, edit);
+      else edit();`,'manual macro keyboard delete');
+await writeFile(macroKeyboardPath,macroKeyboard);
 let scalarCursor=(await readFile(join(root,'src/engine/cursor.ts'),'utf8')).replace(/\r\n/g,'\n');
 scalarCursor=replaceOnce(scalarCursor,"this._fnCharOffset = (info.texts[this._fnInnerParaIdx] ?? '').length;","this._fnCharOffset = [...(info.texts[this._fnInnerParaIdx] ?? '')].length;",'note End scalar offset');
 scalarCursor=replaceOnce(scalarCursor,'const charCount = currentText.length;','const charCount = [...currentText].length;','note Right scalar offset');
@@ -208,6 +239,8 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
   getSessionCaretAccess() {
     return { cursor: this.cursor, wasm: this.wasm,
       getCursorPosition: () => this.cursor.getPosition(),
+      selectPictureObject: (section:number,paragraph:number,control:number,type:'equation') =>
+        this.selectPictureObject(section,paragraph,control,type),
       restoreSessionTextBox: (saved: import('../jueony/modules/preferences/public/index.ts').TextBoxBookmark): boolean => {
         if(!restoreStudioTextBoxCursorN014({cursor:this.cursor,wasm:this.wasm},saved))return false;
         this.updateCaret();this.eventBus.emit('command-state-changed');return true;
@@ -320,6 +353,7 @@ await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 
 // 저장할 Blob에 문서 버전을 연결해 저장 중 발생한 새 편집을 clean 처리하지 않는다.
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
+fileCommands = "import { SaveSourceConflictError } from '../../jueony/modules/document-files/public/index.ts';\n" + fileCommands;
 let saveHistory = (await readFile(join(root, 'src/engine/history.ts'), 'utf8')).replace(/\r\n/g, '\n');
 saveHistory = replaceOnce(saveHistory, "import { NO_TEXT_MUTATION_EFFECTS } from './command';",
   "import { NO_TEXT_MUTATION_EFFECTS, SnapshotCommand } from './command';", 'save snapshot class identity');
@@ -342,11 +376,21 @@ saveHistory = replaceOnce(saveHistory, '  peekUndoTop(): EditCommand | null {', 
 
   peekUndoTop(): EditCommand | null {`, 'save frame snapshot ownership');
 await writeFile(join(root, 'src/engine/history.ts'), saveHistory);
+const bridgePath = join(root, 'src/core/wasm-bridge.ts');
+let saveBridge = (await readFile(bridgePath, 'utf8')).replace(/\r\n/g, '\n');
+for (const call of ['exportFn.call(this.doc)', 'exportFn.call(this.doc, password)']) {
+  const reported = `return runReportedExport(\n      () => ${call} as WasmDocumentExport,\n    );`;
+  if (saveBridge.split(reported).length !== 3) throw new Error('portable reported save baseline');
+  saveBridge = saveBridge.replaceAll(reported,
+    `return this.withPortableMetrics(() => runReportedExport(\n      () => ${call} as WasmDocumentExport,\n    ));`);
+}
+await writeFile(bridgePath, saveBridge);
 fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
 fileCommands = "import { PreservationError, verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
 fileCommands = "import { acknowledgeDownloadedFile, readDownloadedFormat } from '../../jueony/adapters/files/download-connection.ts';\n" + fileCommands;
 fileCommands = "import { rememberSavedFormat, readSavedFormat } from '../../jueony/adapters/files/saved-format.ts';\n" + fileCommands;
 fileCommands = "import { directionCopyName, requireDistinctDirectionCopy } from '../../jueony/adapters/files/direction-save-copy.ts';\n" + fileCommands;
+fileCommands = "import { rememberedFileFingerprint } from '../../jueony/adapters/files/fingerprints.ts';\n" + fileCommands;
 fileCommands = replaceOnce(fileCommands,
   '    const options = await promptSaveAsOptions(services, format);\n    if (options === null) return;',
   `    const editor = (window as any).jueonyEditor;
@@ -421,6 +465,21 @@ fileCommands = replaceOnce(fileCommands,
 fileCommands = replaceOnce(fileCommands,
   "  if (sourceFormat === 'hml') markConvertedHmlSaveHandle(result.handle);",
   "  rememberSavedFormat(result.handle, saveFormat);\n  if (sourceFormat === 'hml') markConvertedHmlSaveHandle(result.handle);", 'acknowledged save connection format');
+fileCommands = replaceOnce(fileCommands,
+  '  passwordProtected = false,\n): void {',
+  '  passwordProtected = false,\n  expectedRevision?: unknown,\n): void {', 'save completion revision receipt');
+fileCommands = replaceOnce(fileCommands,
+  '  services.documentState.markClean(reason);',
+  `  services.documentState.markClean(reason);
+  if (result.handle && (saveFormat === 'hwp' || saveFormat === 'hwpx')) {
+    (window as any).jueonyEditor?.acknowledgeVerifiedSave?.(expectedRevision, rememberedFileFingerprint(result.handle));
+  }`, 'verified write to undo rebase');
+fileCommands = replaceOnce(fileCommands,
+  "        'save-as',\n        password !== null,\n      ),",
+  "        'save-as',\n        password !== null,\n        (payload.blob as Blob & { jueonyRevision?: string }).jueonyRevision,\n      ),", 'save-as write revision receipt');
+fileCommands = replaceOnce(fileCommands,
+  "        'save',\n        password !== null,\n      ),",
+  "        'save',\n        password !== null,\n        (payload.blob as Blob & { jueonyRevision?: string }).jueonyRevision,\n      ),", 'current write revision receipt');
 fileCommands = replaceOnce(fileCommands,'  return {\n    blob: new Blob([artifact.bytes as unknown as BlobPart], {',`  const {HwpDocument} = services.wasm.getWasmModuleExports() as typeof import('@wasm/rhwp.js');
   if(format !== 'hml') verifyPreservedExport(services.wasm, artifact.bytes, format, artifact.contentLoss,
     bytes => password === undefined ? new HwpDocument(bytes) : HwpDocument.openWithPassword(bytes,password));
@@ -433,7 +492,13 @@ fileCommands = replaceOnce(fileCommands,
     }), { jueonyRevision: (window as any).jueonyEditor?.revision() }),`, 'save revision');
 fileCommands = replaceOnce(fileCommands,
   "console.warn('[file:save] File System Access API 실패, 폴백:', error);\n    return { method: 'fallback', handle: null, fileName: suggestedName };",
-  "console.error('[file:save]', error);\n    alert('저장하지 못했습니다. 문서는 수정 상태로 유지됩니다.\\n' + String(error));\n    return 'cancelled';", 'save failure');
+  "if (error instanceof SaveSourceConflictError) throw error;\n    console.error('[file:save]', error);\n    alert('저장하지 못했습니다. 문서는 수정 상태로 유지됩니다.\\n' + String(error));\n    return 'cancelled';", 'save failure');
+fileCommands = replaceOnce(fileCommands,
+  "export type SaveCurrentDocumentResult = 'saved' | 'cancelled' | 'failed' | 'unsupported';",
+  "export type SaveCurrentDocumentResult = 'saved' | 'cancelled' | 'failed' | 'unsupported' | 'source-conflict';", 'save source conflict result');
+fileCommands = replaceOnce(fileCommands,
+  "    reportSaveError('file:save', error);\n    return 'failed';",
+  "    if (error instanceof SaveSourceConflictError) {\n      showToast({ message: error.message, durationMs: 7500 });\n      return 'source-conflict';\n    }\n    reportSaveError('file:save', error);\n    return 'failed';", 'show the source conflict and preserve the editing state');
 fileCommands = replaceOnce(fileCommands,
   'const downloadName = await promptFallbackName(saveName, format);',
   'const downloadName = saveName;', 'single save-as dialog');

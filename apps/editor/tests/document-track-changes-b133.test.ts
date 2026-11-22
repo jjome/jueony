@@ -120,9 +120,9 @@ test('stale state, malformed response, and unverifiable post-state never report 
 test('audit locks current Rust/WASM support to preservation-only evidence, not public commands', async () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const root = resolve(here, '../../..');
-  const wasmDeclaration = await readFile(resolve(root, 'upstream/rhwp/rhwp-studio/public/rhwp.d.ts'), 'utf8');
-  const wasmApi = await readFile(resolve(root, 'upstream/rhwp/src/wasm_api.rs'), 'utf8');
-  const hwpxHeader = await readFile(resolve(root, 'upstream/rhwp/src/serializer/hwpx/header.rs'), 'utf8');
+  const wasmDeclaration = await readFile(resolve(root, 'upstream/rhwp-source/rhwp-studio/public/rhwp.d.ts'), 'utf8');
+  const wasmApi = await readFile(resolve(root, 'upstream/rhwp-source/src/wasm_api.rs'), 'utf8');
+  const hwpxHeader = await readFile(resolve(root, 'upstream/rhwp-source/src/serializer/hwpx/header.rs'), 'utf8');
   assert.doesNotMatch(wasmDeclaration, /DocumentTrackChanges|TrackedChanges|TrackChanges/);
   assert.doesNotMatch(wasmApi, /getDocumentTrackChanges|applyDocumentTrackChanges/);
   assert.match(hwpxHeader, /fn track_change_flags\(/, 'opaque track-change config is preserved');

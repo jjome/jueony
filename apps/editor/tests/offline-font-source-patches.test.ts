@@ -30,6 +30,9 @@ test('offline font source patch matches the pinned generated rule inventory and 
     for (const name of ['webfont-supply.ts', 'canvaskit-sfnt.ts']) {
       await writeFile(join(target, name), await readFile(new URL(name, sourceRoot)));
     }
+    for (const name of ['font-loader.ts', 'font-rule-runtime.ts']) {
+      await writeFile(join(root, 'src/core', name), await readFile(new URL(`../../${name}`, sourceRoot)));
+    }
     const evidence = await applyOfflineFontSourcePatches({ root });
     assert.equal(evidence.literalCount, 256);
     assert.equal(evidence.files.length, 2);
@@ -38,5 +41,7 @@ test('offline font source patch matches the pinned generated rule inventory and 
       assert.doesNotMatch(await readFile(join(root, ...item.path.split('/')), 'utf8'), /https?:\/\//u);
     }
     assert.deepEqual(JSON.parse(await readFile(join(root, 'public/offline-font-evidence.json'), 'utf8')), evidence);
+    assert.match(await readFile(join(root, 'src/core/font-loader.ts'), 'utf8'), /FONT_RULE_WEBFONT_ENTRIES\.filter\(entry => !entry\.file\.startsWith/u);
+    assert.match(await readFile(join(root, 'src/core/font-rule-runtime.ts'), 'utf8'), /supply\.online\.sources\.some.+\? supply\.offline/u);
   } finally { await rm(root, { recursive: true, force: true }); }
 });

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
-| 검증 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
+| 구현 | 완료 8/25 · 부분 17 | — 상위 범위 없음 |
+| 검증 | 완료 8/25 · 부분 17 | — 상위 범위 없음 |
 | Agent 연결 | 해당 없음 25 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -19,8 +19,8 @@
 ## 먼저 할 일
 
 - **구현** [N041](<16-architecture-and-validation.md#n041>) **독립 한글에서 복합 코퍼스 일괄 검수** — 합성 5종×HWP/HWPX 10/10과 manifest 계약 3/3을 통과했다. 같은 Jueony Rust/WASM 엔진의 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서와 공개 문서 코퍼스의 독립 비교는 남아 부분이다.
-- **구현** [N042](<16-architecture-and-validation.md#n042>) **한글·Jueony 인쇄/PDF 조판 비교** — 계약 4/4와 2쪽 표·그림·필드 복합 문서의 HWP/HWPX baseline 2/2를 통과했다. 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 fingerprint 비교는 실행하지 않아 부분이다.
-- **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — 정책·coordinator 15/15와 strict TypeScript 검사를 통과했다. 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증은 미연결·미실행이라 부분이다.
+- **구현** [N042](<16-architecture-and-validation.md#n042>) **한글·Jueony 인쇄/PDF 조판 비교** — A4 가로 PDF 두 장에 합성 문서 5쪽을 모아찍고 용지 크기와 원본 바이트를 확인했다. Jueony의 HWP/HWPX 조판 기준 2건 통과. 독립 한글 PDF·폰트·실물 출력 비교가 남았다.
+- **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — Windows 파일의 권한·잠금·외부 수정·HWP/HWPX/HWT 사본 보존 11건을 검증했다. 개발판의 실제 파일 선택창에서 합성 HWP·HWPX를 열고 사본의 바이트 또는 XML 본문을 확인했다. Chrome과 변경된 Windows 개발판에서 외부 수정 원인과 다른 이름 저장·재열기 안내를 확인했다. Windows 저장 선택창으로 편집 내용을 별도 HWPX에 저장했고 디스크 원본과 사본의 본문이 각각 보존됐다. 기관 ACL과 서명 설치본은 별도다.
 
 ## 기능별 작업표
 
@@ -55,7 +55,7 @@
 | [R08](<16-architecture-and-validation.md#r08>) · 작업 | 환경과 보기 상태 모듈 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [R09](<16-architecture-and-validation.md#r09>) · 작업 | 모델 연결과 제공자 adapter 경계 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [R10](<16-architecture-and-validation.md#r10>) · 작업 | Agent 실행과 context 조립 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R11](<16-architecture-and-validation.md#r11>) · 작업 | 매크로와 업무 템플릿 경계 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R11](<16-architecture-and-validation.md#r11>) · 작업 | 매크로와 업무 템플릿 경계 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [R12](<16-architecture-and-validation.md#r12>) · 작업 | Session과 UI controller로 shell 해체 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [R13](<16-architecture-and-validation.md#r13>) · 작업 | iframe와 빌드 패치 의존을 adapter로 격리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [R14](<16-architecture-and-validation.md#r14>) · 작업 | 기존 상태와 자격증명 호환 최종 검수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
@@ -192,9 +192,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
 - 완료 범위: 현재 HWP/HWPX/TXT/MD와 선택 범위/한도/임시 수명 유지;열린 미저장 자료 우선;다른 업무 자료 차단
-- 다음 작업: 자료 adapter·검색 facade·hash Port 적용; 등록/추출 repository/Parser Port 통합 남음
+- 다음 작업: 선택 자료 조회와 백그라운드 색인에 공통 읽기 경로를 적용했다. Chrome에서 선택한 HWPX를 열어 미저장 내용을 모델 요청에서 읽고 원본 파일을 바이트 단위로 보존했다. 다른 업무·닫힌 탭·연결 변경·취소 범위를 검사했다. 등록·추출 저장소와 파서 통합이 남았다.
 - 선행 작업: [R04](<16-architecture-and-validation.md#r04>) · [R06](<16-architecture-and-validation.md#r06>)
-- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>)
+- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>) · [workspace-reference-reader.ts](<../../apps/editor/src/composition/workspace-reference-reader.ts>) · [workspace-reference-reader.test.ts](<../../apps/editor/tests/workspace-reference-reader.test.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `PARTIAL`
 
 </details>
@@ -234,9 +234,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
 - 완료 범위: single/bounded 동작 유지;최종 한 번 적용;취소/문서 변경/새 문서/부분 실패/실행 기록 검증;DOM/provider 직접 의존 없음
-- 다음 작업: 문맥·single/bounded 실행 facade 적용; RunRepository 및 화면 기록 조정 이관 남음
+- 다음 작업: 장문 조회 조건·선택 자료와 검색·편집 기록의 입력값 가림을 문맥 조립 코드에 이관했다. AI와 반복 작업 실행 기록의 추가·조회는 같은 업무 상태에 연결한 저장소 계약을 사용한다. Chrome에서 문서 저장·재열기·되돌리기 및 편집기를 다시 열 때 채팅별 기록의 보존과 분리를 확인했다. 화면의 실행 상태 조정 추가 이관이 남았다.
 - 선행 작업: [R04](<16-architecture-and-validation.md#r04>) · [R06](<16-architecture-and-validation.md#r06>) · [R07](<16-architecture-and-validation.md#r07>) · [R09](<16-architecture-and-validation.md#r09>)
-- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>)
+- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>) · [agent-context.ts](<../../apps/editor/src/composition/agent-context.ts>) · [workspace-run-repository.ts](<../../apps/editor/src/adapters/storage/workspace-run-repository.ts>) · [agent-context.test.ts](<../../apps/editor/tests/agent-context.test.ts>) · [workspace-run-repository.test.ts](<../../apps/editor/tests/workspace-run-repository.test.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `PARTIAL`
 
 </details>
@@ -245,13 +245,13 @@
 <summary>R11 · 매크로와 업무 템플릿 경계 분리</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 현행 7명령/대상 유일성/한 요청 undo 유지;독자 엔진 실행 없음;기존 macro v1 자료 유지
-- 다음 작업: Automation facade·명령 재생 적용; macro repository와 화면 조정 일부 남음
+- 다음 작업: 명령과 수동 기록의 업무별 저장 경계 및 변수·대상 화면을 분리했다. Chrome에서 AI 편집으로 반복 작업을 생성하고 대상에 재생했다. 이름 변경과 삭제를 다시 열어 확인했고 다른 업무에 나타나지 않았다. 기존 형식의 본문 반복 작업도 재생했다. 저장 실패 뒤 이전 기록과 다음 저장을 보존한다.
 - 선행 작업: [R04](<16-architecture-and-validation.md#r04>) · [R06](<16-architecture-and-validation.md#r06>)
-- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>)
-- 원래 기록: `PARTIAL`
+- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [workspace-macro-repository.ts](<../../apps/editor/src/adapters/storage/workspace-macro-repository.ts>) · [command-macros.ts](<../../apps/editor/src/ui/command-macros.ts>) · [workspace-macro-repository.test.ts](<../../apps/editor/tests/workspace-macro-repository.test.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `SCOPED_MACRO_REPOSITORY_VERIFIED_2026_11_22`
 
 </details>
 
@@ -262,9 +262,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
 - 완료 범위: shell은 조립/화면 연결만 소유;UI의 DB/LLM/WASM 직접 호출 없음;업무 전환/닫기/복구/포커스 흐름 유지
-- 다음 작업: Session/설정 UI 분리·typed iframe client 적용; 자료/메시지/복원 UI 추가 분리 남음
+- 다음 작업: 업무 정렬·자료 폴더·임시 첨부·채팅 결과·종료 확인·문서 열기와 저장·인용 위치 이동을 분리했다. Chrome에서 같은 원본의 탭 재사용과 로컬 AI가 인용한 PDF 쪽·Word 문단·Excel 셀을 확인했다. 변경된 Windows 개발판에서 원본 충돌 안내와 두 파일 버전 보존을 확인했다. 이전 Windows 종료 확인에서 취소·복구본 보관·재실행을 검증했다. 문서 수명과 화면 상태 처리의 추가 이관이 남았다.
 - 선행 작업: [R05](<16-architecture-and-validation.md#r05>) · [R06](<16-architecture-and-validation.md#r06>) · [R07](<16-architecture-and-validation.md#r07>) · [R08](<16-architecture-and-validation.md#r08>) · [R10](<16-architecture-and-validation.md#r10>) · [R11](<16-architecture-and-validation.md#r11>)
-- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>)
+- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>) · [alignment-macros.ts](<../../apps/editor/src/ui/alignment-macros.ts>) · [reference-index-refresh.ts](<../../apps/editor/src/composition/reference-index-refresh.ts>) · [reference-panel.ts](<../../apps/editor/src/ui/reference-panel.ts>) · [chat-messages.ts](<../../apps/editor/src/ui/chat-messages.ts>) · [native-exit-dialog.ts](<../../apps/editor/src/ui/native-exit-dialog.ts>) · [workspace-recovery.ts](<../../apps/editor/src/composition/workspace-recovery.ts>) · [document-file-actions.ts](<../../apps/editor/src/composition/document-file-actions.ts>) · [reference-citations.ts](<../../apps/editor/src/composition/reference-citations.ts>) · [reference-citation-dialog.ts](<../../apps/editor/src/ui/reference-citation-dialog.ts>) · [document-file-actions.test.ts](<../../apps/editor/tests/document-file-actions.test.ts>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
 - 원래 기록: `PARTIAL`
 
 </details>
@@ -288,12 +288,12 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 업무/채팅/탭/설정/매크로/키를 초기화 없이 유지;모듈 간 영역 보존;미지원 새 버전 거부;평문 fallback 없음
-- 다음 작업: 기존 기록은 VERIFIED_BASE(첫 이관 기준선)만 확인했다. 남은 모듈 이관 후 최종 호환/통합 회귀를 다시 확인한다.
+- 다음 작업: 실제 Windows DPAPI 키 저장·복원·교체·삭제를 검증했다. 이름 없는 한글 제어 문자가 기록된 기존 업무 상태도 다시 열 수 있게 수정했다. 남은 모듈의 기존 데이터 검사가 필요하다.
 - 선행 작업: [R12](<16-architecture-and-validation.md#r12>) · [R13](<16-architecture-and-validation.md#r13>)
-- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>)
-- 원래 기록: `VERIFIED_BASE`
+- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [connection-store.test.mjs](<../../apps/launcher/tests/connection-store.test.mjs>) · [connection-persistence.test.mjs](<../../apps/launcher/tests/connection-persistence.test.mjs>) · [workspace-state.test.ts](<../../apps/editor/tests/workspace-state.test.ts>)
+- 원래 기록: `VERIFIED_BASE;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -302,12 +302,12 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NA**.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 경계 위반 신규 0;기존 검증 동작 회귀 없음;문서·데이터 보존;가짜와 실제 adapter 계약 일치;미검증 한글 항목 별도 공개
-- 다음 작업: 기존 기록은 VERIFIED_BASE(첫 이관 기준선)만 확인했다. 남은 모듈 이관 후 최종 호환/통합 회귀를 다시 확인한다.
+- 다음 작업: 편집기와 실행기·파일 저장 검증 및 11개 모듈 경계를 재검사했다. 독립 한글과 미이관 모듈의 최종 통합은 남았다.
 - 선행 작업: [R14](<16-architecture-and-validation.md#r14>)
-- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>)
-- 원래 기록: `VERIFIED_BASE`
+- 근거: [refactor-work-plan.csv](<../refactor-work-plan.csv>) · [32-modular-refactor-result.md](<../32-modular-refactor-result.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `VERIFIED_BASE;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -383,9 +383,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 Jueony published layout baseline·쪽 수/텍스트 재조판/개체 위치 결함 분류·교차 생산자와 글꼴 지문 fail-closed
-- 다음 작업: 계약 4/4와 2쪽 표·그림·필드 복합 문서의 HWP/HWPX baseline 2/2를 통과했다. 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 fingerprint 비교는 실행하지 않아 부분이다.
+- 다음 작업: A4 가로 PDF 두 장에 합성 문서 5쪽을 모아찍고 용지 크기와 원본 바이트를 확인했다. Jueony의 HWP/HWPX 조판 기준 2건 통과. 독립 한글 PDF·폰트·실물 출력 비교가 남았다.
 - 상위 항목: [B019](<15-output-and-tools.md#b019>) 인쇄 미리 보기
-- 근거: [04-compatibility-validation.md](<../04-compatibility-validation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 근거: [04-compatibility-validation.md](<../04-compatibility-validation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;JUEONY_PRINT_LAYOUT_BASELINE_2026_11_09`
 
 </details>
@@ -397,10 +397,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: picker 취소 no-op와 봉인 증거 preflight 뒤 temp write/flush·final probe/revalidate·atomic compare-replace/readback을 순서화하고 race에는 replace 0회·실패에는 cleanup을 요구하며 committed 뒤 readback 문제는 save-state-uncertain과 reopen으로 분류해 원본 불변을 주장하지 않음
-- 다음 작업: 정책·coordinator 15/15와 strict TypeScript 검사를 통과했다. 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증은 미연결·미실행이라 부분이다.
+- 다음 작업: Windows 파일의 권한·잠금·외부 수정·HWP/HWPX/HWT 사본 보존 11건을 검증했다. 개발판의 실제 파일 선택창에서 합성 HWP·HWPX를 열고 사본의 바이트 또는 XML 본문을 확인했다. Chrome과 변경된 Windows 개발판에서 외부 수정 원인과 다른 이름 저장·재열기 안내를 확인했다. Windows 저장 선택창으로 편집 내용을 별도 HWPX에 저장했고 디스크 원본과 사본의 본문이 각각 보존됐다. 기관 ACL과 서명 설치본은 별도다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;WINDOWS_FILE_PREFLIGHT_POLICY_2026_11_09;WINDOWS_ATOMIC_SAVE_COORDINATOR_2026_11_09`
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>) · [verify-native-file-storage.mjs](<../../apps/editor/scripts/verify-native-file-storage.mjs>) · [verify-agent-files.mjs](<../../apps/editor/scripts/verify-agent-files.mjs>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;WINDOWS_FILE_PREFLIGHT_POLICY_2026_11_09;WINDOWS_ATOMIC_SAVE_COORDINATOR_2026_11_09;SCOPED_CHECKLIST_COMPLETION_2026_11_21`
 
 </details>
 
@@ -410,11 +410,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157의 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증
-- 다음 작업: 실제 Edge 3 scenarios PASS이며 page/console/external/missing resource가 모두 0이었다. 실제 app boot/shell 주입과 Tauri/Windows 비정상 종료·사용자 문서 복구는 남아 부분이다.
+- 완료 범위: 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157의 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증 실제 앱 업무 저장소의 복구본 쓰기·삭제와 창 종료도 최신 기록 대조 및 엄격한 트랜잭션 완료에 연결.
+- 다음 작업: Chrome·고정 WebView2·Windows Tauri에서 종료 뒤 복구를 검증했다. Tauri 강제 종료 후 HWPX 미저장 글자와 무결성 값이 복원됐다. 실제 Windows 종료 확인창에서 취소와 복구본 보관 종료를 통과했고 재실행 뒤 글자와 원본 바이트를 확인했다. 전체 OS·저장 장치 장애가 남았다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [indexeddb-recovery-checkpoint-n044.ts](<../../apps/editor/src/adapters/storage/indexeddb-recovery-checkpoint-n044.ts>) · [recovery-checkpoint-lifecycle-n044.ts](<../../apps/editor/src/composition/recovery-checkpoint-lifecycle-n044.ts>) · [verify-recovery-checkpoint-browser-n044.mjs](<../../apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs>) · [recovery-checkpoint-browser-n044.ts](<../../apps/editor/scripts/fixtures/recovery-checkpoint-browser-n044.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;RECOVERY_CHECKPOINT_TRANSACTION_2026_11_09;INDEXEDDB_RECOVERY_CHECKPOINT_CAS_2026_11_09;RECOVERY_CHECKPOINT_LIFECYCLE_2026_11_09;EDGE_INDEXEDDB_RECOVERY_VERIFICATION_2026_11_09`
+- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [indexeddb-recovery-checkpoint-n044.ts](<../../apps/editor/src/adapters/storage/indexeddb-recovery-checkpoint-n044.ts>) · [recovery-checkpoint-lifecycle-n044.ts](<../../apps/editor/src/composition/recovery-checkpoint-lifecycle-n044.ts>) · [verify-recovery-checkpoint-browser-n044.mjs](<../../apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs>) · [recovery-checkpoint-browser-n044.ts](<../../apps/editor/scripts/fixtures/recovery-checkpoint-browser-n044.ts>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [verify-recovery-integrity.mjs](<../../apps/editor/scripts/verify-recovery-integrity.mjs>) · [verify-close-recovery.mjs](<../../apps/editor/scripts/verify-close-recovery.mjs>) · [indexeddb-workspace.ts](<../../apps/editor/src/adapters/storage/indexeddb-workspace.ts>) · [verify-document-lifecycle.mjs](<../../apps/editor/scripts/verify-document-lifecycle.mjs>) · [verify-workspace-checkpoint-webview.mjs](<../../apps/editor/scripts/verify-workspace-checkpoint-webview.mjs>) · [106-recovery-integrity.md](<../106-recovery-integrity.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;RECOVERY_CHECKPOINT_TRANSACTION_2026_11_09;INDEXEDDB_RECOVERY_CHECKPOINT_CAS_2026_11_09;RECOVERY_CHECKPOINT_LIFECYCLE_2026_11_09;EDGE_INDEXEDDB_RECOVERY_VERIFICATION_2026_11_09;SCOPED_CHECKLIST_COMPLETION_2026_11_21;WORKSPACE_STRICT_CHECKPOINT_2026_11_22`
 
 </details>
 
@@ -425,9 +425,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 로컬 WASM·런타임·폰트·third-party notices·hash와 기관 endpoint allowlist를 fail-closed 검사하고 외부 URL을 분류하는 오프라인 번들 감사 계약
-- 다음 작업: commit 7d2bea41 기준 WebView2 고정 버전 오프라인 manifest에 정확한 버전·아키텍처·로컬 경로·SHA-256·license/notice 바이트와 링크 검증을 추가하고 7/7을 통과했다. 범위 버전·경로 탈출·변조·누락은 fail-closed다. 최종 설치본의 실제 runtime 로딩·패키지 서명·기관 allowlist/배포 승인과 AI 제외 endpoint 확인은 남아 FAIL/PARTIAL 배포 차단을 유지한다.
-- 근거: [06-license-inventory.md](<../06-license-inventory.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [offline-font-source-patches.mjs](<../../apps/editor/scripts/integration/offline-font-source-patches.mjs>) · [offline-font-source-patches.test.ts](<../../apps/editor/tests/offline-font-source-patches.test.ts>) · [n045-offline-contract.mjs](<../../apps/editor/scripts/lib/n045-offline-contract.mjs>) · [n045-offline-contract.test.ts](<../../apps/editor/tests/n045-offline-contract.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;OFFLINE_BUNDLE_AUDIT_2026_11_09;CDN_FONT_LITERALS_REMOVED_256;EXTERNAL_ENDPOINTS_REMAINING_5;WEBVIEW2_FIXED_RUNTIME_MANIFEST_2026_11_09;FAIL_OFFLINE_BUNDLE`
+- 다음 작업: 기관 오프라인 빌드의 로컬 파일 305개와 공식 WebView2 고정 런타임·약관·고지를 검증했다. 실제 Windows WebView2 검수 창에서 HWPX와 외부 모델 기본 거절을 확인했다. 기관 서명 설치본과 실제 기관망이 남았다.
+- 근거: [06-license-inventory.md](<../06-license-inventory.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [offline-font-source-patches.mjs](<../../apps/editor/scripts/integration/offline-font-source-patches.mjs>) · [offline-font-source-patches.test.ts](<../../apps/editor/tests/offline-font-source-patches.test.ts>) · [n045-offline-contract.mjs](<../../apps/editor/scripts/lib/n045-offline-contract.mjs>) · [n045-offline-contract.test.ts](<../../apps/editor/tests/n045-offline-contract.test.ts>) · [146-ieumoffice-followup.md](<../146-ieumoffice-followup.md>) · [manifest.json](<../evidence/ieum-followup-2026-11-21/manifest.json>) · [147-checklist-completion.md](<../147-checklist-completion.md>) · [manifest.json](<../evidence/checklist-completion-2026-11-21/manifest.json>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;OFFLINE_BUNDLE_AUDIT_2026_11_09;CDN_FONT_LITERALS_REMOVED_256;EXTERNAL_ENDPOINTS_REMAINING_5;WEBVIEW2_FIXED_RUNTIME_MANIFEST_2026_11_09;FAIL_OFFLINE_BUNDLE;SCOPED_IEUM_FOLLOWUP_2026_11_21`
 
 </details>
 

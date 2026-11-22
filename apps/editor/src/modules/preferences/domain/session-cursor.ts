@@ -1,5 +1,6 @@
 import {validateTextBoxBookmark} from './textbox-bookmark.ts';
 import {validateEndnoteSelectionBookmark} from './endnote-bookmark.ts';
+import {parseMixedRootSelectionBookmarkN015,parseSingleEquationSelectionBookmarkN015} from './root-object-bookmarks.ts';
 import type { SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, ObjectSelectionBookmark, ObjectSelectionEntry, RootClickHereFieldSelectionBookmarkN016 } from '../public/contracts.ts';
 import {validateBodyCaret} from './body-caret.ts';
 const integer = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 2147483647;
@@ -63,6 +64,8 @@ export function validateSessionCursor(value: any): SessionCursor | undefined {
   if(value?.kind==='textbox')return validateTextBoxBookmark(value);
   if(value?.kind==='endnote-selection')return validateEndnoteSelectionBookmark(value);
   if(value?.kind==='object-selection')return objectSelection(value);
+  if(value?.kind==='mixed-root-object-selection')return parseMixedRootSelectionBookmarkN015(value);
+  if(value?.kind==='single-root-equation-selection')return parseSingleEquationSelectionBookmarkN015(value);
   if(value?.kind==='root-clickhere-field-selection')return rootClickHereFieldSelection(value);
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const focus = point(value.focus); if (!focus) return;

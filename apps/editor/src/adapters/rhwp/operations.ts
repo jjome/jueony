@@ -7,6 +7,7 @@ import {prepareAxisFormulaUpdates} from './table-axis-formulas.ts';
 import {verifyPreservedExport} from './preservation.ts';
 import {executeRowHeights} from './row-heights.ts';
 import {executeEqualColumns} from './equal-columns.ts';
+import {executeAgentPageBorderInclusion,executeAgentPageBorderInclusions} from './agent-page-border-inclusion.ts';
 import {executeCellPadding} from './cell-padding.ts';
 import {assertNativeTableWritable,protectedTableEvidence,assertProtectedTableUnchanged} from './table-write-guard.ts';
 import {executeAgentTableHeader} from './agent-table-header.ts';
@@ -31,6 +32,7 @@ import {executeAgentSectionSplit} from './agent-section-split.ts';
 import {executeAgentSectionOperation} from './agent-section-settings.ts';
 import {executeAgentPageBackground} from './agent-page-background.ts';
 import {executeAgentMasterPage} from './agent-master-pages.ts';
+import {executeAgentStoredCharacterStyle} from './agent-stored-character-style.ts';
 import { tableAxisKinds, controlKinds, charRules, tableAxisPlan, pageProperties, selectedCells, mm } from '../../modules/document/public/engine-integration.ts';
 export { controlKinds };
 const fail = (message: string): never => { throw new Error(message); };
@@ -78,6 +80,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
   if(op.kind==='split_section'){executeAgentSectionSplit(doc,snapshot,op);return;}
   if(op.kind==='set_section_tabs'||op.kind==='set_line_numbers'){executeAgentSectionOperation(doc,snapshot.name,op);return;}
   if(op.kind==='set_page_background'){executeAgentPageBackground(doc,op);return;}
+  if(op.kind==='set_page_border_inclusion'){executeAgentPageBorderInclusions(doc,snapshot,op);return;}
   if(op.kind==='set_master_page_text'||op.kind==='delete_master_page'){executeAgentMasterPage(doc,snapshot.name,op);return;}
   if(op.kind==='apply_paragraph_style') {const n=snapshot.nodes.find(n=>n.id===op.target)!;checked(doc.applyStyle(n.section,n.paragraph,op.styleId));return;}
   if(op.kind==='set_columns'){checked(doc.setColumnDef(op.section,op.count,0,1,mm(op.spacingMm)));return;}
@@ -86,7 +89,12 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const flags={...parsed(doc.getPageHide(n.section,n.paragraph)),...op.properties};
     checked(doc.setPageHide(n.section,n.paragraph,...['hideHeader','hideFooter','hideMasterPage','hideBorder','hideFill','hidePageNum'].map(key=>flags[key]===true)));return;
   }
-  if (op.kind === 'set_page_setup') { checked(doc.setPageDef(op.section, JSON.stringify(pageProperties(parsed(doc.getPageDef(op.section)), op.properties)))); return; }
+  if (op.kind === 'set_page_setup') {
+    if(Object.hasOwn(op.properties,'borderIncludesHeader')||Object.hasOwn(op.properties,'borderIncludesFooter')){
+      executeAgentPageBorderInclusion(doc,snapshot,op.section,op.properties);
+    }else checked(doc.setPageDef(op.section,JSON.stringify(pageProperties(parsed(doc.getPageDef(op.section)),op.properties))));
+    return;
+  }
   if(tableAxisKinds.includes(op.kind)) {
     const axis=op as Extract<ControlOp,{index:number}>,table=tables.get(axis.target)!;
     assertNativeTableWritable(doc,table);
@@ -162,6 +170,9 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     } finally { if(undo!==undefined)doc.discardSnapshot(undo); }
   }
   if (op.kind === 'format_characters' || op.kind === 'format_paragraph') {
+    if(op.kind==='format_characters'&&Object.hasOwn(op.properties,'storedStyle')){
+      executeAgentStoredCharacterStyle(doc,snapshot,op.target,op.properties);return;
+    }
     const n = snapshot.nodes.find(n => n.id === op.target)!;
     if (op.kind === 'format_characters') checked(doc.applyCharFormat(n.section, n.paragraph, 0, doc.getParagraphLength(n.section, n.paragraph), JSON.stringify(charProperties(doc,op.properties))));
     else {

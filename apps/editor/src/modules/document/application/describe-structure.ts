@@ -6,7 +6,9 @@ const character = (p: DocumentProperties) => `${p.fontFamily ?? ''} ${numeric(p.
 const paragraph = (p: DocumentProperties) => `${(typeof p.alignment==='string'?alignments[p.alignment]:undefined) ?? p.alignment} 정렬 · 줄 간격 ${p.lineSpacing} · 왼쪽/오른쪽 여백 ${mm(p.marginLeft ?? 0)}/${mm(p.marginRight ?? 0)}mm · 들여쓰기 ${mm(p.indent ?? 0)}mm · 앞/뒤 간격 ${mm(p.spacingBefore ?? 0)}/${mm(p.spacingAfter ?? 0)}mm`;
 export function describeStructure(s?: Structure) {
  if (!s) return '이전 기록에는 구조 정보가 없습니다.';
- const capability = s.sectionMergeAvailable===true?'엔진 지원 있음; 두 일반 본문 구역의 추가 원본 검사 필요':'지원 없음';
+ const capability = s.sectionMergeAvailable === true
+   ? '두 한 단 본문 구역을 대상으로 원본 확인 · 뒤 구역 첫 문단 아래의 일반 평면 표 한 개 이동 가능'
+   : '지원 없음';
  const lines = s.sections.map(({ index, page: p }) => `구역 ${index + 1}: ${mm(p.width)}×${mm(p.height)}mm ${p.landscape ? '가로' : '세로'} · 여백 좌/우/위/아래 ${mm(p.marginLeft)}/${mm(p.marginRight)}/${mm(p.marginTop)}/${mm(p.marginBottom)}mm`);
  lines.push(`AI 구역 합치기: ${capability} · 뒤 구역 설정은 앞 구역 설정을 따릅니다.`);
  s.sections.forEach(s=>{if(s.columns)lines.push(`구역 ${s.index+1} 단 설정: ${JSON.stringify(s.columns)}`);});

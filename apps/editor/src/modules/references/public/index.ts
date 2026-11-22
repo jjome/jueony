@@ -1,4 +1,10 @@
 export type {Source,RetrievalScope,SourceChunk,RetrievalHit,RetrievalSummary,RetrievalIndex,RetrievedSource} from './contracts.ts';
+export type {RetrievalMode} from './contracts.ts';
+export type {HwpReferenceAddress,HwpReferenceCell,OfficeTextReferenceAddress,SpreadsheetReferenceAddress,SourceAddress,SourceLocation,SourceVersion} from './contracts.ts';
+export {MAX_SOURCE_LOCATIONS,describeSourceAddress,findSpreadsheetLocation,parseOfficeTextQuery,sourceLocationsInRange,validSourceLocations} from '../domain/source-locations.ts';
+export {tokenizeForSearch} from '../domain/korean-ranking.ts';
 export {createReferenceFacade} from '../application/facade.ts';
 export type {ReferenceFacade} from '../application/facade.ts';
 export type {ContentHashPort} from '../ports/content-hash.ts';
+export type {RankedIndexPort} from '../ports/ranked-index.ts';
+export {findSourceTextOffset} from '../domain/lookup-text.ts';

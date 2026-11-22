@@ -12,7 +12,7 @@ const config=()=>({modelId:'HCX-007',endpoint,maxOutputTokens:2048});
 const generate=(request,signal=new AbortController().signal)=>createHyperCLOVA(config(),'fixture-secret').generate(input(request),signal);
 before(async()=>{
  provider=http.createServer(async(req,res)=>{
-  let raw='';for await(const part of req)raw+=part;
+  req.setEncoding('utf8');let raw='';for await(const part of req)raw+=part;
   const body=JSON.parse(raw),data=JSON.parse(body.messages[1].content);calls.push({url:req.url,headers:req.headers,body,data});
   if(data.instruction==='unauthorized'){res.writeHead(401);res.end('fixture-secret');return;}
   if(data.instruction==='quota'){res.writeHead(429);res.end('fixture-secret');return;}

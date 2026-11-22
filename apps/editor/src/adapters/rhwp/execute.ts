@@ -1,6 +1,7 @@
 import {formulaInputTarget,refreshFormulaInput} from './table-formula-input.ts';
 import {agentFileKinds} from '../../modules/document/public/index.ts';
 import {executeAgentDocumentMetadata} from './agent-document-information.ts';
+import {executeShapeFill} from './agent-shape-fill.ts';
 import {executeCellParagraph} from './cell-paragraph.ts';
 import {executeTableSubdivision} from './table-subdivision.ts';
 import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
@@ -8,7 +9,7 @@ import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
 import {executeNestedCellEdit} from './nested-cell-edit.ts';
-import {executeNestedTableAxis} from './nested-table-axis.ts';
+import {executeNestedRowReshape,executeNestedTableAxis} from './nested-table-axis.ts';
 import {insertAgentTableFormula} from './insert-agent-table-formula.ts';
 import {updateTableFormulaField} from './update-table-formula-field.ts';
 import {agentSeriesRange} from '../../modules/document/public/engine-integration.ts';
@@ -28,6 +29,10 @@ import { nativeDocument } from './structure.ts';
 export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[], copyMetrics?:SubdivisionCopyMetrics) {
   if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
+  const first=operations[0];
+  if(operations.length===1&&first.kind==='set_shape_fill'){executeShapeFill(doc,snapshot,first);return;}
+  if(operations.length===1&&(first.kind==='merge_table_cells'||first.kind==='split_table_cell')&&
+     snapshot.structure?.nestedTables?.some(table=>table.id===first.target))return executeNestedRowReshape(doc,snapshot,first);
   const nestedAxis=operations.find(op=>'index' in op && 'target' in op && /^(insert|delete)_table_(row|column)$/u.test(op.kind) &&
     snapshot.structure?.nestedTables?.some(t=>t.id===op.target));
   if(nestedAxis&&'index' in nestedAxis){
@@ -73,7 +78,7 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
   }
   if(operations.length===1&&operations[0].kind==='set_document_metadata'){executeAgentDocumentMetadata(doc,snapshot,operations[0]);return;}
   if(operations.length===1&&operations[0].kind==='remove_empty_section')return executeAgentEmptySection(doc,snapshot,operations[0]);
-  if(operations.length===1&&operations[0].kind==='merge_sections')return executeAgentSectionMerge(doc,snapshot,operations[0]);
+  if(operations.length===1&&operations[0].kind==='merge_sections')return executeAgentSectionMerge(wasm,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_table_cells')return executeTableMerge(doc,snapshot,operations[0]);
   if(operations.length===1&&(operations[0].kind==='split_table'||operations[0].kind==='attach_table'))return executeTableStructure(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='replace_cell_paragraph')return executeCellParagraph(doc,snapshot,operations[0]);

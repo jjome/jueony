@@ -8,7 +8,7 @@ let server,provider,token,logs='',calls=[];
 const input={request:'test',document:{nodes:[]},references:[],history:[]};
 before(async()=>{
  provider=http.createServer(async(req,res)=>{
-  let bytes='';for await(const chunk of req)bytes+=chunk;
+  req.setEncoding('utf8');let bytes='';for await(const chunk of req)bytes+=chunk;
   const body=JSON.parse(bytes);calls.push({body,authorization:req.headers.authorization,url:req.url});
   if(req.url.startsWith('/v3/chat-completions/')){
    res.setHeader('Content-Type','application/json');res.end(JSON.stringify({status:{code:'20000'},result:{finishReason:'stop',message:{role:'assistant',content:JSON.stringify({message:'연결 확인',operations:[],sourceIds:[]})}}}));return;

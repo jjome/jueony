@@ -1,3 +1,4 @@
+import {isSupportedReferenceName} from './references.ts';
 export type TemporaryReference={id:string;workspaceId:string;chatId:string;file:File};
 // Browser session only: bytes never enter workspace history or the credential store.
 export class TemporaryReferences {
@@ -6,7 +7,7 @@ export class TemporaryReferences {
  add(workspaceId:string,chatId:string,files:File[]){
   const next=[...this.items];
   for(const file of files){
-   if(!/\.(hwp|hwpx|txt|md)$/i.test(file.name))throw new Error('참고 첨부는 HWP/HWPX/TXT/MD만 지원합니다: '+file.name);
+   if(!isSupportedReferenceName(file.name))throw new Error('참고 첨부는 HWP/HWPX/TXT/MD/PDF/DOCX/XLSX를 지원합니다: '+file.name);
    if(file.size>16*1024*1024)throw new Error('첨부 파일은 16MB까지입니다: '+file.name);
    if(next.some(x=>x.workspaceId===workspaceId&&x.chatId===chatId&&x.file.name===file.name&&x.file.size===file.size&&x.file.lastModified===file.lastModified))continue;
    next.push({id:'attachment:'+crypto.randomUUID(),workspaceId,chatId,file});
